@@ -8,73 +8,108 @@
 #pragma comment(lib,"ws2_32.lib") //Linking Winsock Library
 #include <ws2tcpip.h> // Used to convert IPv4 or IPv6 addressed to standard binary and vice versa
 
+#include<string>
 
-#define SERVER //"---.---.---.---"  //ip address of udp server
-#define BUFLEN 512  //Max length of buffer
+#define SERVER "192.168.0.106"  //IP address of RBMS UDP server
+//TODO : what would be the buflen limit be and based on the limit the message send has to be restricted
+#define BUFLEN 8  //Max length of buffer including '\0' character at the end; Therefore, essentially 7 characters
+// Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define PORT 8888   //The port on which to listen for incoming data
 
 int main(void)
 {
-	struct sockaddr_in si_other;
-	int s, slen = sizeof(si_other);
+	WSADATA win_socket_struct;
+	SOCKET s;
+
+	struct sockaddr_in client_struct;
+	int client_struct_len = sizeof(client_struct);
+
 	char buf[BUFLEN];
-	char message[BUFLEN];
-	WSADATA wsa;
+	std::string buffer;
+
+	//TODO : what would be the limit and based on the limit the msg send has to be restricted
+	// char msg[BUFLEN];
+	std::string message;
 
 	//Initialise winsock
-	printf("\nInitialising Winsock...");
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+	std::cout << "\nInitialising Winsock... " << std::endl;
+	if (WSAStartup(MAKEWORD(2, 2), &win_socket_struct) != 0)
 	{
-		printf("Failed. Error Code : %d", WSAGetLastError());
+		std::cout << "Failed. Error Code : " << WSAGetLastError() << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
+	std::cout << "Initialised Winsock" << std::endl;
 
-	printf("Initialised.\n");
 	//create socket
 	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 	{
-		printf("socket() failed with error code : %d", WSAGetLastError());
+		std::cout << "Could not create socket : " << WSAGetLastError << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	//setup address structure
-	memset((char *)&si_other, 0, sizeof(si_other));
-	si_other.sin_family = AF_INET;
-	si_other.sin_port = htons(PORT);
-
-	// si_other.sin_addr.S_un.S_addr = inet_addr(SERVER);
-	
-	if(inet_pton(AF_INET, SERVER, &si_other.sin_addr.S_un.S_addr) != 1)
+	memset((char *)&client_struct, 0, sizeof(client_struct));
+	client_struct.sin_family = AF_INET;
+	if (inet_pton(AF_INET, SERVER, &client_struct.sin_addr.S_un.S_addr) != 1)
 	{
-		printf("failed to convert ipv4 or ipv6 to binary standard format");
+		std::cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError << std::endl;
 		exit(EXIT_FAILURE);
 	};
+	client_struct.sin_port = htons(PORT);
 
 
 	//start communication
 	while (1)
 	{
-		printf("Enter message : ");
-		gets_s(message,BUFLEN);
+		std::cout << "Enter message : ";
+		std::cin >> message;
+
+		//TODO : what would be the limit and based on the limit the msg send has to be restricted
+
+		// char * msg = new char[message.size() + 1];
+		// message.copy(msg, message.size() + 1);
+		// msg[message.size()] = '\0';
+
+		char* msg = new char[BUFLEN];
+		memset(msg, '\0', BUFLEN);
+
+		int messageSize = message.size();
+		int lastIndex = message.size();
+		if(messageSize > BUFLEN)
+		{
+			messageSize = BUFLEN;
+			lastIndex = messageSize - 1;
+		}
+
+		message.copy(msg, messageSize);
+		msg[lastIndex] = '\0';
+
+		std::cout << msg << std::endl;
 
 		//send the message
-		if (sendto(s, message, strlen(message), 0, (struct sockaddr *) &si_other, slen) == SOCKET_ERROR)
+		if (sendto(s, msg, strlen(msg), 0, (struct sockaddr *)&client_struct, client_struct_len) == SOCKET_ERROR)
 		{
-			printf("sendto() failed with error code : %d", WSAGetLastError());
+			std::cout << "sendto() failed with error code : " << WSAGetLastError << std::endl;
 			exit(EXIT_FAILURE);
 		}
+
+		// clean up dynamic char* array[]
+		memset(msg, '\0', BUFLEN);
+		delete[] msg;
 
 		//receive a reply and print it
 		//clear the buffer by filling null, it might have previously received data
 		memset(buf, '\0', BUFLEN);
 		//try to receive some data, this is a blocking call
-		if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen) == SOCKET_ERROR)
+		if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&client_struct, &client_struct_len) == SOCKET_ERROR)
 		{
-			printf("recvfrom() failed with error code : %d", WSAGetLastError());
+			std::cout << "recvfrom() failed with error code : " << WSAGetLastError << std::endl;
 			exit(EXIT_FAILURE);
 		}
-		puts(buf);
+
+		buffer = std::string(buf);
+		std::cout << "Sent Data: " << buffer << std::endl;
 	}
 
 	closesocket(s);
