@@ -3,10 +3,10 @@
 #include "pch.h"
 #include <iostream>
 
-#include "stdio.h"
+#include <cstdio>
 #include <winsock2.h>
-#pragma comment(lib,"ws2_32.lib") //Winsock Library
-#include <ws2tcpip.h>
+#pragma comment(lib,"ws2_32.lib") //Linking Winsock Library
+#include <ws2tcpip.h> // Used to convert IPv4 or IPv6 addressed to standard binary and vice versa
 
 
 #define SERVER //"---.---.---.---"  //ip address of udp server
