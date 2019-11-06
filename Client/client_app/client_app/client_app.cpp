@@ -1,5 +1,9 @@
 // client_app.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
+
+// Generate proto files from the proto file definition:
+// ..\..\..\protoc - 3.10.1 - win32\bin\protoc.exe - I = ..\..\..\Proto\ --cpp_out =. ..\..\..\Proto\messages.proto
+
 #include "pch.h"
 #include <iostream>
 
@@ -8,22 +12,30 @@
 #pragma comment(lib,"ws2_32.lib") //Linking Winsock Library
 #include <ws2tcpip.h> // Used to convert IPv4 or IPv6 addressed to standard binary and vice versa
 
-#include<string>
+#include <string>
+#include <algorithm>
+#include "messages.pb.h"
 
-#define SERVER "192.168.0.106"  //IP address of RBMS UDP server
-//TODO : what would be the buflen limit be and based on the limit the message send has to be restricted
-#define BUFLEN 8  //Max length of buffer including '\0' character at the end; Therefore, essentially 7 characters
+
+#define SERVER "192.168.0.115"  //IP address of RBMS UDP server
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
+#define BUFLEN 32768		//Max length of buffer including 
+
 #define PORT 8888   //The port on which to listen for incoming data
 
 int main(void)
 {
+	// Verify that the version of the library that we linked against is
+	// compatible with the version of the headers we compiled against.
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
+
 	WSADATA win_socket_struct;
 	SOCKET s;
 
 	struct sockaddr_in client_struct;
 	int client_struct_len = sizeof(client_struct);
 
+	char* msg = new char[BUFLEN];
 	char buf[BUFLEN];
 	std::string buffer;
 
@@ -65,27 +77,17 @@ int main(void)
 		std::cout << "Enter message : ";
 		std::cin >> message;
 
-		//TODO : what would be the limit and based on the limit the msg send has to be restricted
+		instructions::request request;
+		request.set_topic(message);
 
-		// char * msg = new char[message.size() + 1];
-		// message.copy(msg, message.size() + 1);
-		// msg[message.size()] = '\0';
+		std::cout << message << std::endl;
 
-		char* msg = new char[BUFLEN];
-		memset(msg, '\0', BUFLEN);
+		const int sizeOfRequest = request.ByteSize();
+		std::cout << sizeOfRequest << std::endl;
 
-		int messageSize = message.size();
-		int lastIndex = message.size();
-		if(messageSize > BUFLEN)
-		{
-			messageSize = BUFLEN;
-			lastIndex = messageSize - 1;
-		}
+		memset(msg, '\0', BUFLEN + 1);
 
-		message.copy(msg, messageSize);
-		msg[lastIndex] = '\0';
-
-		std::cout << msg << std::endl;
+		request.SerializeToArray(msg, sizeOfRequest);
 
 		//send the message
 		if (sendto(s, msg, strlen(msg), 0, (struct sockaddr *)&client_struct, client_struct_len) == SOCKET_ERROR)
@@ -94,22 +96,26 @@ int main(void)
 			exit(EXIT_FAILURE);
 		}
 
-		// clean up dynamic char* array[]
-		memset(msg, '\0', BUFLEN);
-		delete[] msg;
+		// FIXME :: DOESN'T Work ?? clean up dynamic char* array[]
+		// memset(msg, '\0', BUFLEN);
+		// delete[] msg;
 
 		//receive a reply and print it
 		//clear the buffer by filling null, it might have previously received data
-		memset(buf, '\0', BUFLEN);
-		//try to receive some data, this is a blocking call
-		if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&client_struct, &client_struct_len) == SOCKET_ERROR)
-		{
-			std::cout << "recvfrom() failed with error code : " << WSAGetLastError << std::endl;
-			exit(EXIT_FAILURE);
-		}
+		// memset(buf, '\0', BUFLEN);
+		// //try to receive some data, this is a blocking call
+		// if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&client_struct, &client_struct_len) == SOCKET_ERROR)
+		// {
+		// 	std::cout << "recvfrom() failed with error code : " << WSAGetLastError << std::endl;
+		// 	exit(EXIT_FAILURE);
+		// }
 
-		buffer = std::string(buf);
-		std::cout << "Sent Data: " << buffer << std::endl;
+
+		// request
+
+
+		// buffer = std::string(buf);
+		// std::cout << "Sent Data: " << buffer << std::endl;
 	}
 
 	closesocket(s);
