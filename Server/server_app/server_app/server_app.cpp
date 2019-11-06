@@ -1,6 +1,9 @@
 // server_app.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+// Generate proto files from the proto file definition:
+// ..\..\..\protoc - 3.10.1 - win32\bin\protoc.exe - I = ..\..\..\Proto\ --cpp_out =. ..\..\..\Proto\messages.proto
+
 #include "pch.h"
 #include <iostream>
 
@@ -10,12 +13,19 @@
 #include <ws2tcpip.h>	// Used to convert IPv4 or IPv6 addressed to standard binary and vice versa
 
 #include <string>
+#include <algorithm>
+#include "messages.pb.h"
 
-#define BUFLEN 512  //Max length of buffer
+// Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
+#define BUFLEN 32768		//Max length of buffer 
 #define PORT 8888   //The port on which to listen for incoming data
 
-int main()
+int main(void)
 {
+	// Verify that the version of the library that we linked against is
+	// compatible with the version of the headers we compiled against.
+	// GOOGLE_PROTOBUF_VERIFY_VERSION;
+
 	/*
 	 * Socket Variables
 	 */
@@ -96,31 +106,42 @@ int main()
 		fflush(stdout);
 
 		//clear the buffer by filling null, it might have previously received data
-		memset(buf, '\0', BUFLEN);
+		memset(buf, '\0', BUFLEN + 1);
 
-		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&client_struct, &client_struct_len)) == SOCKET_ERROR)
+		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&client_struct, &client_struct_len)) ==
+			SOCKET_ERROR)
 		{
 			std::cout << "recvfrom() failed with error code : " << WSAGetLastError << std::endl;
 			exit(EXIT_FAILURE);
 		}
 
-		buffer = std::string(buf);
+		instructions::request request;
+
+		std::cout << strlen(buf) << std::endl;
+		int sizeOfReceivedMsg = strlen(buf);
+
+		// buffer = std::string(buf);
+
+		std::cout << sizeOfReceivedMsg << std::endl;
+		request.ParseFromArray(buf, sizeOfReceivedMsg);
+
+		std::cout << "Received data:" << request.topic() << std::endl;
 
 		//print details of the client/peer and the data received
-		char printable_IP_add_buf[INET_ADDRSTRLEN];
-		if ((inet_ntop(AF_INET, &client_struct.sin_addr, printable_IP_add_buf, INET_ADDRSTRLEN)) != nullptr)
-		{
-			clientIP = std::string(printable_IP_add_buf);
-		}
+		// char printable_IP_add_buf[INET_ADDRSTRLEN];
+		// if ((inet_ntop(AF_INET, &client_struct.sin_addr, printable_IP_add_buf, INET_ADDRSTRLEN)) != nullptr)
+		// {
+		// 	clientIP = std::string(printable_IP_add_buf);
+		// }
+		//
+		// std::cout << "Data Recieved from client IP - " << clientIP << ": " << buffer << std::endl;
 
-		std::cout << "Data Recieved from client IP - " << clientIP << ": " << buffer << std::endl;
-
-		//now reply the client with the same data
-		if (sendto(s, buf, recv_len, 0, (struct sockaddr*)&client_struct, client_struct_len) == SOCKET_ERROR)
-		{
-			std::cout << "sendto() failed with error code : " << WSAGetLastError << std::endl;
-			exit(EXIT_FAILURE);
-		}
+		// //now reply the client with the same data
+		// if (sendto(s, buf, recv_len, 0, (struct sockaddr*)&client_struct, client_struct_len) == SOCKET_ERROR)
+		// {
+		// 	std::cout << "sendto() failed with error code : " << WSAGetLastError << std::endl;
+		// 	exit(EXIT_FAILURE);
+		// }
 	}
 
 	closesocket(s);
