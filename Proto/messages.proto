@@ -1,0 +1,30 @@
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+
+// To compile and generate the cpp files for this proto files, run the following commands:
+// cd C:\...\COEN445-Autonomous-Roombooking\
+// protobuf_exe\protoc.exe -I=. --cpp_out=..\Client\client_app\client_app\ --cpp_out=..\Server\server_app\server_app  instructions_contract.proto
+// The above command should generate the cpp files for the contract in both the server and the client app
+
+syntax = "proto3";
+package instructions;
+
+// import "include/google/protobuf/timestamp.proto";
+
+message request {
+  int32 requestId = 1;  
+  string date = 2;
+  string time = 3;
+  int32 minimum = 4;
+  repeated string inviteParticipant = 5;
+  string topic = 6;
+
+  // google.protobuf.Timestamp last_updated = 7;
+  // required map<string, string> listParticipants = 8;
+}
+
+message response{
+  int32 requestId = 1;
+  string description = 2;
+}
