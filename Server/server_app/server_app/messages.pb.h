@@ -54,24 +54,24 @@ struct TableStruct_messages_2eproto {
   static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_messages_2eproto;
-namespace instructions {
+namespace messages {
 class request;
 class requestDefaultTypeInternal;
 extern requestDefaultTypeInternal _request_default_instance_;
 class response;
 class responseDefaultTypeInternal;
 extern responseDefaultTypeInternal _response_default_instance_;
-}  // namespace instructions
+}  // namespace messages
 PROTOBUF_NAMESPACE_OPEN
-template<> ::instructions::request* Arena::CreateMaybeMessage<::instructions::request>(Arena*);
-template<> ::instructions::response* Arena::CreateMaybeMessage<::instructions::response>(Arena*);
+template<> ::messages::request* Arena::CreateMaybeMessage<::messages::request>(Arena*);
+template<> ::messages::response* Arena::CreateMaybeMessage<::messages::response>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
-namespace instructions {
+namespace messages {
 
 // ===================================================================
 
 class request :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:instructions.request) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:messages.request) */ {
  public:
   request();
   virtual ~request();
@@ -151,7 +151,7 @@ class request :
   void InternalSwap(request* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "instructions.request";
+    return "messages.request";
   }
   private:
   inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
@@ -273,7 +273,7 @@ class request :
   void _internal_set_minimum(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // @@protoc_insertion_point(class_scope:instructions.request)
+  // @@protoc_insertion_point(class_scope:messages.request)
  private:
   class _Internal;
 
@@ -290,7 +290,7 @@ class request :
 // -------------------------------------------------------------------
 
 class response :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:instructions.response) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:messages.response) */ {
  public:
   response();
   virtual ~response();
@@ -370,7 +370,7 @@ class response :
   void InternalSwap(response* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "instructions.response";
+    return "messages.response";
   }
   private:
   inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
@@ -423,7 +423,7 @@ class response :
   void _internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // @@protoc_insertion_point(class_scope:instructions.response)
+  // @@protoc_insertion_point(class_scope:messages.response)
  private:
   class _Internal;
 
@@ -452,7 +452,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 request::_internal_requestid() const {
   return requestid_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 request::requestid() const {
-  // @@protoc_insertion_point(field_get:instructions.request.requestId)
+  // @@protoc_insertion_point(field_get:messages.request.requestId)
   return _internal_requestid();
 }
 inline void request::_internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -461,7 +461,7 @@ inline void request::_internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 valu
 }
 inline void request::set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_requestid(value);
-  // @@protoc_insertion_point(field_set:instructions.request.requestId)
+  // @@protoc_insertion_point(field_set:messages.request.requestId)
 }
 
 // string date = 2;
@@ -469,15 +469,15 @@ inline void request::clear_date() {
   date_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline const std::string& request::date() const {
-  // @@protoc_insertion_point(field_get:instructions.request.date)
+  // @@protoc_insertion_point(field_get:messages.request.date)
   return _internal_date();
 }
 inline void request::set_date(const std::string& value) {
   _internal_set_date(value);
-  // @@protoc_insertion_point(field_set:instructions.request.date)
+  // @@protoc_insertion_point(field_set:messages.request.date)
 }
 inline std::string* request::mutable_date() {
-  // @@protoc_insertion_point(field_mutable:instructions.request.date)
+  // @@protoc_insertion_point(field_mutable:messages.request.date)
   return _internal_mutable_date();
 }
 inline const std::string& request::_internal_date() const {
@@ -491,26 +491,26 @@ inline void request::set_date(std::string&& value) {
   
   date_.SetNoArena(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:instructions.request.date)
+  // @@protoc_insertion_point(field_set_rvalue:messages.request.date)
 }
 inline void request::set_date(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   date_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:instructions.request.date)
+  // @@protoc_insertion_point(field_set_char:messages.request.date)
 }
 inline void request::set_date(const char* value, size_t size) {
   
   date_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:instructions.request.date)
+  // @@protoc_insertion_point(field_set_pointer:messages.request.date)
 }
 inline std::string* request::_internal_mutable_date() {
   
   return date_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline std::string* request::release_date() {
-  // @@protoc_insertion_point(field_release:instructions.request.date)
+  // @@protoc_insertion_point(field_release:messages.request.date)
   
   return date_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
@@ -521,7 +521,7 @@ inline void request::set_allocated_date(std::string* date) {
     
   }
   date_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), date);
-  // @@protoc_insertion_point(field_set_allocated:instructions.request.date)
+  // @@protoc_insertion_point(field_set_allocated:messages.request.date)
 }
 
 // string time = 3;
@@ -529,15 +529,15 @@ inline void request::clear_time() {
   time_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline const std::string& request::time() const {
-  // @@protoc_insertion_point(field_get:instructions.request.time)
+  // @@protoc_insertion_point(field_get:messages.request.time)
   return _internal_time();
 }
 inline void request::set_time(const std::string& value) {
   _internal_set_time(value);
-  // @@protoc_insertion_point(field_set:instructions.request.time)
+  // @@protoc_insertion_point(field_set:messages.request.time)
 }
 inline std::string* request::mutable_time() {
-  // @@protoc_insertion_point(field_mutable:instructions.request.time)
+  // @@protoc_insertion_point(field_mutable:messages.request.time)
   return _internal_mutable_time();
 }
 inline const std::string& request::_internal_time() const {
@@ -551,26 +551,26 @@ inline void request::set_time(std::string&& value) {
   
   time_.SetNoArena(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:instructions.request.time)
+  // @@protoc_insertion_point(field_set_rvalue:messages.request.time)
 }
 inline void request::set_time(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   time_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:instructions.request.time)
+  // @@protoc_insertion_point(field_set_char:messages.request.time)
 }
 inline void request::set_time(const char* value, size_t size) {
   
   time_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:instructions.request.time)
+  // @@protoc_insertion_point(field_set_pointer:messages.request.time)
 }
 inline std::string* request::_internal_mutable_time() {
   
   return time_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline std::string* request::release_time() {
-  // @@protoc_insertion_point(field_release:instructions.request.time)
+  // @@protoc_insertion_point(field_release:messages.request.time)
   
   return time_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
@@ -581,7 +581,7 @@ inline void request::set_allocated_time(std::string* time) {
     
   }
   time_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), time);
-  // @@protoc_insertion_point(field_set_allocated:instructions.request.time)
+  // @@protoc_insertion_point(field_set_allocated:messages.request.time)
 }
 
 // int32 minimum = 4;
@@ -592,7 +592,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 request::_internal_minimum() const {
   return minimum_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 request::minimum() const {
-  // @@protoc_insertion_point(field_get:instructions.request.minimum)
+  // @@protoc_insertion_point(field_get:messages.request.minimum)
   return _internal_minimum();
 }
 inline void request::_internal_set_minimum(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -601,7 +601,7 @@ inline void request::_internal_set_minimum(::PROTOBUF_NAMESPACE_ID::int32 value)
 }
 inline void request::set_minimum(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_minimum(value);
-  // @@protoc_insertion_point(field_set:instructions.request.minimum)
+  // @@protoc_insertion_point(field_set:messages.request.minimum)
 }
 
 // repeated string inviteParticipant = 5;
@@ -615,66 +615,66 @@ inline void request::clear_inviteparticipant() {
   inviteparticipant_.Clear();
 }
 inline std::string* request::add_inviteparticipant() {
-  // @@protoc_insertion_point(field_add_mutable:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_add_mutable:messages.request.inviteParticipant)
   return _internal_add_inviteparticipant();
 }
 inline const std::string& request::_internal_inviteparticipant(int index) const {
   return inviteparticipant_.Get(index);
 }
 inline const std::string& request::inviteparticipant(int index) const {
-  // @@protoc_insertion_point(field_get:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_get:messages.request.inviteParticipant)
   return _internal_inviteparticipant(index);
 }
 inline std::string* request::mutable_inviteparticipant(int index) {
-  // @@protoc_insertion_point(field_mutable:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_mutable:messages.request.inviteParticipant)
   return inviteparticipant_.Mutable(index);
 }
 inline void request::set_inviteparticipant(int index, const std::string& value) {
-  // @@protoc_insertion_point(field_set:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_set:messages.request.inviteParticipant)
   inviteparticipant_.Mutable(index)->assign(value);
 }
 inline void request::set_inviteparticipant(int index, std::string&& value) {
-  // @@protoc_insertion_point(field_set:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_set:messages.request.inviteParticipant)
   inviteparticipant_.Mutable(index)->assign(std::move(value));
 }
 inline void request::set_inviteparticipant(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   inviteparticipant_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_set_char:messages.request.inviteParticipant)
 }
 inline void request::set_inviteparticipant(int index, const char* value, size_t size) {
   inviteparticipant_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_set_pointer:messages.request.inviteParticipant)
 }
 inline std::string* request::_internal_add_inviteparticipant() {
   return inviteparticipant_.Add();
 }
 inline void request::add_inviteparticipant(const std::string& value) {
   inviteparticipant_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_add:messages.request.inviteParticipant)
 }
 inline void request::add_inviteparticipant(std::string&& value) {
   inviteparticipant_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_add:messages.request.inviteParticipant)
 }
 inline void request::add_inviteparticipant(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   inviteparticipant_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_add_char:messages.request.inviteParticipant)
 }
 inline void request::add_inviteparticipant(const char* value, size_t size) {
   inviteparticipant_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_add_pointer:messages.request.inviteParticipant)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
 request::inviteparticipant() const {
-  // @@protoc_insertion_point(field_list:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_list:messages.request.inviteParticipant)
   return inviteparticipant_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
 request::mutable_inviteparticipant() {
-  // @@protoc_insertion_point(field_mutable_list:instructions.request.inviteParticipant)
+  // @@protoc_insertion_point(field_mutable_list:messages.request.inviteParticipant)
   return &inviteparticipant_;
 }
 
@@ -683,15 +683,15 @@ inline void request::clear_topic() {
   topic_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline const std::string& request::topic() const {
-  // @@protoc_insertion_point(field_get:instructions.request.topic)
+  // @@protoc_insertion_point(field_get:messages.request.topic)
   return _internal_topic();
 }
 inline void request::set_topic(const std::string& value) {
   _internal_set_topic(value);
-  // @@protoc_insertion_point(field_set:instructions.request.topic)
+  // @@protoc_insertion_point(field_set:messages.request.topic)
 }
 inline std::string* request::mutable_topic() {
-  // @@protoc_insertion_point(field_mutable:instructions.request.topic)
+  // @@protoc_insertion_point(field_mutable:messages.request.topic)
   return _internal_mutable_topic();
 }
 inline const std::string& request::_internal_topic() const {
@@ -705,26 +705,26 @@ inline void request::set_topic(std::string&& value) {
   
   topic_.SetNoArena(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:instructions.request.topic)
+  // @@protoc_insertion_point(field_set_rvalue:messages.request.topic)
 }
 inline void request::set_topic(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   topic_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:instructions.request.topic)
+  // @@protoc_insertion_point(field_set_char:messages.request.topic)
 }
 inline void request::set_topic(const char* value, size_t size) {
   
   topic_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:instructions.request.topic)
+  // @@protoc_insertion_point(field_set_pointer:messages.request.topic)
 }
 inline std::string* request::_internal_mutable_topic() {
   
   return topic_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline std::string* request::release_topic() {
-  // @@protoc_insertion_point(field_release:instructions.request.topic)
+  // @@protoc_insertion_point(field_release:messages.request.topic)
   
   return topic_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
@@ -735,7 +735,7 @@ inline void request::set_allocated_topic(std::string* topic) {
     
   }
   topic_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), topic);
-  // @@protoc_insertion_point(field_set_allocated:instructions.request.topic)
+  // @@protoc_insertion_point(field_set_allocated:messages.request.topic)
 }
 
 // -------------------------------------------------------------------
@@ -750,7 +750,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 response::_internal_requestid() const {
   return requestid_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 response::requestid() const {
-  // @@protoc_insertion_point(field_get:instructions.response.requestId)
+  // @@protoc_insertion_point(field_get:messages.response.requestId)
   return _internal_requestid();
 }
 inline void response::_internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -759,7 +759,7 @@ inline void response::_internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 val
 }
 inline void response::set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_requestid(value);
-  // @@protoc_insertion_point(field_set:instructions.response.requestId)
+  // @@protoc_insertion_point(field_set:messages.response.requestId)
 }
 
 // string description = 2;
@@ -767,15 +767,15 @@ inline void response::clear_description() {
   description_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline const std::string& response::description() const {
-  // @@protoc_insertion_point(field_get:instructions.response.description)
+  // @@protoc_insertion_point(field_get:messages.response.description)
   return _internal_description();
 }
 inline void response::set_description(const std::string& value) {
   _internal_set_description(value);
-  // @@protoc_insertion_point(field_set:instructions.response.description)
+  // @@protoc_insertion_point(field_set:messages.response.description)
 }
 inline std::string* response::mutable_description() {
-  // @@protoc_insertion_point(field_mutable:instructions.response.description)
+  // @@protoc_insertion_point(field_mutable:messages.response.description)
   return _internal_mutable_description();
 }
 inline const std::string& response::_internal_description() const {
@@ -789,26 +789,26 @@ inline void response::set_description(std::string&& value) {
   
   description_.SetNoArena(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:instructions.response.description)
+  // @@protoc_insertion_point(field_set_rvalue:messages.response.description)
 }
 inline void response::set_description(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   description_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:instructions.response.description)
+  // @@protoc_insertion_point(field_set_char:messages.response.description)
 }
 inline void response::set_description(const char* value, size_t size) {
   
   description_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:instructions.response.description)
+  // @@protoc_insertion_point(field_set_pointer:messages.response.description)
 }
 inline std::string* response::_internal_mutable_description() {
   
   return description_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline std::string* response::release_description() {
-  // @@protoc_insertion_point(field_release:instructions.response.description)
+  // @@protoc_insertion_point(field_release:messages.response.description)
   
   return description_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
@@ -819,7 +819,7 @@ inline void response::set_allocated_description(std::string* description) {
     
   }
   description_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), description);
-  // @@protoc_insertion_point(field_set_allocated:instructions.response.description)
+  // @@protoc_insertion_point(field_set_allocated:messages.response.description)
 }
 
 #ifdef __GNUC__
@@ -830,7 +830,7 @@ inline void response::set_allocated_description(std::string* description) {
 
 // @@protoc_insertion_point(namespace_scope)
 
-}  // namespace instructions
+}  // namespace messages
 
 // @@protoc_insertion_point(global_scope)
 

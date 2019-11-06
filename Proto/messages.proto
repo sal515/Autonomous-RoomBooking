@@ -8,7 +8,7 @@
 // The above command should generate the cpp files for the contract in both the server and the client app
 
 syntax = "proto3";
-package instructions;
+package messages;
 
 // import "include/google/protobuf/timestamp.proto";
 

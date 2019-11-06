@@ -115,7 +115,7 @@ int main(void)
 			exit(EXIT_FAILURE);
 		}
 
-		instructions::request request;
+		messages::request request;
 
 		std::cout << strlen(buf) << std::endl;
 		int sizeOfReceivedMsg = strlen(buf);
