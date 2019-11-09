@@ -4,6 +4,9 @@
 // Generate proto files from the proto file definition:
 // ..\..\..\protoc - 3.10.1 - win32\bin\protoc.exe - I = ..\..\..\Proto\ --cpp_out =. ..\..\..\Proto\messages.proto
 
+
+// File management: https://www.tutorialspoint.com/cplusplus/cpp_files_streams.htm
+
 #include "pch.h"
 #include <iostream>
 
@@ -16,6 +19,9 @@
 #include <algorithm>
 #include "messages.pb.h"
 
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 #define SERVER "192.168.0.115"  //IP address of RBMS UDP server
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
@@ -28,6 +34,31 @@ int main(void)
 	// Verify that the version of the library that we linked against is
 	// compatible with the version of the headers we compiled against.
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+
+
+
+	json json_var;
+	json_var["i"] = 0;
+	json_var["j"] = 10;
+	json_var["l"] = (int(json_var.at("i"))+ int(json_var.at("j")))/2;
+
+	std::string json_string = json_var.dump();
+
+
+	std::cout << json_var.at("l") << std::endl;
+	std::cout << json_string << std::endl;
+
+
+
+	int pause = 0;
+	std::cin >> pause;
+
+	return 0;
+
+
+
+
 
 	WSADATA win_socket_struct;
 	SOCKET s;
@@ -77,7 +108,7 @@ int main(void)
 		std::cout << "Enter message : ";
 		std::cin >> message;
 
-		instructions::request request;
+		messages::request request;
 		request.set_topic(message);
 
 		std::cout << message << std::endl;
