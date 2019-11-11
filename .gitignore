@@ -332,3 +332,5 @@ ASALocalRun/
 JSON/
 
 external_libraries_ignored/
+
+Client/client_app/client_app/local_storage/
