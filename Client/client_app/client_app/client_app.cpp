@@ -68,26 +68,26 @@ int main(void)
 
 	char* msg = new char[BUFLEN];
 	char buf[BUFLEN];
-	std::string buffer;
+	string buffer;
 
 	//TODO : what would be the limit and based on the limit the msg send has to be restricted
 	// char msg[BUFLEN];
-	std::string message;
+	string message;
 
 	//Initialise winsock
-	std::cout << "\nInitialising Winsock... " << std::endl;
+	cout << "\nInitialising Winsock... " << endl;
 	if (WSAStartup(MAKEWORD(2, 2), &win_socket_struct) != 0)
 	{
-		std::cout << "Failed. Error Code : " << WSAGetLastError() << std::endl;
+		cout << "Failed. Error Code : " << WSAGetLastError() << endl;
 		exit(EXIT_FAILURE);
 	}
 
-	std::cout << "Initialised Winsock" << std::endl;
+	cout << "Initialised Winsock" << endl;
 
 	//create socket
 	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 	{
-		std::cout << "Could not create socket : " << WSAGetLastError << std::endl;
+		cout << "Could not create socket : " << WSAGetLastError << endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -96,7 +96,7 @@ int main(void)
 	client_struct.sin_family = AF_INET;
 	if (inet_pton(AF_INET, SERVER, &client_struct.sin_addr.S_un.S_addr) != 1)
 	{
-		std::cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError << std::endl;
+		cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError << endl;
 		exit(EXIT_FAILURE);
 	};
 	client_struct.sin_port = htons(PORT);
@@ -105,16 +105,16 @@ int main(void)
 	//start communication
 	while (1)
 	{
-		std::cout << "Enter message : ";
-		std::cin >> message;
+		cout << "Enter message : ";
+		cin >> message;
 
 		messages::request request;
 		request.set_topic(message);
 
-		std::cout << message << std::endl;
+		cout << message << endl;
 
 		const int sizeOfRequest = request.ByteSize();
-		std::cout << sizeOfRequest << std::endl;
+		cout << sizeOfRequest << endl;
 
 		memset(msg, '\0', BUFLEN + 1);
 
@@ -123,7 +123,7 @@ int main(void)
 		//send the message
 		if (sendto(s, msg, strlen(msg), 0, (struct sockaddr *)&client_struct, client_struct_len) == SOCKET_ERROR)
 		{
-			std::cout << "sendto() failed with error code : " << WSAGetLastError << std::endl;
+			cout << "sendto() failed with error code : " << WSAGetLastError << endl;
 			exit(EXIT_FAILURE);
 		}
 
@@ -137,7 +137,7 @@ int main(void)
 		// //try to receive some data, this is a blocking call
 		// if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&client_struct, &client_struct_len) == SOCKET_ERROR)
 		// {
-		// 	std::cout << "recvfrom() failed with error code : " << WSAGetLastError << std::endl;
+		// 	cout << "recvfrom() failed with error code : " << WSAGetLastError << endl;
 		// 	exit(EXIT_FAILURE);
 		// }
 
@@ -145,8 +145,8 @@ int main(void)
 		// request
 
 
-		// buffer = std::string(buf);
-		// std::cout << "Sent Data: " << buffer << std::endl;
+		// buffer = string(buf);
+		// cout << "Sent Data: " << buffer << endl;
 	}
 
 	closesocket(s);
