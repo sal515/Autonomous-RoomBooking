@@ -10,24 +10,56 @@
 #include "pch.h"
 #include <iostream>
 
-#include <cstdio>
+// socket library
 #include <winsock2.h>
 #pragma comment(lib,"ws2_32.lib") //Linking Winsock Library
 #include <ws2tcpip.h> // Used to convert IPv4 or IPv6 addressed to standard binary and vice versa
 
+// Other libraries
 #include <string>
+#include <cstdio>
 #include <algorithm>
+#include "json.hpp"
+#include <fstream>
+
+#include "dbHelper.h"
+
+// protobuf
 #include "messages.pb.h"
 
-#include "json.hpp"
+#include <windows.h>
+// #include <fileapi.h>
 
+
+// namespaces
 using json = nlohmann::json;
+using std::string;
+using std::cout;
+using std::cin;
+using std::endl;
+using std::fstream;
+
 
 #define SERVER "192.168.0.115"  //IP address of RBMS UDP server
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer including 
-
 #define PORT 8888   //The port on which to listen for incoming data
+
+const auto dir_local_storage = "local_storage";
+const auto dir_log = "local_storage/log";
+const auto dir_json_db = "local_storage/client_json_db";
+const auto db_path = "local_storage/client_json_db/db.txt";
+
+
+// Example Function prototypes
+void example_create_remove_directories();
+int test_pause_exit();
+
+
+// Function prototypes
+void createClientDirectories();
+void removeClientDirectories();
+
 
 int main(void)
 {
@@ -35,29 +67,28 @@ int main(void)
 	// compatible with the version of the headers we compiled against.
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+	createClientDirectories();
+	// removeClientDirectories();
 
 
-
-	json json_var;
-	json_var["i"] = 0;
-	json_var["j"] = 10;
-	json_var["l"] = (int(json_var.at("i"))+ int(json_var.at("j")))/2;
-
-	std::string json_string = json_var.dump();
-
-
-	std::cout << json_var.at("l") << std::endl;
-	std::cout << json_string << std::endl;
+	json ajson;
+	json bjson;
+	ajson["apple"] = "Apple";
+	ajson["ball"] = "Ball";
+	bjson["cat"] = "cat";
+	bjson["dog"] = 0;
+	ajson["bjson"] = bjson;
 
 
+	cout << dbHelper::json_to_string(ajson) << endl;
 
-	int pause = 0;
-	std::cin >> pause;
+	string anyData = dbHelper::read_db(db_path);
+	dbHelper::write_db(db_path, dbHelper::json_to_string(ajson));
+	string yesData = dbHelper::read_db(db_path);
+	
+	// dbHelper::read_db("client_db.txt");
 
-	return 0;
-
-
-
+	return test_pause_exit();
 
 
 	WSADATA win_socket_struct;
@@ -152,5 +183,43 @@ int main(void)
 	closesocket(s);
 	WSACleanup();
 
+	return 0;
+}
+
+
+void createClientDirectories()
+{
+	dbHelper::createDirectory(dir_local_storage);
+	dbHelper::createDirectory(dir_log);
+	dbHelper::createDirectory(dir_json_db);
+}
+
+void removeClientDirectories()
+{
+	dbHelper::removeDirectory(dir_local_storage);
+	dbHelper::removeDirectory(dir_log);
+	dbHelper::removeDirectory(dir_json_db);
+}
+
+
+// ==================  Examples  ======================================
+void example_create_remove_directories()
+{
+
+	// Removing and Creating directory order matters
+	// Cannot delete directories with existing subdirectories
+	// Cannot create subdirectories if the outer directory does not exist
+	dbHelper::createDirectory(dir_local_storage);
+	dbHelper::createDirectory(dir_log);
+	dbHelper::createDirectory(dir_json_db);
+	// dbHelper::createDirectory("delete");
+	// dbHelper::removeDirectory("delete");
+	// dbHelper::removeDirectory("local_storage/log");
+}
+
+int test_pause_exit()
+{
+	int pause = 0;
+	cin >> pause;
 	return 0;
 }
