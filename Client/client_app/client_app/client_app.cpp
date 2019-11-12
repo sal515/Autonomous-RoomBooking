@@ -21,11 +21,12 @@
 #include <algorithm>
 #include "json.hpp"
 #include <fstream>
+#include <map>
+#include <vector>
+#include <iomanip>
+
 
 #include "dbHelper.h"
-
-// protobuf
-#include "messages.pb.h"
 
 #include <windows.h>
 // #include <fileapi.h>
@@ -38,6 +39,7 @@ using std::cout;
 using std::cin;
 using std::endl;
 using std::fstream;
+using std::vector;
 
 
 #define SERVER "192.168.0.115"  //IP address of RBMS UDP server
@@ -63,12 +65,118 @@ void removeClientDirectories();
 
 int main(void)
 {
-	// Verify that the version of the library that we linked against is
-	// compatible with the version of the headers we compiled against.
-	GOOGLE_PROTOBUF_VERIFY_VERSION;
-
 	createClientDirectories();
 	// removeClientDirectories();
+
+	//Server only
+	// json room;
+
+	json all_days;
+	json time;
+	json request;
+	json userId;
+
+
+	json userA = {
+		{"ip", "168.204.654.152"},
+		{"listeningPort", "8000"},
+		{"userName", "UserA"}
+	};
+
+	json userB = {
+		{"ip", "162.344.367.132"},
+		{"listeningPort", "5000"},
+		{"userName", "UserB"}
+	};
+
+	json userC = {
+		{"ip", "122.111.333.555"},
+		{"listeningPort", "2222"},
+		{"userName", "UserC"}
+	};
+
+	vector<json> invitedParticipantsVec;
+	vector<json> confirmedParticipantsVec;
+
+	invitedParticipantsVec.push_back(userA);
+	invitedParticipantsVec.push_back(userB);
+	invitedParticipantsVec.push_back(userC);
+
+	confirmedParticipantsVec.push_back(userA);
+	confirmedParticipantsVec.push_back(userB);
+
+	json event =
+	{
+		{"minimumParticipants", "min Participants"},
+		{"rq", "request number"},
+		{"mt", "meeting number"},
+		{"invitedParticipantsVec", invitedParticipantsVec},
+		{"confirmedParticipantsVec", confirmedParticipantsVec},
+		{"topic", "Some topic for the event I guess"},
+		{"bookingDate", "some Date"},
+		{"requester", "requester IP"}
+	};
+
+
+	time["6"] = event;
+	time["7"] = json({});
+	time["8"] = json({});
+	time["9"] = json({});
+	time["10"] = json({});
+	time["11"] = json({});
+	time["12"] = json({});
+	time["13"] = json({});
+	time["14"] = json({});
+	time["15"] = json({});
+	time["16"] = json({});
+	time["17"] = json({});
+	time["18"] = json({});
+	time["19"] = json({});
+	time["20"] = json({});
+
+	all_days["monday"] = time;
+	all_days["tuesday"] = time;
+	all_days["wednesday"] = time;
+	all_days["thursday"] = time;
+	all_days["friday"] = time;
+
+
+
+	std::ofstream writeFile("local_storage/client_json_db/storage.json");
+	writeFile << std::setw(4) << all_days << std::endl;
+	writeFile.close();
+
+
+	std::ifstream readFile("local_storage/client_json_db/storage.json");
+	json db;
+	readFile >> db;
+	readFile.close();
+
+	db.at("friday").at("10") = event;
+
+
+	std::ofstream writeNewFile("local_storage/client_json_db/db.json");
+	writeNewFile << std::setw(4) << db << std::endl;
+	writeNewFile.close();
+
+
+
+
+
+	return test_pause_exit();
+
+
+	// server only
+	// room["EV005.251"] = all_days;
+	// room["EV02.301"] = all_days;
+
+
+	// string testEvent = event.dump();
+	// cout << testEvent << endl;
+	// json str2Json = json::parse(testEvent);
+	// vector<string> jsonArr2Vector = (str2Json.at("invitedParticipantsVec"));
+	// cout << jsonArr2Vector.at(0) << endl;
+	// return  test_pause_exit();
 
 
 	json ajson;
@@ -85,7 +193,7 @@ int main(void)
 	string anyData = dbHelper::read_db(db_path);
 	dbHelper::write_db(db_path, dbHelper::json_to_string(ajson));
 	string yesData = dbHelper::read_db(db_path);
-	
+
 	// dbHelper::read_db("client_db.txt");
 
 	return test_pause_exit();
@@ -139,17 +247,17 @@ int main(void)
 		cout << "Enter message : ";
 		cin >> message;
 
-		messages::request request;
-		request.set_topic(message);
+		// messages::request request;
+		// request.set_topic(message);
 
 		cout << message << endl;
 
-		const int sizeOfRequest = request.ByteSize();
-		cout << sizeOfRequest << endl;
+		// const int sizeOfRequest = request.ByteSize();
+		// cout << sizeOfRequest << endl;
 
 		memset(msg, '\0', BUFLEN + 1);
 
-		request.SerializeToArray(msg, sizeOfRequest);
+		// request.SerializeToArray(msg, sizeOfRequest);
 
 		//send the message
 		if (sendto(s, msg, strlen(msg), 0, (struct sockaddr *)&client_struct, client_struct_len) == SOCKET_ERROR)
@@ -205,7 +313,6 @@ void removeClientDirectories()
 // ==================  Examples  ======================================
 void example_create_remove_directories()
 {
-
 	// Removing and Creating directory order matters
 	// Cannot delete directories with existing subdirectories
 	// Cannot create subdirectories if the outer directory does not exist
