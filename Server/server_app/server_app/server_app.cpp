@@ -143,8 +143,8 @@ int main(void)
 
 		cout << "clientIP: " << clientIP << endl;
 		buffer = std::string(buf);
-		json received_data = json::parse(buffer);
-		cout << received_data.at("message") << std::endl;
+		//json received_data = json::parse(buffer);
+		//cout << received_data.at("message") << std::endl;
 
 
 		//

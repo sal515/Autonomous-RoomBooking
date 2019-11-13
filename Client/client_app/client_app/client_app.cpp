@@ -32,7 +32,7 @@ using std::fstream;
 using std::vector;
 
 
-#define SERVER "192.168.0.115"  //IP address of RBMS UDP server
+#define SERVER "172.30.154.89"  //IP address of RBMS UDP server
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer including 
 #define PORT 8888   //The port on which to listen for incoming data
