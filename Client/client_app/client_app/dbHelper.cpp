@@ -158,20 +158,20 @@ void dbHelper::example_db_creator(string example_db_path)
 	confirmedParticipantsVec.push_back(userA);
 	confirmedParticipantsVec.push_back(userB);
 
-	json event =
+	json meeting =
 	{
 		{"minimumParticipants", "min Participants"},
 		{"rq", "request number"},
 		{"mt", "meeting number"},
 		{"invitedParticipantsVec", invitedParticipantsVec},
 		{"confirmedParticipantsVec", confirmedParticipantsVec},
-		{"topic", "Some topic for the event I guess"},
+		{"topic", "Some topic for the meeting I guess"},
 		{"bookingDate", "some Date"},
 		{"requester", "requester IP"}
 	};
 
 
-	time["6"] = event;
+	time["6"] = meeting;
 	time["7"] = json({});
 	time["8"] = json({});
 	time["9"] = json({});
@@ -205,8 +205,8 @@ void dbHelper::example_db_creator(string example_db_path)
 	// JSON Array to Vector Example code: 
 	// =====================================
 	// string testEvent = event.dump();
-	// cout << testEvent << endl;
-	// json str2Json = json::parse(testEvent);
+	// cout << test << endl;
+	// json str2Json = json::parse(test);
 	// vector<string> jsonArr2Vector = (str2Json.at("invitedParticipantsVec"));
 	// cout << jsonArr2Vector.at(0) << endl;
 	// return  test_pause_exit();
@@ -334,22 +334,6 @@ json dbHelper::db_to_json(const string& dbPath)
 	}
 }
 
-
-bool dbHelper::update_event(json& db, const string& day, const string& time, const json& event)
-{
-	try
-	{
-		db.at(day).at(time) = event;
-		return true;
-	}
-	catch (nlohmann::json::exception& e)
-	{
-		cout << "Exception: update_event method throws -> " << e.what() << endl;
-		return false;
-	}
-}
-
-
 bool dbHelper::update_db(const string& dbPath, const json& db)
 {
 	try
@@ -370,7 +354,31 @@ bool dbHelper::update_db(const string& dbPath, const json& db)
 	}
 	catch (std::ofstream::failure& e)
 	{
-		cout << "Exception: update_event method throws -> " << e.what() << endl;
+		cout << "Exception: update_meeting method throws -> " << e.what() << endl;
 		return false;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+// bool meeting::update_meeting(json& db, const string& day, const string& time, const json& meeting)
+// {
+// 	try
+// 	{
+// 		db.at(day).at(time) = meeting;
+// 		return true;
+// 	}
+// 	catch (nlohmann::json::exception& e)
+// 	{
+// 		cout << "Exception: update_meeting method throws -> " << e.what() << endl;
+// 		return false;
+// 	}
+// }
+

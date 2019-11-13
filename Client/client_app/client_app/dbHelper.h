@@ -1,7 +1,5 @@
 #pragma once
 #include <string>
-
-#include <string>
 #include "json.hpp"
 #include <filesystem>
 #include <iostream>
@@ -32,7 +30,7 @@ public:
 	 * Usage example: json db = dbHelper::db_to_json(dbPath);
 	 */
 	static json db_to_json(const string &dbPath); 
-	static bool update_event(json &db, const string &day, const string &time, const json &event);
+	// static bool update_meeting(json &db, const string &day, const string &time, const json &meeting);
 	static bool update_db(const string &dbPath, const json &db);
 
 
