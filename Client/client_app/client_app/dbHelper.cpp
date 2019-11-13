@@ -119,6 +119,91 @@ int test_json()
 }
 
 
+void dbHelper::example_db_creator(string example_db_path)
+{
+	//Server only
+	// json room;
+
+	json all_days;
+	json time;
+	json request;
+	json userId;
+
+
+	json userA = {
+		{"ip", "168.204.654.152"},
+		{"listeningPort", "8000"},
+		{"userName", "UserA"}
+	};
+
+	json userB = {
+		{"ip", "162.344.367.132"},
+		{"listeningPort", "5000"},
+		{"userName", "UserB"}
+	};
+
+	json userC = {
+		{"ip", "122.111.333.555"},
+		{"listeningPort", "2222"},
+		{"userName", "UserC"}
+	};
+
+	std::vector<json> invitedParticipantsVec;
+	vector<json> confirmedParticipantsVec;
+
+	invitedParticipantsVec.push_back(userA);
+	invitedParticipantsVec.push_back(userB);
+	invitedParticipantsVec.push_back(userC);
+
+	confirmedParticipantsVec.push_back(userA);
+	confirmedParticipantsVec.push_back(userB);
+
+	json event =
+	{
+		{"minimumParticipants", "min Participants"},
+		{"rq", "request number"},
+		{"mt", "meeting number"},
+		{"invitedParticipantsVec", invitedParticipantsVec},
+		{"confirmedParticipantsVec", confirmedParticipantsVec},
+		{"topic", "Some topic for the event I guess"},
+		{"bookingDate", "some Date"},
+		{"requester", "requester IP"}
+	};
+
+
+	time["6"] = event;
+	time["7"] = json({});
+	time["8"] = json({});
+	time["9"] = json({});
+	time["10"] = json({});
+	time["11"] = json({});
+	time["12"] = json({});
+	time["13"] = json({});
+	time["14"] = json({});
+	time["15"] = json({});
+	time["16"] = json({});
+	time["17"] = json({});
+	time["18"] = json({});
+	time["19"] = json({});
+	time["20"] = json({});
+
+	all_days["monday"] = time;
+	all_days["tuesday"] = time;
+	all_days["wednesday"] = time;
+	all_days["thursday"] = time;
+	all_days["friday"] = time;
+
+
+	// std::ofstream writeFile(example_db_path);
+	// writeFile << std::setw(4) << all_days << std::endl;
+	// writeFile.close();
+
+	// reading data from the example db
+	json db = dbHelper::db_to_json(example_db_path);
+	db.at("friday").at("10") = event;
+}
+
+
 dbHelper::dbHelper()
 {
 }
@@ -154,7 +239,6 @@ bool dbHelper::createDirectory(string relativeDirName)
 	{
 		cout << "Exception: createDirectory method throws -> " << e.what() << endl;
 		return false;
-
 	}
 }
 
@@ -172,10 +256,7 @@ bool dbHelper::isDirectoryExist(string relativeDirName)
 	{
 		cout << "Exception: isDirectoryExist method throws -> " << e.what() << endl;
 		return false;
-
 	}
-
-	
 }
 
 
@@ -202,68 +283,82 @@ bool dbHelper::removeDirectory(string relativeDirName)
 		cout << "Exception: removeDirectory method throws -> " << e.what() << endl;
 		return false;
 	}
-
 }
 
 
-string dbHelper::read_db(string dbPath)
+json dbHelper::db_to_json(const string& dbPath)
+{
+	// usage example
+	// json db = dbHelper::db_to_json(dbPath);
+
+	try
+	{
+		// example db path: local_storage/client_json_db/db.json 
+		const fs::path p(dbPath);
+		if (fs::exists(p))
+		{
+			std::ifstream readFile(dbPath);
+			json db;
+			readFile >> db;
+			readFile.close();
+			return db;
+
+			// example below below (tested)
+			// std::ifstream readFile("local_storage/client_json_db/storage.json");
+			// json db;
+			// readFile >> db;
+			// readFile.close();
+		}
+		else
+		{
+			// if the db.json file was not created send empty json object back
+			return json({});
+		}
+	}
+	catch (fstream::failure& e)
+	{
+		cout << "Exception: read_db_json method throws -> " << e.what() << endl;
+		return json({});
+	}
+}
+
+
+bool dbHelper::update_event(json& db, const string& day, const string& time, const json& event)
+{
+	try
+	{
+		db.at(day).at(time) = event;
+		return true;
+	}
+	catch (nlohmann::json::exception& e)
+	{
+		cout << "Exception: update_event method throws -> " << e.what() << endl;
+		return false;
+	}
+}
+
+
+bool dbHelper::update_db(const string& dbPath, const json& db)
 {
 	try
 	{
 		fs::path p(dbPath);
 		if (fs::exists(p))
 		{
-			string data;
-			fstream file;
-			file.open(dbPath, std::ios::out | std::ios::in);
-			file >> data;
-			file.close();
-			return data;
+			std::ofstream writeFile(dbPath);
+			writeFile << std::setw(4) << db << std::endl;
+			writeFile.close();
 
-		}
-		else
-		{
-			fstream file;
-			file.open(dbPath, std::ios::out | std::ios::in | std::ios::trunc);
-			file.close();
-			return string();
-		}
-	}
-	catch (fstream::failure e)
-	{
-		cout << "Exception: read_db method throws -> " << e.what() << endl;
-		return string();
-	}
-}
-
-
-bool dbHelper::write_db(string dbPath, string data)
-{
-	try
-	{
-		fs::path p(dbPath);
-		if (fs::exists(p))
-		{
-			// string data;
-			fstream file;
-			file.open(dbPath, std::ios::out | std::ios::in);
-			file << data;
-			file.close();
 			return true;
 		}
 		else
 		{
-			// string data;
-			fstream file;
-			file.open(dbPath, std::ios::out | std::ios::in | std::ios::trunc);
-			file << data;
-			file.close();
-			return true;
+			return false;
 		}
 	}
-	catch (fstream::failure e)
+	catch (std::ofstream::failure& e)
 	{
-		cout << "Exception: read_db method throws -> " << e.what() << endl;
+		cout << "Exception: update_event method throws -> " << e.what() << endl;
 		return false;
 	}
 }

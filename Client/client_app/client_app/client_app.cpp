@@ -17,11 +17,8 @@
 
 // Other libraries
 #include <string>
-#include <cstdio>
-#include <algorithm>
 #include "json.hpp"
 #include <fstream>
-#include <map>
 #include <vector>
 #include <iomanip>
 
@@ -42,15 +39,16 @@ using std::fstream;
 using std::vector;
 
 
+
 #define SERVER "192.168.0.115"  //IP address of RBMS UDP server
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer including 
 #define PORT 8888   //The port on which to listen for incoming data
 
 const auto dir_local_storage = "local_storage";
-const auto dir_log = "local_storage/log";
-const auto dir_json_db = "local_storage/client_json_db";
-const auto db_path = "local_storage/client_json_db/db.txt";
+const auto log_path = "local_storage/log.json";
+const auto db_path = "local_storage/db.json";
+const auto example_db_path = "local_storage/example_db.json";
 
 
 // Example Function prototypes
@@ -68,97 +66,13 @@ int main(void)
 	createClientDirectories();
 	// removeClientDirectories();
 
-	//Server only
-	// json room;
+	json db = dbHelper::db_to_json(db_path);
+	dbHelper::update_event(db, "friday", "10", json({}));
 
-	json all_days;
-	json time;
-	json request;
-	json userId;
-
-
-	json userA = {
-		{"ip", "168.204.654.152"},
-		{"listeningPort", "8000"},
-		{"userName", "UserA"}
-	};
-
-	json userB = {
-		{"ip", "162.344.367.132"},
-		{"listeningPort", "5000"},
-		{"userName", "UserB"}
-	};
-
-	json userC = {
-		{"ip", "122.111.333.555"},
-		{"listeningPort", "2222"},
-		{"userName", "UserC"}
-	};
-
-	vector<json> invitedParticipantsVec;
-	vector<json> confirmedParticipantsVec;
-
-	invitedParticipantsVec.push_back(userA);
-	invitedParticipantsVec.push_back(userB);
-	invitedParticipantsVec.push_back(userC);
-
-	confirmedParticipantsVec.push_back(userA);
-	confirmedParticipantsVec.push_back(userB);
-
-	json event =
+	if(dbHelper::update_db(db_path, db))
 	{
-		{"minimumParticipants", "min Participants"},
-		{"rq", "request number"},
-		{"mt", "meeting number"},
-		{"invitedParticipantsVec", invitedParticipantsVec},
-		{"confirmedParticipantsVec", confirmedParticipantsVec},
-		{"topic", "Some topic for the event I guess"},
-		{"bookingDate", "some Date"},
-		{"requester", "requester IP"}
+		cout << "db updated" << endl;
 	};
-
-
-	time["6"] = event;
-	time["7"] = json({});
-	time["8"] = json({});
-	time["9"] = json({});
-	time["10"] = json({});
-	time["11"] = json({});
-	time["12"] = json({});
-	time["13"] = json({});
-	time["14"] = json({});
-	time["15"] = json({});
-	time["16"] = json({});
-	time["17"] = json({});
-	time["18"] = json({});
-	time["19"] = json({});
-	time["20"] = json({});
-
-	all_days["monday"] = time;
-	all_days["tuesday"] = time;
-	all_days["wednesday"] = time;
-	all_days["thursday"] = time;
-	all_days["friday"] = time;
-
-
-
-	std::ofstream writeFile("local_storage/client_json_db/storage.json");
-	writeFile << std::setw(4) << all_days << std::endl;
-	writeFile.close();
-
-
-	std::ifstream readFile("local_storage/client_json_db/storage.json");
-	json db;
-	readFile >> db;
-	readFile.close();
-
-	db.at("friday").at("10") = event;
-
-
-	std::ofstream writeNewFile("local_storage/client_json_db/db.json");
-	writeNewFile << std::setw(4) << db << std::endl;
-	writeNewFile.close();
-
 
 
 
@@ -190,11 +104,11 @@ int main(void)
 
 	cout << dbHelper::json_to_string(ajson) << endl;
 
-	string anyData = dbHelper::read_db(db_path);
-	dbHelper::write_db(db_path, dbHelper::json_to_string(ajson));
-	string yesData = dbHelper::read_db(db_path);
+	// string anyData = dbHelper::read_db_json(db_path);
+	// dbHelper::update_event(db_path, dbHelper::json_to_string(ajson));
+	// string yesData = dbHelper::read_db_json(db_path);
 
-	// dbHelper::read_db("client_db.txt");
+	// dbHelper::read_db_json("client_db.txt");
 
 	return test_pause_exit();
 
@@ -298,15 +212,13 @@ int main(void)
 void createClientDirectories()
 {
 	dbHelper::createDirectory(dir_local_storage);
-	dbHelper::createDirectory(dir_log);
-	dbHelper::createDirectory(dir_json_db);
+	// dbHelper::createDirectory(dir_log);
 }
 
 void removeClientDirectories()
 {
 	dbHelper::removeDirectory(dir_local_storage);
-	dbHelper::removeDirectory(dir_log);
-	dbHelper::removeDirectory(dir_json_db);
+	// dbHelper::removeDirectory(dir_log);
 }
 
 
@@ -317,8 +229,8 @@ void example_create_remove_directories()
 	// Cannot delete directories with existing subdirectories
 	// Cannot create subdirectories if the outer directory does not exist
 	dbHelper::createDirectory(dir_local_storage);
-	dbHelper::createDirectory(dir_log);
-	dbHelper::createDirectory(dir_json_db);
+	// dbHelper::createDirectory(dir_log);
+	// dbHelper::createDirectory(dir_json_db);
 	// dbHelper::createDirectory("delete");
 	// dbHelper::removeDirectory("delete");
 	// dbHelper::removeDirectory("local_storage/log");
