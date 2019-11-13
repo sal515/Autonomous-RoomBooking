@@ -16,6 +16,9 @@
 #include "json.hpp"
 #include <vector>
 
+#include "user.h"
+#include "meeting.h"
+
 #include "dbHelper.h"
 
 #include <windows.h>
