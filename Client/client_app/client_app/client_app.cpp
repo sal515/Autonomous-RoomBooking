@@ -32,7 +32,6 @@ using std::fstream;
 using std::vector;
 
 
-
 #define SERVER "192.168.0.115"  //IP address of RBMS UDP server
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer including 
@@ -46,22 +45,15 @@ const auto example_db_path = "local_storage/example_db.json";
 
 
 // Example Function prototypes
-void example_create_remove_directories();
 int test_pause_exit();
-
-
-// Function prototypes
-void createClientDirectories();
-void removeClientDirectories();
 
 
 int main(void)
 {
-
 	dbHelper::createDirectory(dir_local_storage);
 
 	json db = dbHelper::db_to_json(db_path);
-	
+
 	// dbHelper::update_event(db, "friday", "10", json({}));
 	// if(dbHelper::update_db(db_path, db)) { cout << "db updated" << endl; }
 
@@ -93,7 +85,7 @@ int main(void)
 	//create socket
 	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
 	{
-		cout << "Could not create socket : " << WSAGetLastError << endl;
+		cout << "Could not create socket : " << WSAGetLastError() << endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -102,7 +94,7 @@ int main(void)
 	client_struct.sin_family = AF_INET;
 	if (inet_pton(AF_INET, SERVER, &client_struct.sin_addr.S_un.S_addr) != 1)
 	{
-		cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError << endl;
+		cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError() << endl;
 		exit(EXIT_FAILURE);
 	};
 	client_struct.sin_port = htons(PORT);
@@ -126,7 +118,7 @@ int main(void)
 		//send the message
 		if (sendto(s, msg, strlen(msg), 0, (struct sockaddr *)&client_struct, client_struct_len) == SOCKET_ERROR)
 		{
-			cout << "sendto() failed with error code : " << WSAGetLastError << endl;
+			cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
 			exit(EXIT_FAILURE);
 		}
 
@@ -157,19 +149,6 @@ int main(void)
 
 
 // ==================  Examples  ======================================
-void example_create_remove_directories()
-{
-	// Removing and Creating directory order matters
-	// Cannot delete directories with existing subdirectories
-	// Cannot create subdirectories if the outer directory does not exist
-	dbHelper::createDirectory(dir_local_storage);
-	// dbHelper::createDirectory(dir_log);
-	// dbHelper::createDirectory(dir_json_db);
-	// dbHelper::createDirectory("delete");
-	// dbHelper::removeDirectory("delete");
-	// dbHelper::removeDirectory("local_storage/log");
-}
-
 int test_pause_exit()
 {
 	int pause = 0;
