@@ -193,14 +193,26 @@ void dbHelper::example_db_creator(string example_db_path)
 	all_days["thursday"] = time;
 	all_days["friday"] = time;
 
+	std::ofstream writeFile(example_db_path);
+	writeFile << std::setw(4) << all_days << std::endl;
+	writeFile.close();
 
-	// std::ofstream writeFile(example_db_path);
-	// writeFile << std::setw(4) << all_days << std::endl;
-	// writeFile.close();
+	// server only
+	// room["EV005.251"] = all_days;
+	// room["EV02.301"] = all_days;
 
-	// reading data from the example db
-	json db = dbHelper::db_to_json(example_db_path);
-	db.at("friday").at("10") = event;
+
+	// JSON Array to Vector Example code: 
+	// =====================================
+	// string testEvent = event.dump();
+	// cout << testEvent << endl;
+	// json str2Json = json::parse(testEvent);
+	// vector<string> jsonArr2Vector = (str2Json.at("invitedParticipantsVec"));
+	// cout << jsonArr2Vector.at(0) << endl;
+	// return  test_pause_exit();
+
+
+
 }
 
 
