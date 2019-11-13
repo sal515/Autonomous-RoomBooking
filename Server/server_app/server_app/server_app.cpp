@@ -2,7 +2,7 @@
 
 #include "pch.h"
 #include <iostream>
-
+#include "json.hpp"
 #include <cstdio>
 #include <winsock2.h>
 #pragma comment(lib,"ws2_32.lib") //Linking Winsock Library
@@ -10,7 +10,6 @@
 
 // Other libraries
 #include <string>
-#include "json.hpp"
 #include <vector>
 
 #include "dbHelper.h"
