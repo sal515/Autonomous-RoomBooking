@@ -1,7 +1,8 @@
 #pragma once
-#include "json.hpp"
-#include <string>
-#include <vector>
+
+#include "pch.h"
+
+
 using json = nlohmann::json;
 
 
@@ -149,4 +150,4 @@ struct messages {
 		return room;
 	}
 
-};
+} message;
