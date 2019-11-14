@@ -50,13 +50,14 @@ const auto example_db_path = "local_storage/example_db.json";
 // Example Function prototypes
 int test_pause_exit();
 void menu();
-bool check_schedule(struct tm *time);
+bool check_ip(const string &ip);
+bool check_schedule(json schedule);
 bool extract_date(const std::string& s, int& d, int& m, int& y);
 
 
 int main(void)
 {
-	/*dbHelper::createDirectory(dir_local_storage);
+	dbHelper::createDirectory(dir_local_storage);
 
 	json db = dbHelper::db_to_json(db_path);
 
@@ -148,9 +149,8 @@ int main(void)
 	}
 
 	closesocket(s);
-	WSACleanup(); */
+	WSACleanup(); 
 
-	cout << "This is supposed to output";
 
 	return test_pause_exit();
 }
@@ -171,16 +171,16 @@ void menu()
 	switch (choice)
 	{
 	case 'b':
-		string date_time;
+		string date;
 		int mm, dd, yyyy, hh, min_participants;
 		string topic;
 		cout << "Please provide the following details:\n"
 			<< "Date (DD/MM/YYYY): ";
-		cin >> date_time;
-		while (!extract_date(date_time, dd, mm, yyyy))
+		cin >> date;
+		while (!extract_date(date, dd, mm, yyyy))
 		{
 			cout << "\nPlease input a valid date (DD/MM/YYYY): ";
-			cin >> date_time;
+			cin >> date;
 		}
 		cout << "\nTime of meeting (24hr): ";
 		cin >> hh;
@@ -195,8 +195,11 @@ void menu()
 		cin >> min_participants;
 		vector<string> participants = list_of_participants(min_participants);
 
-		//Elie copy into json to send to server + implement request id?
+		//Copy into json to send to server + implement request id with incremental?
+		//variables are date, time, topic, min_participants and participants(list)
 		break;
+
+		//Make the other cases
 	
 
 	}
@@ -293,6 +296,12 @@ bool check_ip(const string &ip)
 	struct sockaddr_in sa;
 	int result = inet_pton(AF_INET, ip.c_str(), &(sa.sin_addr));
 	return result != 0;
+}
+
+bool check_schedule(json schedule)
+{
+	//look into json file to see if available or not
+	return false;
 }
 
 // function expects the string in format dd/mm/yyyy:
