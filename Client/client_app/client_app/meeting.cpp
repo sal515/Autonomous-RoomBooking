@@ -8,39 +8,22 @@ json meeting::meetingObj_to_json(const meeting& meetInfo)
 	meeting_json["rq"] = meetInfo.rq;
 	meeting_json["mt"] = meetInfo.mt;
 
-	json invitationParticipantArr = json::array();
-	for (user element : meetInfo.invitedParticipants)
+	for (const string &element : meetInfo.invitedParticipantsIP)
 	{
-		invitationParticipantArr.push_back
-		({
-				{"ip", element.ip},
-				{"listeningPort", element.listeningPort},
-				{"userName", element.userName}
-			});
+		meeting_json["invitedParticipantsIP"].push_back(element);
 	}
-	meeting_json["invitedParticipants"] = invitationParticipantArr;
 
-	json confirmedParticipantArr = json::array();
-	for (user element : meetInfo.confirmedParticipants)
+	for (const string &element : meetInfo.confirmedParticipantsIP)
 	{
-		confirmedParticipantArr.push_back
-		({
-				{"ip", element.ip},
-				{"listeningPort", element.listeningPort},
-				{"userName", element.userName}
-			});
+		meeting_json["confirmedParticipantsIP"].push_back(element);
 	}
-	meeting_json["confirmedParticipants"] = confirmedParticipantArr;
 	meeting_json["roomNumber"] = meetInfo.roomNumber;
 	meeting_json["topic"] = meetInfo.topic;
-	meeting_json["requester"] =
-	{
-		{"ip", meetInfo.requester.ip},
-		{"listeningPort", meetInfo.requester.listeningPort},
-		{"userName", meetInfo.requester.userName}
-	};
+	meeting_json["requesterIP"] = meetInfo.requesterIP;
 	return meeting_json;
 }
+
+
 
 
 // {"meetingDate", meetInfo.},

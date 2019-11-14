@@ -2,7 +2,6 @@
 #include <string>
 #include "json.hpp"
 #include <vector>
-#include "user.h"
 
 using std::string;
 using std::vector;
@@ -13,12 +12,17 @@ struct meeting
 	int minimumParticipants;
 	int rq;
 	int mt;
-	vector<user> invitedParticipants;
-	vector<user> confirmedParticipants;
+	vector<string> invitedParticipantsIP;
+	vector<string> confirmedParticipantsIP;
 	string roomNumber;
 	string topic;
 	// Date bookingDate;
-	user requester;
+	string requesterIP;
+
+	// Model Only required for auto registration
+	// vector<user> invitedParticipantsIP;
+	// vector<user> confirmedParticipantsIP;
+
 
 	static json meetingObj_to_json(const meeting &meetInfo);
 
