@@ -1,19 +1,21 @@
 ﻿#pragma once
+#include <iostream>
 #include <string>
 #include "json.hpp"
 #include <vector>
-#include <Bits.h>
-
 
 using std::string;
 using std::vector;
 using json = nlohmann::json;
+using std::cout;
+using std::endl;
+
 
 struct meeting
 {
 	int minimumParticipants = -1;
 	int rq = -1;
-	int mt= -1;
+	int mt = -1;
 	vector<string> invitedParticipantsIP;
 	vector<string> confirmedParticipantsIP;
 	string roomNumber = "";
@@ -21,12 +23,16 @@ struct meeting
 	// Date bookingDate;
 	string requesterIP = "";
 
-	// Model Only required for auto registration
-	// vector<user> invitedParticipantsIP;
-	// vector<user> confirmedParticipantsIP;
+	static json meetingObj_to_json(const meeting& meetInfo);
+	static meeting json_to_meetingObj(const json& meeting_json);
 
+	// client specific meeting manipulators
+	static json client_get_meeting(json& db, const string& day, const string& time);
+	static bool client_update_meeting(json& db, const string& day, const string& time, const json& meeting);
+	static bool client_isMeeting(json& db, const string& day, const string& time);
 
-	static json meetingObj_to_json(const meeting &meetInfo);
-	static meeting json_to_meetingObj(const json meeting_json);
-
+	// server specific meeting manipulators
+	static json server_get_meeting(json& db, const string& day, const string& time, const string& room);
+	static bool server_update_meeting(json& db, const string& day, const string& time, const string& room,                                  const json& meeting);
+	static bool server_isMeeting(json& db, const string& day, const string& time, const string& room);
 };

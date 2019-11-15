@@ -1,4 +1,5 @@
-#pragma once
+﻿#pragma once
+
 #include <string>
 #include "json.hpp"
 #include <filesystem>
@@ -6,7 +7,9 @@
 #include <fstream>
 #include <vector>
 #include <iomanip>
+#include <map>
 
+#include "time_day_room.h"
 
 namespace fs = std::experimental::filesystem;
 using json = nlohmann::json;
@@ -16,26 +19,19 @@ using std::cin;
 using std::endl;
 using std::fstream;
 using std::vector;
+using std::map;
 
-class dbHelper
+
+struct db_helper
 {
-public:
-	dbHelper();
-	~dbHelper();
 	static bool createDirectory(std::string dirName);
 	static bool isDirectoryExist(string dirName);
 	static string json_to_string(json ajson);
 	static bool removeDirectory(string relativeDirName);
 	/*
-	 * Usage example: json db = dbHelper::db_to_json(dbPath);
+	 * Usage example: json db = db_helper::db_to_json(dbPath);
 	 */
-	static json db_to_json(const string &dbPath); 
-	// static bool update_meeting(json &db, const string &day, const string &time, const json &meeting);
-	static bool update_db(const string &dbPath, const json &db);
-
-
-
-	// Example methods
-	static void example_db_creator(string example_db_path);
+	static void initialize_db(const string& dbPath, const bool &isClient);
+	static json db_to_json(const string& dbPath);
+	static bool save_db(const string& dbPath, const json& db);
 };
-

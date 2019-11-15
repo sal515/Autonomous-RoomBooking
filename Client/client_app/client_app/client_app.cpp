@@ -17,8 +17,8 @@
 #include <vector>
 
 #include "meeting.h"
-
-#include "dbHelper.h"
+#include "db_helper.h"
+#include "app_config.h"
 
 #include <windows.h>
 // #include <fileapi.h>
@@ -33,51 +33,43 @@ using std::endl;
 using std::fstream;
 using std::vector;
 
+// Example Function prototypes
+int test_pause_exit();
+
 
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer including 
 #define LISTENING_PORT 8888   //The port on which to listen for incoming data
 
 string SERVER_IP_IN;
-string DEBUG_HARDCODED_SERVER_IP_IN = "192.168.0.115"; //IP address of RBMS UDP server
-
-// Path for directories and files
-const auto DIR_LOCAL_STORAGE = "local_storage";
-const auto LOG_PATH = "local_storage/log.json";
-const auto DB_PATH = "local_storage/db.json";
-const auto EXAMPLE_DB_PATH = "local_storage/example_db.json";
 
 
-// Example Function prototypes
-int test_pause_exit();
+// Function prototypes
+string ask_for_ip();
 
 
 int main(void)
 {
-	cout << "Please input the server IP" << endl;
-	cin >> SERVER_IP_IN;
 
-	if (SERVER_IP_IN == "d")
-	{
-		SERVER_IP_IN = DEBUG_HARDCODED_SERVER_IP_IN;
-	}
+	db_helper dbHelper;
+	// dbHelper.removeDirectory(clientPath.DIR_LOCAL_STORAGE);
+	dbHelper.createDirectory(config.DIR_LOCAL_STORAGE);
+	dbHelper.initialize_db(config.DB_PATH, TRUE);
+	json db = dbHelper.db_to_json(config.DB_PATH);
+
+	cout << db.at("friday") << endl;
+
+	return test_pause_exit();
+
+
+
+	SERVER_IP_IN = ask_for_ip();
 
 	// The character array should be the size of the string+1 to accomodate the '\0' - null character at the end
 	int const server_ip_in_size = SERVER_IP_IN.length() + 1;
 	char* SERVER = new char[server_ip_in_size];
 	memset(SERVER, '\0', server_ip_in_size);
 	strcpy_s(SERVER, server_ip_in_size, SERVER_IP_IN.c_str());
-
-
-	dbHelper::createDirectory(DIR_LOCAL_STORAGE);
-
-	json db = dbHelper::db_to_json(DB_PATH);
-
-	// dbHelper::update_event(db, "friday", "10", json({}));
-	// if(dbHelper::update_db(DB_PATH, db)) { cout << "db updated" << endl; }
-
-	// return test_pause_exit();
-
 
 	WSADATA win_socket_struct;
 	SOCKET s;
@@ -118,6 +110,7 @@ int main(void)
 	};
 	client_struct.sin_port = htons(LISTENING_PORT);
 
+	// delete[] SERVER;
 
 	//start communication
 	while (1)
@@ -164,6 +157,20 @@ int main(void)
 	WSACleanup();
 
 	return 0;
+}
+
+
+string ask_for_ip()
+{
+	string SERVER_IP_IN;
+	cout << "Please input the server IP" << endl;
+	cin >> SERVER_IP_IN;
+
+	if (SERVER_IP_IN == "d")
+	{
+		SERVER_IP_IN = config.DEBUG_HARDCODED_SERVER_IP_IN;
+	}
+	return SERVER_IP_IN;
 }
 
 
