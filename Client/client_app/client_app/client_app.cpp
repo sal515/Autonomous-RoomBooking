@@ -62,7 +62,7 @@ int main(void)
 	char buf[BUFLEN];
 	string buffer;
 	string message;
-
+	
 	//Initialise winsock
 	cout << "\nInitialising Winsock... " << endl;
 	if (WSAStartup(MAKEWORD(2, 2), &win_socket_struct) != 0)
@@ -142,6 +142,7 @@ int main(void)
 
 void menu() 
 { 
+	int reqCounter = 1;
 	char choice;
 	cout << "Please select from the following options:\n"
 		 << "b. Book a Room\n"
@@ -156,63 +157,77 @@ void menu()
 
 			switch (choice)
 			{
-			case 'b':
-				string date;
-				int mm, dd, yyyy, hh, min_participants;
-				string topic;
-				cout << "Please provide the following details:\n"
-					<< "Date (DD/MM/YYYY): ";
-				cin >> date;
-				while (!extract_date(date, dd, mm, yyyy))
+				case 'b':
 				{
-					cout << "\nPlease input a valid date (DD/MM/YYYY): ";
+					string date;
+					int mm, dd, yyyy, hh, min_participants;
+					string topic;
+					cout << "Please provide the following details:\n"
+						<< "Date (DD/MM/YYYY): ";
 					cin >> date;
-				}
-				cout << "\nTime of meeting (24hr): ";
-				cin >> hh;
-				while (hh > 24 || hh < 0)
-				{
-					cout << "\nPlease input a valid time 0-24: ";
+					while (!extract_date(date, dd, mm, yyyy))
+					{
+						cout << "\nPlease input a valid date (DD/MM/YYYY): ";
+						cin >> date;
+					}
+					cout << "\nTime of meeting (24hr): ";
 					cin >> hh;
-				}
-				cout << "\nTopic of meeting: ";
-				cin >> topic;
-				cout << "\nMinimum number of Participants: ";
-				cin >> min_participants;
-				vector<string> participants = list_of_participants(min_participants);
+					while (hh > 24 || hh < 0)
+					{
+						cout << "\nPlease input a valid time 0-24: ";
+						cin >> hh;
+					}
+					cout << "\nTopic of meeting: ";
+					cin >> topic;
+					cout << "\nMinimum number of Participants: ";
+					cin >> min_participants;
+					vector<string> participants = list_of_participants(min_participants);
 
-				//Copy into json to send to server + implement request id with incremental?
-				//variables are date, time, topic, min_participants and participants(list)
-				goodInput = true;
-				//put in json obj.
-				break;
-			case 'c':
-				string meet_ID;
-				while (!getMeetID(meet_ID)) {
-					cout << "\nPlease enter a meeting ID: ";
-					cin >> meet_ID;
-				}
-				//check if meeting in agenda.
-				//check if meeting creator is same IP.
-				//if it is, send cancellation.
-				goodInput = true;
-				break;
-			case 'w':
-				string meet_ID;
-				while (!getMeetID(meet_ID)) {
-					cout << "\nPlease enter a meeting ID: ";
-					cin >> meet_ID;
-				}
-				//check if meeting in agenda
-				// request withdrawal if in local agenda.
-				//store in json
-				goodInput = true;
-				break;
-			case 'e':
-				cout << "exiting program";
-				return;
+					//Copy into json to send to server + implement request id with incremental?
+					//variables are date, time, topic, min_participants and participants(list)
+					goodInput = true;
+					string requestID = std::to_string(reqCounter);
+					string timeH = std::to_string(hh);
+					string minParts = std::to_string(min_participants);
+					json reqz = message.request(requestID, date, timeH, minParts, participants, topic);
 
-				cout << "Please enter a valid input";
+					//put in json obj.
+					break;
+				}
+				case 'c':
+				{
+					string meet_ID;
+					while (!getMeetID(meet_ID)) {
+						cout << "\nPlease enter a meeting ID: ";
+						cin >> meet_ID;
+					}
+					//check if meeting in agenda.
+					//check if meeting creator is same IP.
+					//if it is, send cancellation.
+					goodInput = true;
+					json cancel = message.cancelMeet(meet_ID);
+					break;
+				}
+				case 'w':
+				{
+					string meet_ID;
+					while (!getMeetID(meet_ID)) {
+						cout << "\nPlease enter a meeting ID: ";
+						cin >> meet_ID;
+					}
+					//check if meeting in agenda
+					// request withdrawal if in local agenda.
+					//store in json
+					goodInput = true;
+					break;
+				}
+				case 'e':
+				{
+					cout << "exiting program";
+					return;
+
+					cout << "Please enter a valid input";
+				}
 			}
 		}
 		goodInput = false;
