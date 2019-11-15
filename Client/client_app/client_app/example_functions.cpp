@@ -16,7 +16,7 @@ using std::endl;
 using std::fstream;
 using std::vector;
 
-// ================ dbHelper functions ================ 
+// ================ db_helper functions ================ 
 
 void test_path()
 {
@@ -33,22 +33,22 @@ void test_path()
 	// 	}
 	// 	else
 	// 	{
-	// 		cout << "ERROR: Couldn't retrieve the executable file path" << endl;
+	// 		cout << "ERROR: Couldn't retrieve the executable file client_path" << endl;
 	// 	}
 	// }
 	// catch (...)
 	// {
-	// 	cout << "ERROR: Couldn't retrieve the executable file path" << endl;
+	// 	cout << "ERROR: Couldn't retrieve the executable file client_path" << endl;
 	// }
 
 
 	const fs::path pathToShow{fs::current_path()};
 
 	int i = 0;
-	cout << "Displaying path info for: " << pathToShow << "\n";
+	cout << "Displaying client_path info for: " << pathToShow << "\n";
 	for (const auto& part : pathToShow)
 	{
-		cout << "path part: " << i++ << " = " << part << "\n";
+		cout << "client_path part: " << i++ << " = " << part << "\n";
 	}
 
 	cout << "exists() = " << fs::exists(pathToShow) << "\n"
@@ -74,7 +74,7 @@ void test_path()
 	}
 
 
-	cout << "path concat/append:\n";
+	cout << "client_path concat/append:\n";
 	fs::path p1("C:\\temp");
 	p1 /= "user";
 	p1 /= "data";
@@ -135,7 +135,7 @@ int test_json()
 }
 
 
-void dbHelper::example_db_creator(string example_db_path)
+void example_db_creator(string example_db_path)
 {
 	//Server only
 	// json room_list;
@@ -228,4 +228,4 @@ void dbHelper::example_db_creator(string example_db_path)
 	// return  test_pause_exit();
 }
 
-// ================ dbHelper functions ================ 
+// ================ db_helper functions ================ 
