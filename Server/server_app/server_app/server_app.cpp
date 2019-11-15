@@ -129,8 +129,22 @@ int main(void)
 
 		cout << "clientIP: " << clientIP << endl;
 		buffer = std::string(buf);
-		//json received_data = json::parse(buffer);
-		//cout << received_data.at("message") << std::endl;
+		json received_data = json::parse(buffer);
+
+		string msgType = received_data.at("message");
+		if (!msgType.compare("REQUEST")) {
+			// fill in info here
+		}
+		else if (!msgType.compare("CANCEL")) {
+			// do stuff
+		}
+		else if (!msgType.compare("WITHDRAW")) {
+			//do more stuff
+		}
+		else if (!msgType.compare("CONFIRM")) {
+			// do extra stuff
+		}
+		cout << received_data.at("message") << std::endl;
 
 
 		//

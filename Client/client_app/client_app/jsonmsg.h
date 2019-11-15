@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 
 #include "pch.h"
 
@@ -152,4 +151,4 @@ struct messages {
 		return room;
 	}
 
-} message;
+};

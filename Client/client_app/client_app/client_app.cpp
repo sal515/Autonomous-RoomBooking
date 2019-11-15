@@ -18,7 +18,7 @@ using std::fstream;
 using std::vector;
 
 
-#define SERVER "172.30.154.89"  //IP address of RBMS UDP server
+#define SERVER "192.168.1.133"  //IP address of RBMS UDP server
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer including 
 #define PORT 8888   //The port on which to listen for incoming data
@@ -34,6 +34,7 @@ const auto example_db_path = "local_storage/example_db.json";
 int test_pause_exit();
 vector<string> list_of_participants(int min);
 void menu();
+bool getMeetID(const string& meetID);
 bool check_ip(const string &ip);
 bool check_schedule(json schedule);
 bool extract_date(const std::string& s, int& d, int& m, int& y);
@@ -189,6 +190,7 @@ void menu()
 					string requestID = std::to_string(reqCounter);
 					string timeH = std::to_string(hh);
 					string minParts = std::to_string(min_participants);
+					messages message;
 					json reqz = message.request(requestID, date, timeH, minParts, participants, topic);
 
 					//put in json obj.
@@ -205,6 +207,7 @@ void menu()
 					//check if meeting creator is same IP.
 					//if it is, send cancellation.
 					goodInput = true;
+					messages message;
 					json cancel = message.cancelMeet(meet_ID);
 					break;
 				}
@@ -312,12 +315,13 @@ vector<string> list_of_participants(int min) {
 		}
 
 	}
+	return participants;
 
 }
 
 bool getMeetID(const string& meetID) {
 	//add funciton to look in agenda
-
+	return true;
 }
 
 
