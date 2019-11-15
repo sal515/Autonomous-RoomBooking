@@ -24,7 +24,10 @@
 #include <fstream>
 #include <filesystem>
 #include "jsonmsg.h"
-#include "dbHelper.h"
+#include "db_helper.h"
+#include "app_config.h"
+#include "time_day_room.h"
+#include "meeting.h"
 
 #include <windows.h>
 
