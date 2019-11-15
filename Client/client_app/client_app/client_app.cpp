@@ -36,16 +36,16 @@ using std::vector;
 
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer including 
-#define PORT 8888   //The port on which to listen for incoming data
+#define LISTENING_PORT 8888   //The port on which to listen for incoming data
 
-string server_ip_in;
-string debug_hardcoded_server_ip_in = "192.168.0.115"; //IP address of RBMS UDP server
+string SERVER_IP_IN;
+string DEBUG_HARDCODED_SERVER_IP_IN = "192.168.0.115"; //IP address of RBMS UDP server
 
 // Path for directories and files
-const auto dir_local_storage = "local_storage";
-const auto log_path = "local_storage/log.json";
-const auto db_path = "local_storage/db.json";
-const auto example_db_path = "local_storage/example_db.json";
+const auto DIR_LOCAL_STORAGE = "local_storage";
+const auto LOG_PATH = "local_storage/log.json";
+const auto DB_PATH = "local_storage/db.json";
+const auto EXAMPLE_DB_PATH = "local_storage/example_db.json";
 
 
 // Example Function prototypes
@@ -55,26 +55,26 @@ int test_pause_exit();
 int main(void)
 {
 	cout << "Please input the server IP" << endl;
-	cin >> server_ip_in;
+	cin >> SERVER_IP_IN;
 
-	if (server_ip_in == "d")
+	if (SERVER_IP_IN == "d")
 	{
-		server_ip_in = debug_hardcoded_server_ip_in;
+		SERVER_IP_IN = DEBUG_HARDCODED_SERVER_IP_IN;
 	}
 
 	// The character array should be the size of the string+1 to accomodate the '\0' - null character at the end
-	int const server_ip_in_size = server_ip_in.length() + 1;
+	int const server_ip_in_size = SERVER_IP_IN.length() + 1;
 	char* SERVER = new char[server_ip_in_size];
 	memset(SERVER, '\0', server_ip_in_size);
-	strcpy_s(SERVER, server_ip_in_size, server_ip_in.c_str());
+	strcpy_s(SERVER, server_ip_in_size, SERVER_IP_IN.c_str());
 
 
-	dbHelper::createDirectory(dir_local_storage);
+	dbHelper::createDirectory(DIR_LOCAL_STORAGE);
 
-	json db = dbHelper::db_to_json(db_path);
+	json db = dbHelper::db_to_json(DB_PATH);
 
 	// dbHelper::update_event(db, "friday", "10", json({}));
-	// if(dbHelper::update_db(db_path, db)) { cout << "db updated" << endl; }
+	// if(dbHelper::update_db(DB_PATH, db)) { cout << "db updated" << endl; }
 
 	// return test_pause_exit();
 
@@ -116,7 +116,7 @@ int main(void)
 		cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError() << endl;
 		exit(EXIT_FAILURE);
 	};
-	client_struct.sin_port = htons(PORT);
+	client_struct.sin_port = htons(LISTENING_PORT);
 
 
 	//start communication
