@@ -37,24 +37,30 @@ void menu()
 			{
 			case 'b':
 			{
-				string date;
-				int mm, dd, yyyy, hh, min_participants;
+				string day;
+				// int mm, dd, yyyy, hh;
+				int min_participants;
 				string topic;
-				cout << "Please provide the following details:\n"
-					<< "Date (DD/MM/YYYY): ";
-				cin >> date;
-				while (!extract_date(date, dd, mm, yyyy))
-				{
-					cout << "\nPlease input a valid date (DD/MM/YYYY): ";
-					cin >> date;
-				}
-				cout << "\nTime of meeting (24hr): ";
-				cin >> hh;
-				while (hh > 24 || hh < 0)
-				{
-					cout << "\nPlease input a valid time 0-24: ";
-					cin >> hh;
-				}
+
+				cout << "Please provide the day of the week:\n"
+					<< "Day: ";
+				cin >> day;
+
+
+				// while (!extract_date(date, dd, mm, yyyy))
+				// {
+				// 	cout << "\nPlease input a valid date (DD/MM/YYYY): ";
+				// 	cin >> date;
+				// }
+				// cout << "\nTime of meeting (24hr): ";
+				// cin >> hh;
+				// while (hh > 24 || hh < 0)
+				// {
+				// 	cout << "\nPlease input a valid time 0-24: ";
+				// 	cin >> hh;
+				// }
+
+
 				cout << "\nTopic of meeting: ";
 				cin >> topic;
 				cout << "\nMinimum number of Participants: ";
@@ -62,7 +68,7 @@ void menu()
 				vector<string> participants = list_of_participants(min_participants);
 
 				//Copy into json to send to server + implement request id with incremental?
-				//variables are date, time, topic, min_participants and participants(list)
+				//variables are day, time, topic, min_participants and participants(list)
 				goodInput = true;
 				string requestID = std::to_string(reqCounter);
 				string timeH = std::to_string(hh);

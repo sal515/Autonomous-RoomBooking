@@ -20,7 +20,6 @@ struct meeting
 	vector<string> confirmedParticipantsIP;
 	string roomNumber;
 	string topic;
-	// Date bookingDate;
 	string requesterIP;
 
 	static json meetingObj_to_json(const meeting& meetInfo);

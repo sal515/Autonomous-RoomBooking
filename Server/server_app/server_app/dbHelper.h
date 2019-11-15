@@ -5,12 +5,13 @@
 #include "json.hpp"
 #include <filesystem>
 #include <iostream>
-#include <fstream>s
+#include <fstream>
 #include <vector>
 #include <iomanip>
 
 
-namespace fs = std::experimental::filesystem;
+//namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 using json = nlohmann::json;
 using std::string;
 using std::cout;
