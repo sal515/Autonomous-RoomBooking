@@ -4,24 +4,7 @@
 // File management: https://www.tutorialspoint.com/cplusplus/cpp_files_streams.htm
 
 #include "pch.h"
-#include <iostream>
 
-// socket library
-#include <winsock2.h>
-#pragma comment(lib,"ws2_32.lib") //Linking Winsock Library
-#include <ws2tcpip.h> // Used to convert IPv4 or IPv6 addressed to standard binary and vice versa
-
-// Other libraries
-#include <string>
-#include <ctime>
-#include <sstream>
-#include <iomanip>
-#include "json.hpp"
-#include <vector>
-
-#include "dbHelper.h"
-
-#include <windows.h>
 // #include <fileapi.h>
 
 
@@ -49,6 +32,7 @@ const auto example_db_path = "local_storage/example_db.json";
 
 // Example Function prototypes
 int test_pause_exit();
+vector<string> list_of_participants(int min);
 void menu();
 bool check_ip(const string &ip);
 bool check_schedule(json schedule);
@@ -165,47 +149,74 @@ void menu()
 		 << "w. Withdraw from a Meeting\n"
 		 << "r. Request to Participate\n"
 		 << "e. Exit the Program\n";
+	bool goodInput = false;
+	while (1) {
+		while (!goodInput) {
+			cin >> choice;
 
-	cin >> choice;
+			switch (choice)
+			{
+			case 'b':
+				string date;
+				int mm, dd, yyyy, hh, min_participants;
+				string topic;
+				cout << "Please provide the following details:\n"
+					<< "Date (DD/MM/YYYY): ";
+				cin >> date;
+				while (!extract_date(date, dd, mm, yyyy))
+				{
+					cout << "\nPlease input a valid date (DD/MM/YYYY): ";
+					cin >> date;
+				}
+				cout << "\nTime of meeting (24hr): ";
+				cin >> hh;
+				while (hh > 24 || hh < 0)
+				{
+					cout << "\nPlease input a valid time 0-24: ";
+					cin >> hh;
+				}
+				cout << "\nTopic of meeting: ";
+				cin >> topic;
+				cout << "\nMinimum number of Participants: ";
+				cin >> min_participants;
+				vector<string> participants = list_of_participants(min_participants);
 
-	switch (choice)
-	{
-	case 'b':
-		string date;
-		int mm, dd, yyyy, hh, min_participants;
-		string topic;
-		cout << "Please provide the following details:\n"
-			<< "Date (DD/MM/YYYY): ";
-		cin >> date;
-		while (!extract_date(date, dd, mm, yyyy))
-		{
-			cout << "\nPlease input a valid date (DD/MM/YYYY): ";
-			cin >> date;
+				//Copy into json to send to server + implement request id with incremental?
+				//variables are date, time, topic, min_participants and participants(list)
+				goodInput = true;
+				//put in json obj.
+				break;
+			case 'c':
+				string meet_ID;
+				while (!getMeetID(meet_ID)) {
+					cout << "\nPlease enter a meeting ID: ";
+					cin >> meet_ID;
+				}
+				//check if meeting in agenda.
+				//check if meeting creator is same IP.
+				//if it is, send cancellation.
+				goodInput = true;
+				break;
+			case 'w':
+				string meet_ID;
+				while (!getMeetID(meet_ID)) {
+					cout << "\nPlease enter a meeting ID: ";
+					cin >> meet_ID;
+				}
+				//check if meeting in agenda
+				// request withdrawal if in local agenda.
+				//store in json
+				goodInput = true;
+				break;
+			case 'e':
+				cout << "exiting program";
+				return;
+
+				cout << "Please enter a valid input";
+			}
 		}
-		cout << "\nTime of meeting (24hr): ";
-		cin >> hh;
-		while (hh > 24 || hh < 0)
-		{
-			cout << "\nPlease input a valid time 0-24: ";
-			cin >> hh;
-		}
-		cout << "\nTopic of meeting: ";
-		cin >> topic;
-		cout << "\nMinimum number of Participants: ";
-		cin >> min_participants;
-		vector<string> participants = list_of_participants(min_participants);
-
-		//Copy into json to send to server + implement request id with incremental?
-		//variables are date, time, topic, min_participants and participants(list)
-		break;
-
-		//Make the other cases
-	
-
+		goodInput = false;
 	}
-
-
-
 }
 
 vector<string> list_of_participants(int min) {
@@ -289,6 +300,10 @@ vector<string> list_of_participants(int min) {
 
 }
 
+bool getMeetID(const string& meetID) {
+	//add funciton to look in agenda
+
+}
 
 
 bool check_ip(const string &ip)

@@ -8,6 +8,27 @@
 
 #ifndef PCH_H
 #define PCH_H
+#include <iostream>
+
+// socket library
+#include <winsock2.h>
+#pragma comment(lib,"ws2_32.lib") //Linking Winsock Library
+#include <ws2tcpip.h> // Used to convert IPv4 or IPv6 addressed to standard binary and vice versa
+
+// Other libraries
+#include <string>
+#include <ctime>
+#include <sstream>
+#include <iomanip>
+#include "json.hpp"
+#include <vector>
+#include <string>
+#include <fstream>
+#include <filesystem>
+#include "jsonmsg.h"
+#include "dbHelper.h"
+
+#include <windows.h>
 
 // TODO: add headers that you want to pre-compile here
 
