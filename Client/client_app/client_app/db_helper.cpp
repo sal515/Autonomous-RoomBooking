@@ -126,9 +126,6 @@ void db_helper::initialize_db(const string& dbPath, const bool& isClient)
 
 json db_helper::db_to_json(const string& dbPath)
 {
-	// usage example
-	// json db = db_helper::db_to_json(dbPath);
-
 	try
 	{
 		// example db client_path: local_storage/client_json_db/db.json 

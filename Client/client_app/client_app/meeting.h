@@ -13,23 +13,38 @@ using std::endl;
 
 struct meeting
 {
-	int minimumParticipants = -1;
-	int rq = -1;
-	int mt = -1;
+	int minimumParticipants;
+	int rq;
+	int mt;
 	vector<string> invitedParticipantsIP;
 	vector<string> confirmedParticipantsIP;
-	string roomNumber = "";
-	string topic = "";
+	string roomNumber;
+	string topic;
 	// Date bookingDate;
-	string requesterIP = "";
+	string requesterIP;
 
 	static json meetingObj_to_json(const meeting& meetInfo);
 	static meeting json_to_meetingObj(const json& meeting_json);
+	
+	meeting();
+	meeting	(
+		const int &minimumParticipants,
+		const int &rq,
+		const int &mt,
+		const vector<string> &invitedParticipantsIP,
+		const vector<string> &confirmedParticipantsIP,
+		const string &roomNumber,
+		const string &topic,
+		const string &requesterIP
+	);
 
 	// client specific meeting manipulators
 	static json client_get_meeting(json& db, const string& day, const string& time);
 	static bool client_update_meeting(json& db, const string& day, const string& time, const json& meeting);
 	static bool client_isMeeting(json& db, const string& day, const string& time);
+
+
+	// --------------------------------------------
 
 	// server specific meeting manipulators
 	static json server_get_meeting(json& db, const string& day, const string& time, const string& room);

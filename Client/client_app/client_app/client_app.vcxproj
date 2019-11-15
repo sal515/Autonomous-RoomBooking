@@ -160,9 +160,10 @@
   <ItemGroup>
     <ClCompile Include="app_config.cpp" />
     <ClCompile Include="client_app.cpp" />
+    <ClCompile Include="project_examples.cpp" />
     <ClCompile Include="time_day_room.cpp" />
     <ClCompile Include="db_helper.cpp" />
-    <ClCompile Include="example_functions.cpp" />
+    <ClCompile Include="syntax_examples.cpp" />
     <ClCompile Include="meeting.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

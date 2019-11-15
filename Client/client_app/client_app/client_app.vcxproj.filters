@@ -41,9 +41,6 @@
     <ClCompile Include="meeting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="example_functions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="db_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,6 +48,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="app_config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="syntax_examples.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="project_examples.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

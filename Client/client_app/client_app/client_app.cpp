@@ -43,28 +43,29 @@ int test_pause_exit();
 
 string SERVER_IP_IN;
 
-
 // Function prototypes
 string ask_for_ip();
 
 
+
 int main(void)
 {
+	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
+	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
+	db_helper::initialize_db(config.DB_PATH, TRUE);
 
-	db_helper dbHelper;
-	// dbHelper.removeDirectory(clientPath.DIR_LOCAL_STORAGE);
-	dbHelper.createDirectory(config.DIR_LOCAL_STORAGE);
-	dbHelper.initialize_db(config.DB_PATH, TRUE);
-	json db = dbHelper.db_to_json(config.DB_PATH);
+	// loading db from file to memory
+	json db = db_helper::db_to_json(config.DB_PATH);
 
-	cout << db.at("friday") << endl;
 
-	return test_pause_exit();
+
+	// return Testing_dbHelper_meetingObj();
 
 
 
 	SERVER_IP_IN = ask_for_ip();
 
+	// Converting IP: string to char[]
 	// The character array should be the size of the string+1 to accomodate the '\0' - null character at the end
 	int const server_ip_in_size = SERVER_IP_IN.length() + 1;
 	char* SERVER = new char[server_ip_in_size];

@@ -23,7 +23,7 @@ json meeting::meetingObj_to_json(const meeting& meetInfo)
 	return meeting_json;
 }
 
-meeting meeting::json_to_meetingObj(const json &meeting_json)
+meeting meeting::json_to_meetingObj(const json& meeting_json)
 {
 	meeting meetInfo;
 
@@ -54,6 +54,33 @@ meeting meeting::json_to_meetingObj(const json &meeting_json)
 	return meetInfo;
 }
 
+meeting::meeting()
+{
+	int minimumParticipants = -1;
+	int rq = -1;
+	int mt = -1;
+	vector<string> invitedParticipantsIP;
+	vector<string> confirmedParticipantsIP;
+	string roomNumber = "";
+	string topic = "";
+	// Date bookingDate;
+	string requesterIP = "";
+}
+
+meeting::meeting(const int& minimumParticipants, const int& rq, const int& mt,
+	const vector<string>& invitedParticipantsIP, const vector<string>& confirmedParticipantsIP,
+	const string& roomNumber, const string& topic, const string& requesterIP)
+{
+	this->minimumParticipants = minimumParticipants;
+	this->rq = rq;
+	this->mt = mt;
+	this->invitedParticipantsIP = invitedParticipantsIP;
+	this->confirmedParticipantsIP = confirmedParticipantsIP;
+	this->roomNumber = roomNumber;
+	this->topic = topic;
+	this->requesterIP = requesterIP;
+}
+
 json meeting::client_get_meeting(json& db, const string& day, const string& time)
 {
 	try
@@ -63,7 +90,7 @@ json meeting::client_get_meeting(json& db, const string& day, const string& time
 	catch (nlohmann::json::exception& e)
 	{
 		cout << "Exception: client_get_meeting method throws -> " << e.what() << endl;
-		return  json({});
+		return json({});
 	}
 }
 
@@ -84,10 +111,8 @@ bool meeting::client_update_meeting(json& db, const string& day, const string& t
 
 bool meeting::client_isMeeting(json& db, const string& day, const string& time)
 {
-	return meeting::client_get_meeting(db, day, time).empty();
+	return !meeting::client_get_meeting(db, day, time).empty();
 }
-
-
 
 
 // server specific meeting manipulators
@@ -101,12 +126,12 @@ json meeting::server_get_meeting(json& db, const string& day, const string& time
 	catch (nlohmann::json::exception& e)
 	{
 		cout << "Exception: server_get_meeting method throws -> " << e.what() << endl;
-		return  json({});
+		return json({});
 	}
 }
 
 bool meeting::server_update_meeting(json& db, const string& day, const string& time, const string& room,
-	const json& meeting)
+                                    const json& meeting)
 {
 	try
 	{
@@ -123,5 +148,5 @@ bool meeting::server_update_meeting(json& db, const string& day, const string& t
 
 bool meeting::server_isMeeting(json& db, const string& day, const string& time, const string& room)
 {
-	return meeting::server_get_meeting(db, day, time, room).empty();
+	return !meeting::server_get_meeting(db, day, time, room).empty();
 }
