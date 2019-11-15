@@ -30,6 +30,9 @@
     <ClInclude Include="app_config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="jsonmsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">

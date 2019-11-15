@@ -1,22 +1,6 @@
 // server_app.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 #include "pch.h"
-#include <iostream>
-
-#include <cstdio>
-#include <winsock2.h>
-#pragma comment(lib,"ws2_32.lib") //Linking Winsock Library
-#include <ws2tcpip.h>	// Used to convert IPv4 or IPv6 addressed to standard binary and vice versa
-
-// Other libraries
-#include <string>
-#include "json.hpp"
-#include <vector>
-
-#include "dbHelper.h"
-
-#include <windows.h>
-// #include <fileapi.h>
 
 
 // namespaces
@@ -53,7 +37,8 @@ int main(void)
 	WSADATA win_socket_struct;
 	SOCKET s;
 
-	struct sockaddr_in server_struct, si_other;
+	struct sockaddr_in server_struct; 
+	struct sockaddr_in si_other;
 
 	int server_struct_len, recv_len;
 	server_struct_len = sizeof(server_struct);
@@ -145,6 +130,20 @@ int main(void)
 		cout << "clientIP: " << clientIP << endl;
 		buffer = std::string(buf);
 		json received_data = json::parse(buffer);
+
+		string msgType = received_data.at("message");
+		if (!msgType.compare("REQUEST")) {
+			// fill in info here
+		}
+		else if (!msgType.compare("CANCEL")) {
+			// do stuff
+		}
+		else if (!msgType.compare("WITHDRAW")) {
+			//do more stuff
+		}
+		else if (!msgType.compare("CONFIRM")) {
+			// do extra stuff
+		}
 		cout << received_data.at("message") << std::endl;
 
 
