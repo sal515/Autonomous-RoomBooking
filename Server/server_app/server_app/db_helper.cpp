@@ -118,15 +118,20 @@ void db_helper::initialize_db(const string& dbPath, const bool& isClient)
 	else
 	{
 		// ============ Server ===============
-		json room_list;
+		json rooms;
 		json day;
 		json time;
 
+		vector<string> rooms_vec = time_day_room::room_vec();
+		for (string room : rooms_vec)
+		{
+			rooms[room] = json({});
+		}
 
 		map<string, string> time_map = time_day_room::time_map(time_day_room::startTime, time_day_room::endTime);
 		for (const auto &element : time_map)
 		{
-			time[element.first] = json({});
+			time[element.first] = rooms;
 		}
 
 		map<string, string> day_map = time_day_room::day_map();
@@ -144,11 +149,11 @@ void db_helper::initialize_db(const string& dbPath, const bool& isClient)
 				writeFile << std::setw(4) << day << std::endl;
 				writeFile.close();
 
-				cout << "Client agenda was created" << endl;
+				cout << "Server database was created" << endl;
 			}
 			else
 			{
-				cout << "Client agenda already exits" << endl;
+				cout << "Server database already exits" << endl;
 			}
 		}
 		catch (fstream::failure& e)

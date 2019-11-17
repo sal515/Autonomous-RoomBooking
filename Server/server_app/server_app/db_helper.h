@@ -23,7 +23,8 @@ struct db_helper
 	/*
 	 * Usage example: json db = db_helper::db_to_json(dbPath);
 	 */
-	static void initialize_db(const string& dbPath, const bool &isClient);
+	static void initialize_db(const string& dbPath, const bool &is
+	);
 	static json db_to_json(const string& dbPath);
 	static bool save_db(const string& dbPath, const json& db);
 };
