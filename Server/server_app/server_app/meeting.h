@@ -1,11 +1,13 @@
 ﻿#pragma once
 
 #include "pch.h"
+#include "json.hpp"
 
 using json = nlohmann::json;
 
 struct meeting
 {
+	string message;
 	string minimumParticipants;
 	string requestID;
 	string meetingID;
@@ -22,6 +24,7 @@ struct meeting
 
 	meeting();
 	meeting(
+		const string& message,
 		const string& minimumParticipants,
 		const string& requestID,
 		const string& meetingID,
@@ -33,12 +36,6 @@ struct meeting
 		const string& requesterIP,
 		const bool& meetingStatus
 	);
-
-	// client specific meeting manipulators
-	static json client_get_meeting(json& db, const string& day, const string& time);
-	static bool client_update_meeting(json& db, const string& day, const string& time, const json& meeting);
-	static bool client_isMeeting(json& db, const string& day, const string& time);
-
 
 	// --------------------------------------------
 

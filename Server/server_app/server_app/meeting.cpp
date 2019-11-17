@@ -4,6 +4,7 @@
 json meeting::meetingObj_to_json(const meeting& meetInfo)
 {
 	json meeting_json;
+	meeting_json["message"] = meetInfo.message;
 	meeting_json["minimumParticipants"] = meetInfo.minimumParticipants;
 	meeting_json["requestID"] = meetInfo.requestID;
 	meeting_json["meetingID"] = meetInfo.meetingID;
@@ -26,6 +27,9 @@ json meeting::meetingObj_to_json(const meeting& meetInfo)
 meeting meeting::json_to_meetingObj(const json& meeting_json)
 {
 	meeting meetInfo;
+
+	const string message = meeting_json.at("message");
+	meetInfo.message = message;
 
 	const string minimumParticipants = meeting_json.at("minimumParticipants");
 	meetInfo.minimumParticipants = minimumParticipants;
@@ -57,22 +61,25 @@ meeting meeting::json_to_meetingObj(const json& meeting_json)
 
 meeting::meeting()
 {
-	int minimumParticipants = -1;
-	int rq = -1;
-	int mt = -1;
-	vector<string> invitedParticipantsIP;
-	vector<string> confirmedParticipantsIP;
-	string roomNumber = "";
-	string topic = "";
-	// Date bookingDate;
-	string requesterIP = "";
+	message = "-1";
+	minimumParticipants = "-1";
+	requestID = "-1";
+	meetingID = "-1";
+	invitedParticipantsIP = vector<string>();
+	confirmedParticipantsIP = vector<string>();
+	roomNumber = "-1";
+	topic = "-1";
+	meetingDay = "-1";
+	requesterIP = "-1";
+	meetingStatus = false;
 }
 
-meeting::meeting(const string& minimumParticipants, const string& requestID, const string& meetingID,
-	const vector<string>& invitedParticipantsIP, const vector<string>& confirmedParticipantsIP,
-	const string& roomNumber, const string& topic, const string& meetingDay, const string& requesterIP,
-	const bool& meetingStatus)
+meeting::meeting(const string &message, const string& minimumParticipants, const string& requestID, const string& meetingID,
+                 const vector<string>& invitedParticipantsIP, const vector<string>& confirmedParticipantsIP,
+                 const string& roomNumber, const string& topic, const string& meetingDay, const string& requesterIP,
+                 const bool& meetingStatus)
 {
+	this->message = message;
 	this->minimumParticipants = minimumParticipants;
 	this->requestID = requestID;
 	this->meetingID = meetingID;
@@ -82,43 +89,8 @@ meeting::meeting(const string& minimumParticipants, const string& requestID, con
 	this->topic = topic;
 	this->meetingDay = meetingDay;
 	this->requesterIP = requesterIP;
-	this->requesterIP = requesterIP;
-	this->meetingStatus= meetingStatus;
+	this->meetingStatus = meetingStatus;
 }
-
-json meeting::client_get_meeting(json& db, const string& day, const string& time)
-{
-	try
-	{
-		return db.at(day).at(time);
-	}
-	catch (nlohmann::json::exception& e)
-	{
-		cout << "Exception: client_get_meeting method throws -> " << e.what() << endl;
-		return json({});
-	}
-}
-
-bool meeting::client_update_meeting(json& db, const string& day, const string& time, const json& meeting)
-{
-	try
-	{
-		db.at(day).at(time).update(meeting);
-		// db.at(days).at(time) = meeting;
-		return true;
-	}
-	catch (nlohmann::json::exception& e)
-	{
-		cout << "Exception: client_update_meeting method throws -> " << e.what() << endl;
-		return false;
-	}
-}
-
-bool meeting::client_isMeeting(json& db, const string& day, const string& time)
-{
-	return !meeting::client_get_meeting(db, day, time).empty();
-}
-
 
 // server specific meeting manipulators
 
