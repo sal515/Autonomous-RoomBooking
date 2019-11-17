@@ -4,6 +4,7 @@
 #define MSGS_STR_H
 
 using json = nlohmann::json;
+using std::string;
 
 static const struct messageType
 {
@@ -27,63 +28,62 @@ static const struct messageType
 
 struct messages
 {
-	json request(
-		std::string requestID,
-		std::string day,
-		std::string time,
-		std::vector<std::string> list,
-		std::string minimum,
-		std::string topic,
-		std::string meetingStatus,
-		std::string roomID,
-		json& db)
+	static json request(
+		string requestID,
+		string meetingDay,
+		string meetingTime,
+		string minimumParticipants,
+		vector<string> listofParticipants,
+		string topic
+		// string meetingStatus,
+		// string roomNumber,
+		// json& db
+	)
 	{
 		json req;
-		json room;
+		// json listOfPart(listofParticipants);
+		// json room;
 
 		req["message"] = messageType.request;
 		req["requestID"] = requestID;
-		req["day"] = day;
-		req["time"] = time;
-		json listOfPart(list);
-		req["participantsIP"] = listOfPart;
-		req["minimum"] = minimum;
+		req["meetingDay"] = meetingDay;
+		req["meetingTime"] = meetingTime;
+		req["invitedParticipantsIP"] = listofParticipants;
+		req["minimumParticipants"] = minimumParticipants;
 		req["topic"] = topic;
-		req["meetingStatus"] = meetingStatus;
-
-		req["roomID"] = roomID;
-		room[roomID] = req;
-		db.at(day).at(time).update(req);
+		// req["meetingStatus"] = meetingStatus;
+		// req["roomNumber"] = roomNumber;
+		// room[roomNumber] = req;
 		return req;
 	}
 
-	json response_unavail(std::string requestID)
+	static json response_unavail(string requestID)
 	{
 		json deny;
 		deny["message"] = messageType.response;
 		deny["requestID"] = requestID;
-		deny["status"] = "UNAVAILABLE";
+		deny["meetingStatus"] = "UNAVAILABLE";
 		return deny;
 	}
 
-	json invite(
-		std::string meetingID,
-		std::string day,
-		std::string time,
-		std::string topic,
-		std::string requesterIP)
+	static json invite(
+		string meetingID,
+		string meetingDay,
+		string meetingTime,
+		string topic,
+		string requesterIP)
 	{
 		json invitation;
 		invitation["message"] = messageType.invite;
 		invitation["meetingID"] = meetingID;
-		invitation["day"] = day;
-		invitation["time"] = time;
+		invitation["meetingDay"] = meetingDay;
+		invitation["meetingTime"] = meetingTime;
 		invitation["topic"] = topic;
 		invitation["requesterIP"] = requesterIP;
 		return invitation;
 	}
 
-	json accept_inv(std::string meetingID)
+	static json accept_inv(string meetingID)
 	{
 		json accept;
 		accept["message"] = messageType.accept;
@@ -91,7 +91,7 @@ struct messages
 		return accept;
 	}
 
-	json reject_inv(std::string meetingID)
+	static json reject_inv(string meetingID)
 	{
 		json deny;
 		deny["message"] = messageType.reject;
@@ -99,35 +99,32 @@ struct messages
 		return deny;
 	}
 
-	json confirm_room(std::string meetingID, std::string roomID)
+	static json confirm_room(string meetingID, string roomNumber)
 	{
 		json confirmation;
 		confirmation["message"] = messageType.confirm;
 		confirmation["meetingID"] = meetingID;
-		confirmation["roomID"] = roomID;
+		confirmation["roomNumber"] = roomNumber;
 		return confirmation;
 	}
 
-	json scheduled(
-		std::string requestID,
-		std::string meetingID,
-		std::string roomID,
-		std::vector<std::string> list,
-		std::vector<std::string> unconfirmed)
+	static json scheduled(
+		string requestID,
+		string meetingID,
+		string roomNumber,
+		vector<string> confirmedParticipantsIP
+	)
 	{
 		json sched;
 		sched["message"] = messageType.scheduled;
 		sched["requestID"] = requestID;
 		sched["meetingID"] = meetingID;
-		sched["roomID"] = roomID;
-		json listOfPart(list);
-		sched["confirmedParticipantsIP"] = listOfPart;
-		json listUnconfirmed(unconfirmed);
-		sched["invitedParticipantsIP"] = listUnconfirmed;
+		sched["roomNumber"] = roomNumber;
+		sched["confirmedParticipantsIP"] = confirmedParticipantsIP;
 		return sched;
 	}
 
-	json cancel(std::string meetingID, std::string reason)
+	static json cancel(string meetingID, string reason)
 	{
 		json cancel;
 		cancel["message"] = messageType.cancelResponse;
@@ -135,28 +132,27 @@ struct messages
 		cancel["reason"] = reason;
 	}
 
-	json not_sched(
-		std::string requestID,
-		std::string day,
-		std::string time,
-		std::string minimum,
-		std::vector<std::string> list,
-		std::string topic)
+	static json not_sched(
+		string requestID,
+		string meetingDay,
+		string meetingTime,
+		string minimumParticipants,
+		vector<string> confirmedParticipantsIP,
+		string topic)
 	{
 		json notSched;
 		notSched["message"] = messageType.notScheduled;
 		notSched["requestID"] = requestID;
-		notSched["day"] = day;
-		notSched["time"] = time;
-		notSched["minimum"] = minimum;
-		json listOfPart(list);
-		notSched["confirmedParticipantsIP"] = listOfPart;
+		notSched["meetingDay"] = meetingDay;
+		notSched["meetingTime"] = meetingTime;
+		notSched["minimumParticipants"] = minimumParticipants;
+		notSched["confirmedParticipantsIP"] = confirmedParticipantsIP;
 		notSched["topic"] = topic;
 
 		return notSched;
 	}
 
-	json cancelMeet(std::string meetingID)
+	static json cancelMeet(string meetingID)
 	{
 		json cancel;
 		cancel["message"] = messageType.cancelRequest;
@@ -164,7 +160,7 @@ struct messages
 		return cancel;
 	}
 
-	json withdraw(std::string meetingID)
+	static json withdraw(string meetingID)
 	{
 		json withdrawal;
 		withdrawal["message"] = messageType.withdraw;
@@ -172,7 +168,7 @@ struct messages
 		return withdrawal;
 	}
 
-	json withdrawIP(std::string meetingID, std::string IP)
+	static json withdrawIP(string meetingID, string IP)
 	{
 		json withdrawal;
 		withdrawal["message"] = messageType.withdrawNotify;
@@ -181,7 +177,7 @@ struct messages
 		return withdrawal;
 	}
 
-	json add(std::string meetingID)
+	static json add(string meetingID)
 	{
 		json adder;
 		adder["message"] = messageType.add;
@@ -189,16 +185,16 @@ struct messages
 		return adder;
 	}
 
-	json confirm(std::string meetingID, std::string roomID)
+	static json confirm(string meetingID, string roomNumber)
 	{
 		json confirmation;
 		confirmation["message"] = messageType.confirm;
 		confirmation["meetingID"] = meetingID;
-		confirmation["roomID"] = roomID;
+		confirmation["roomNumber"] = roomNumber;
 		return confirmation;
 	}
 
-	json added(std::string meetingID, std::string IP)
+	static json added(string meetingID, string IP)
 	{
 		json addedP;
 		addedP["message"] = messageType.added;
@@ -207,7 +203,7 @@ struct messages
 		return addedP;
 	}
 
-	json room_change(std::string meetingID, std::string newRoomNum)
+	static json room_change(string meetingID, string newRoomNum)
 	{
 		json room;
 		room["message"] = messageType.roomChange;
