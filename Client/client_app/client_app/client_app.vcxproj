@@ -75,6 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -162,6 +163,7 @@
   <ItemGroup>
     <ClCompile Include="app_config.cpp" />
     <ClCompile Include="client_app.cpp" />
+    <ClCompile Include="logger_example.cpp" />
     <ClCompile Include="main_functions.cpp" />
     <ClCompile Include="project_examples.cpp" />
     <ClCompile Include="time_day_room.cpp" />
