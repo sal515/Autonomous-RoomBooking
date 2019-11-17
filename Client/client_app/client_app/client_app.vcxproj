@@ -153,11 +153,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="app_config.h" />
+    <ClInclude Include="json_messages.h" />
     <ClInclude Include="main_functions.h" />
     <ClInclude Include="time_day_room.h" />
     <ClInclude Include="db_helper.h" />
     <ClInclude Include="meeting.h" />
-    <ClInclude Include="jsonmsg.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
