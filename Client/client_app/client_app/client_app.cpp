@@ -6,6 +6,7 @@
 #include "pch.h"
 
 #include "main_functions.h"
+#include <spdlog/version.h>
 
 // #include <fileapi.h>
 
@@ -51,12 +52,23 @@ int main(void)
 	// loading db from file to memory
 	json db = db_helper::db_to_json(config.DB_PATH);
 
-
-
 	// return Testing_dbHelper_meetingObj();
+	// menu();
+	
+
+	spdlog::info("type {}", "info");
+	spdlog::debug("type {}", "debug");
+	spdlog::critical("type {}", "debug");
 
 
-	menu();
+	spdlog::info("Welcome to spdlog version {}.{}.{}  !", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR, SPDLOG_VER_PATCH);
+	spdlog::warn("Easy padding in numbers like {:08d}", 12);
+	spdlog::critical("Support for int: {0:d};  hex: {0:x};  oct: {0:o}; bin: {0:b}", 42);
+	spdlog::info("Support for floats {:03.2f}", 1.23456);
+	spdlog::info("Positional args are {1} {0}..", "too", "supported");
+	spdlog::info("{:>8} aligned, {:<8} aligned", "right", "left");
+
+	
 	return test_pause_exit();
 
 
@@ -112,13 +124,23 @@ int main(void)
 	// delete[] SERVER;
 
 	//start communication
-	while (true)
-	{
+	//while (true)
+	//{
 		// cout << "Enter message : ";
 		// cin >> message;
 
 		json jsonMsg;
-		jsonMsg["message"] = "msg";
+		vector<string> ips;
+		ips.push_back("192.168.1.133");
+		ips.push_back("192.168.0.188");
+		json partIP(ips);
+		
+		jsonMsg["message"] = "REQUEST";
+		jsonMsg["day"] =  "monday";
+		jsonMsg["time"] = "10";
+		jsonMsg["requestID"] = "1";
+		jsonMsg["topic"] = "yomama";
+		jsonMsg["participantsIP"] = partIP;
 		message = jsonMsg.dump();
 
 		cout << message << endl;
@@ -139,18 +161,18 @@ int main(void)
 
 		//receive a reply and print it
 		//clear the buffer by filling null, it might have previously received data
-		// memset(buf, '\0', BUFLEN);
-		// //try to receive some data, this is a blocking call
-		// if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&client_struct, &client_struct_len) == SOCKET_ERROR)
-		// {
-		// 	cout << "recvfrom() failed with error code : " << WSAGetLastError << endl;
-		// 	exit(EXIT_FAILURE);
-		// }
+		 memset(buf, '\0', BUFLEN);
+		 //try to receive some data, this is a blocking call
+		 if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&client_struct, &client_struct_len) == SOCKET_ERROR)
+		 {
+		 	cout << "recvfrom() failed with error code : " << WSAGetLastError << endl;
+		 	exit(EXIT_FAILURE);
+		 }
 
-
-		// buffer = string(buf);
-		// cout << "Sent Data: " << buffer << endl;
-	}
+		 buffer = string(buf);
+		 json received_dat = json::parse(buffer);
+		 cout << "received Data: " << received_dat.at("roomID") << endl;
+	//}
 
 	closesocket(s);
 	WSACleanup(); 

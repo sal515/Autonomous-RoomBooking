@@ -231,9 +231,15 @@ bool getMeetID(const string& meetingID)
 
 bool check_ip(const string& ip)
 {
-	struct sockaddr_in sa;
-	int result = inet_pton(AF_INET, ip.c_str(), &(sa.sin_addr));
-	return result != 0;
+	try {
+		struct sockaddr_in sa;
+		cout << "\n" << ip.c_str() << "\n";
+		int result = inet_pton(AF_INET, ip.c_str(), &(sa.sin_addr));
+		return result != 0;
+	}
+	catch (...) {
+		cout << ip.c_str();
+	}
 }
 
 bool check_schedule(json schedule)
