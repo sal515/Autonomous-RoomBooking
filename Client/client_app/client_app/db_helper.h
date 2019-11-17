@@ -1,15 +1,7 @@
 ﻿#pragma once
 
-#include <string>
+#include "pch.h"
 #include "json.hpp"
-#include <filesystem>
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <iomanip>
-#include <map>
-
-#include "time_day_room.h"
 
 namespace fs = std::experimental::filesystem;
 using json = nlohmann::json;

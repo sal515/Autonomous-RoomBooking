@@ -1,15 +1,8 @@
 ﻿#pragma once
-#include <iostream>
-#include <string>
-#include "json.hpp"
-#include <vector>
 
-using std::string;
-using std::vector;
+#include "pch.h"
+
 using json = nlohmann::json;
-using std::cout;
-using std::endl;
-
 
 struct meeting
 {
@@ -26,19 +19,19 @@ struct meeting
 
 	static json meetingObj_to_json(const meeting& meetInfo);
 	static meeting json_to_meetingObj(const json& meeting_json);
-	
+
 	meeting();
-	meeting	(
-		const string &minimumParticipants,
-		const string &requestID,
-		const string &meetingID,
-		const vector<string> &invitedParticipantsIP,
-		const vector<string> &confirmedParticipantsIP,
-		const string &roomNumber,
-		const string &topic,
-		const string &meetingDay,
-		const string &requesterIP,
-		const bool &meetingStatus
+	meeting(
+		const string& minimumParticipants,
+		const string& requestID,
+		const string& meetingID,
+		const vector<string>& invitedParticipantsIP,
+		const vector<string>& confirmedParticipantsIP,
+		const string& roomNumber,
+		const string& topic,
+		const string& meetingDay,
+		const string& requesterIP,
+		const bool& meetingStatus
 	);
 
 	// client specific meeting manipulators
@@ -51,6 +44,7 @@ struct meeting
 
 	// server specific meeting manipulators
 	static json server_get_meeting(json& db, const string& day, const string& time, const string& room);
-	static bool server_update_meeting(json& db, const string& day, const string& time, const string& room, const json& meeting);
+	static bool server_update_meeting(json& db, const string& day, const string& time, const string& room,
+	                                  const json& meeting);
 	static bool server_isMeeting(json& db, const string& day, const string& time, const string& room);
 };
