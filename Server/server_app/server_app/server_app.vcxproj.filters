@@ -33,6 +33,9 @@
     <ClInclude Include="time_day_room.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="meeting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -47,10 +50,10 @@
     <ClCompile Include="read_msgs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="json_messages.cpp">
+    <ClCompile Include="time_day_room.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="time_day_room.cpp">
+    <ClCompile Include="meeting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

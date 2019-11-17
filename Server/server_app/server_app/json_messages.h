@@ -22,7 +22,7 @@ struct messages {
 		req["time"] = time;
 		req["invitedParticipantsIP"] = listOfPart;
 		req["confirmedParticipantsIP"] = confirmed;
-		req["minimum"] = minimum;
+		req["minimumParticipants"] = minimum;
 		req["topic"] = topic;
 		req["meetingStatus"] = meetingStatus;
 		req["roomNumber"] = roomNumber;

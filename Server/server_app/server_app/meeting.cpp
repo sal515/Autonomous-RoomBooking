@@ -4,6 +4,7 @@
 json meeting::meetingObj_to_json(const meeting& meetInfo)
 {
 	json meeting_json;
+	meeting_json["message"] = meetInfo.message;
 	meeting_json["minimumParticipants"] = meetInfo.minimumParticipants;
 	meeting_json["requestID"] = meetInfo.requestID;
 	meeting_json["meetingID"] = meetInfo.meetingID;
@@ -26,6 +27,9 @@ json meeting::meetingObj_to_json(const meeting& meetInfo)
 meeting meeting::json_to_meetingObj(const json& meeting_json)
 {
 	meeting meetInfo;
+
+	const string message = meeting_json.at("message");
+	meetInfo.message = message;
 
 	const string minimumParticipants = meeting_json.at("minimumParticipants");
 	meetInfo.minimumParticipants = minimumParticipants;
@@ -57,6 +61,7 @@ meeting meeting::json_to_meetingObj(const json& meeting_json)
 
 meeting::meeting()
 {
+	string message = "";
 	int minimumParticipants = -1;
 	int rq = -1;
 	int mt = -1;
@@ -68,11 +73,12 @@ meeting::meeting()
 	string requesterIP = "";
 }
 
-meeting::meeting(const string& minimumParticipants, const string& requestID, const string& meetingID,
+meeting::meeting(const string& message, const string& minimumParticipants, const string& requestID, const string& meetingID,
 	const vector<string>& invitedParticipantsIP, const vector<string>& confirmedParticipantsIP,
 	const string& roomNumber, const string& topic, const string& meetingDay, const string& requesterIP,
 	const bool& meetingStatus)
 {
+	this->message = message;
 	this->minimumParticipants = minimumParticipants;
 	this->requestID = requestID;
 	this->meetingID = meetingID;
@@ -83,7 +89,7 @@ meeting::meeting(const string& minimumParticipants, const string& requestID, con
 	this->meetingDay = meetingDay;
 	this->requesterIP = requesterIP;
 	this->requesterIP = requesterIP;
-	this->meetingStatus= meetingStatus;
+	this->meetingStatus = meetingStatus;
 }
 
 json meeting::client_get_meeting(json& db, const string& day, const string& time)
@@ -92,7 +98,7 @@ json meeting::client_get_meeting(json& db, const string& day, const string& time
 	{
 		return db.at(day).at(time);
 	}
-	catch (nlohmann::json::exception& e)
+	catch (nlohmann::json::exception & e)
 	{
 		cout << "Exception: client_get_meeting method throws -> " << e.what() << endl;
 		return json({});
@@ -107,7 +113,7 @@ bool meeting::client_update_meeting(json& db, const string& day, const string& t
 		// db.at(days).at(time) = meeting;
 		return true;
 	}
-	catch (nlohmann::json::exception& e)
+	catch (nlohmann::json::exception & e)
 	{
 		cout << "Exception: client_update_meeting method throws -> " << e.what() << endl;
 		return false;
@@ -128,7 +134,7 @@ json meeting::server_get_meeting(json& db, const string& day, const string& time
 	{
 		return db.at(day).at(time).at(room);
 	}
-	catch (nlohmann::json::exception& e)
+	catch (nlohmann::json::exception & e)
 	{
 		cout << "Exception: server_get_meeting method throws -> " << e.what() << endl;
 		return json({});
@@ -136,7 +142,7 @@ json meeting::server_get_meeting(json& db, const string& day, const string& time
 }
 
 bool meeting::server_update_meeting(json& db, const string& day, const string& time, const string& room,
-                                    const json& meeting)
+	const json& meeting)
 {
 	try
 	{
@@ -144,7 +150,7 @@ bool meeting::server_update_meeting(json& db, const string& day, const string& t
 		// db.at(days).at(time).at(room) = meeting;
 		return true;
 	}
-	catch (nlohmann::json::exception& e)
+	catch (nlohmann::json::exception & e)
 	{
 		cout << "Exception: server_update_meeting method throws -> " << e.what() << endl;
 		return false;

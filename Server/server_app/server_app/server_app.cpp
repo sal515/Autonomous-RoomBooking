@@ -141,7 +141,7 @@ int main(void)
 				json msgr = message.request(received_data.at("requestID"), received_data.at("day"), received_data.at("time"),
 					partIP, received_data.at("minimum"), received_data.at("topic"), "declined", "EV02.301", db);
 				string msgs = dbHelper::json_to_string(msgr);
-				//meeting meets(msgr.at("minimum"))
+				
 				cout << "database saved to file: " <<
 					dbHelper::save_db(db_path, db)
 					<< endl;
@@ -152,13 +152,15 @@ int main(void)
 			}
 		}
 		else if (!msgType.compare("CANCEL")) {
-			// do stuff
+			// if creator of event sends cancel, proceed and inform all invitees.
 		}
 		else if (!msgType.compare("WITHDRAW")) {
-			//do more stuff
+			// do extra stuff
+			// send message to the creator of event
 		}
 		else if (!msgType.compare("CONFIRM")) {
 			// do extra stuff
+			// send message to the creator of event
 		}
 		cout << received_data.at("message") << std::endl;
 

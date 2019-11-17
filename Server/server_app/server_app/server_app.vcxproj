@@ -23,7 +23,7 @@
     <ProjectGuid>{5770C730-AE07-4230-A26A-D938F665604D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>serverapp</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -43,7 +43,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -155,13 +155,14 @@
     <ClInclude Include="dbHelper.h" />
     <ClInclude Include="json_messages.h" />
     <ClInclude Include="main_headers.h" />
+    <ClInclude Include="meeting.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="read_msgs.hpp" />
     <ClInclude Include="time_day_room.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dbHelper.cpp" />
-    <ClCompile Include="json_messages.cpp" />
+    <ClCompile Include="meeting.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
