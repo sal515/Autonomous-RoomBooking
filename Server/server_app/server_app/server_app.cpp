@@ -2,6 +2,7 @@
 
 #include "pch.h"
 
+#include "process_messages.h"
 
 // namespaces
 using json = nlohmann::json;
@@ -12,23 +13,45 @@ using std::endl;
 using std::fstream;
 using std::vector;
 
+// Example Function prototypes
+int test_pause_exit();
+
 
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer 
 #define PORT 8888   //The port on which to listen for incoming data
 
+// struct messages message;
 
-// Path for directories and files
-const auto dir_local_storage = "local_storage";
-const auto log_path = "local_storage/log.json";
-const auto db_path = "local_storage/db.json";
-const auto example_db_path = "local_storage/example_db.json";
-struct messages message;
 int main(void)
 {
-	dbHelper::createDirectory(dir_local_storage);
-	dbHelper::initialize_db(db_path, TRUE);
-	json db = dbHelper::db_to_json(db_path);
+	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
+	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
+	db_helper::initialize_db(config.DB_PATH, false);
+
+	// loading db from file to memory
+	json db = db_helper::db_to_json(config.DB_PATH);
+
+
+	json received_data;
+
+	// Test: messageType.request
+	received_data.clear();
+	received_data["message"] = messageType.request;
+	received_data["requestID"] = "2";
+	received_data["meetingDay"] = "friday";
+	received_data["meetingTime"] = "10";
+	received_data["invitedParticipantsIP"] = vector<string> {"1.1.1.1", "2.2.2.2"};
+	received_data["minimumParticipants"] = "1";
+	received_data["topic"] = "Testing request message";
+
+	// Process the request data 
+	processMessages(db, received_data);
+
+
+	return test_pause_exit();
+
+
 
 
 	/*
@@ -38,12 +61,14 @@ int main(void)
 	WSADATA win_socket_struct;
 	SOCKET s;
 
-	struct sockaddr_in server_struct; 
-	struct sockaddr_in si_other;
+	struct sockaddr_in server_struct;
+	int server_struct_len = sizeof(server_struct);
+	int recv_len;
 
-	int server_struct_len, recv_len;
-	server_struct_len = sizeof(server_struct);
+	// struct sockaddr_in si_other;
 
+	char msg[BUFLEN];
+	string message;
 
 	char buf[BUFLEN];
 	std::string buffer;
@@ -67,7 +92,6 @@ int main(void)
 		std::cout << "Failed. Error Code : " << WSAGetLastError() << std::endl;
 		exit(EXIT_FAILURE);
 	}
-
 	std::cout << "Initialised Winsock" << std::endl;
 
 
@@ -88,7 +112,6 @@ int main(void)
 	{
 		std::cout << "Could not create socket : " << WSAGetLastError() << std::endl;
 	}
-
 	std::cout << "Socket created" << std::endl;
 
 	//Prepare the sockaddr_in structure
@@ -102,20 +125,18 @@ int main(void)
 		std::cout << "Bind failed with error code : " << WSAGetLastError() << std::endl;
 		exit(EXIT_FAILURE);
 	}
-
 	std::cout << "Bind done" << std::endl;
 
 	//keep listening for data
 	while (1)
 	{
-		db = dbHelper::db_to_json(db_path);
 		std::cout << "Waiting for data..." << std::endl;
 		fflush(stdout);
 
 		//clear the buffer by filling null, it might have previously received data
 		memset(buf, '\0', BUFLEN + 1);
 
-		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&server_struct, &server_struct_len)) ==
+		if ((recvfrom(s, buf, BUFLEN, 0, reinterpret_cast<struct sockaddr *>(&server_struct), &server_struct_len)) ==
 			SOCKET_ERROR)
 		{
 			std::cout << "recvfrom() failed with error code : " << WSAGetLastError() << std::endl;
@@ -131,39 +152,13 @@ int main(void)
 
 		cout << "clientIP: " << clientIP << endl;
 		buffer = std::string(buf);
-		json received_data = json::parse(buffer);
+		json received_data;
+		received_data.update(json::parse(buffer));
 
-		string msgType = received_data.at("message");
-		if (!msgType.compare("REQUEST")) {
-			// fill in info here
-			if (checkSchedule(received_data.at("day"), received_data.at("time"), "EV02.301", db)) {
-				vector<string> partIP = received_data.at("participantsIP");
-				json msgr = message.request(received_data.at("requestID"), received_data.at("day"), received_data.at("time"),
-					partIP, received_data.at("minimum"), received_data.at("topic"), "declined", "EV02.301", db);
-				string msgs = dbHelper::json_to_string(msgr);
-				//meeting meets(msgr.at("minimum"))
-				cout << "database saved to file: " <<
-					dbHelper::save_db(db_path, db)
-					<< endl;
-				msgs.copy(buf, msgs.size());
-			}
-			else if (checkSchedule(received_data.at("day"), received_data.at("time"), "EV005.251", db)) {
-
-			}
-		}
-		else if (!msgType.compare("CANCEL")) {
-			// do stuff
-		}
-		else if (!msgType.compare("WITHDRAW")) {
-			//do more stuff
-		}
-		else if (!msgType.compare("CONFIRM")) {
-			// do extra stuff
-		}
-		cout << received_data.at("message") << std::endl;
+		// Process the request data 
+		processMessages(db, received_data);
 
 
-		//
 		// std::cout << "Data Recieved from client IP - " << clientIP << ": " << buffer << std::endl;
 
 		// //now reply the client with the same data
@@ -177,5 +172,14 @@ int main(void)
 	closesocket(s);
 	WSACleanup();
 
+	return 0;
+}
+
+
+// ==================  Examples  ======================================
+int test_pause_exit()
+{
+	int pause = 0;
+	cin >> pause;
 	return 0;
 }

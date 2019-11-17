@@ -20,7 +20,10 @@ json meeting::meetingObj_to_json(const meeting& meetInfo)
 	}
 	meeting_json["roomNumber"] = meetInfo.roomNumber;
 	meeting_json["topic"] = meetInfo.topic;
+	meeting_json["meetingDay"] = meetInfo.meetingDay;
+	meeting_json["meetingTime"] = meetInfo.meetingTime;
 	meeting_json["requesterIP"] = meetInfo.requesterIP;
+	meeting_json["meetingStatus"] = meetInfo.meetingStatus;
 	return meeting_json;
 }
 
@@ -33,6 +36,9 @@ meeting meeting::json_to_meetingObj(const json& meeting_json)
 
 	const string minimumParticipants = meeting_json.at("minimumParticipants");
 	meetInfo.minimumParticipants = minimumParticipants;
+
+	const string requestID = meeting_json.at("requestID");
+	meetInfo.requestID = requestID;
 
 	const string meetingID = meeting_json.at("meetingID");
 	meetInfo.meetingID = meetingID;
@@ -47,14 +53,23 @@ meeting meeting::json_to_meetingObj(const json& meeting_json)
 		meetInfo.confirmedParticipantsIP.push_back(element);
 	}
 
-	const string tempRoomNum = meeting_json.at("roomNumber");
-	meetInfo.roomNumber = tempRoomNum;
+	const string roomNumber = meeting_json.at("roomNumber");
+	meetInfo.roomNumber = roomNumber;
 
-	const string tempTopic = meeting_json.at("topic");
-	meetInfo.topic = tempTopic;
+	const string topic = meeting_json.at("topic");
+	meetInfo.topic = topic;
+
+	const string meetingDay = meeting_json.at("meetingDay");
+	meetInfo.meetingDay = meetingDay;
+
+	const string meetingTime = meeting_json.at("meetingTime");
+	meetInfo.meetingTime = meetingTime;
 
 	const string tempRequestIP = meeting_json.at("requesterIP");
 	meetInfo.requesterIP = tempRequestIP;
+
+	const bool meetingStatus = meeting_json.at("meetingStatus");
+	meetInfo.meetingStatus = meetingStatus;
 
 	return meetInfo;
 }
@@ -70,13 +85,14 @@ meeting::meeting()
 	roomNumber = "-1";
 	topic = "-1";
 	meetingDay = "-1";
+	meetingTime = "-1";
 	requesterIP = "-1";
 	meetingStatus = false;
 }
 
 meeting::meeting(const string &message, const string& minimumParticipants, const string& requestID, const string& meetingID,
                  const vector<string>& invitedParticipantsIP, const vector<string>& confirmedParticipantsIP,
-                 const string& roomNumber, const string& topic, const string& meetingDay, const string& requesterIP,
+                 const string& roomNumber, const string& topic, const string& meetingDay, const string& meetingTime, const string& requesterIP,
                  const bool& meetingStatus)
 {
 	this->message = message;
@@ -88,6 +104,7 @@ meeting::meeting(const string &message, const string& minimumParticipants, const
 	this->roomNumber = roomNumber;
 	this->topic = topic;
 	this->meetingDay = meetingDay;
+	this->meetingTime = meetingTime;
 	this->requesterIP = requesterIP;
 	this->meetingStatus = meetingStatus;
 }
@@ -123,6 +140,7 @@ bool meeting::server_update_meeting(json& db, const string& day, const string& t
 	}
 }
 
+// is meetting already booked at the given time and day
 bool meeting::server_isMeeting(json& db, const string& day, const string& time, const string& room)
 {
 	return !meeting::server_get_meeting(db, day, time, room).empty();
