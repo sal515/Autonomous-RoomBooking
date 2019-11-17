@@ -34,6 +34,9 @@
 
 
 #include "json.hpp"
+#include "spdlog/spdlog.h"
+// #include "spdlog/sinks/basic_file_sink.h" // support for basic file logging
+// #include "spdlog/sinks/rotating_file_sink.h" // support for rotating file logging
 
 // TODO: add headers that you want to pre-compile here
 #define PCH_H
