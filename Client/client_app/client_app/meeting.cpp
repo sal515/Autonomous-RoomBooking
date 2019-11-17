@@ -4,7 +4,6 @@
 json meeting::meetingObj_to_json(const meeting& meetInfo)
 {
 	json meeting_json;
-	meeting_json["message"] = meetInfo.message;
 	meeting_json["minimumParticipants"] = meetInfo.minimumParticipants;
 	meeting_json["requestID"] = meetInfo.requestID;
 	meeting_json["meetingID"] = meetInfo.meetingID;
@@ -24,13 +23,9 @@ json meeting::meetingObj_to_json(const meeting& meetInfo)
 	return meeting_json;
 }
 
-
 meeting meeting::json_to_meetingObj(const json& meeting_json)
 {
 	meeting meetInfo;
-
-	const string message = meeting_json.at("message");
-	meetInfo.message = message;
 
 	const string minimumParticipants = meeting_json.at("minimumParticipants");
 	meetInfo.minimumParticipants = minimumParticipants;
@@ -62,7 +57,6 @@ meeting meeting::json_to_meetingObj(const json& meeting_json)
 
 meeting::meeting()
 {
-	message = "-1";
 	minimumParticipants = "-1";
 	requestID = "-1";
 	meetingID = "-1";
@@ -75,12 +69,11 @@ meeting::meeting()
 	meetingStatus = false;
 }
 
-meeting::meeting(const string &message, const string& minimumParticipants, const string& requestID, const string& meetingID,
+meeting::meeting(const string& minimumParticipants, const string& requestID, const string& meetingID,
 	const vector<string>& invitedParticipantsIP, const vector<string>& confirmedParticipantsIP,
 	const string& roomNumber, const string& topic, const string& meetingDay, const string& requesterIP,
 	const bool& meetingStatus)
 {
-	this->message = message;
 	this->minimumParticipants = minimumParticipants;
 	this->requestID = requestID;
 	this->meetingID = meetingID;

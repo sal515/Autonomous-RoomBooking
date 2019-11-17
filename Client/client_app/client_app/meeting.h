@@ -6,7 +6,6 @@ using json = nlohmann::json;
 
 struct meeting
 {
-	string message;
 	string minimumParticipants;
 	string requestID;
 	string meetingID;
@@ -23,7 +22,6 @@ struct meeting
 
 	meeting();
 	meeting(
-		const string& message,
 		const string& minimumParticipants,
 		const string& requestID,
 		const string& meetingID,
