@@ -153,7 +153,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="dbHelper.h" />
+    <ClInclude Include="json_messages.h" />
+    <ClInclude Include="main_headers.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="read_msgs.hpp" />
+    <ClInclude Include="time_day_room.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dbHelper.cpp" />
@@ -166,6 +170,7 @@
     </ClCompile>
     <ClCompile Include="read_msgs.cpp" />
     <ClCompile Include="server_app.cpp" />
+    <ClCompile Include="time_day_room.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
