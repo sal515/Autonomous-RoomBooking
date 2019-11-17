@@ -14,6 +14,7 @@ struct meeting
 	string roomNumber;
 	string topic;
 	string meetingDay;
+	string meetingTime;
 	string requesterIP;
 	bool meetingStatus;
 
@@ -30,6 +31,7 @@ struct meeting
 		const string& roomNumber,
 		const string& topic,
 		const string& meetingDay,
+		const string& meetingTime,
 		const string& requesterIP,
 		const bool& meetingStatus
 	);
@@ -39,12 +41,4 @@ struct meeting
 	static bool client_update_meeting(json& db, const string& day, const string& time, const json& meeting);
 	static bool client_isMeeting(json& db, const string& day, const string& time);
 
-
-	// --------------------------------------------
-
-	// server specific meeting manipulators
-	static json server_get_meeting(json& db, const string& day, const string& time, const string& room);
-	static bool server_update_meeting(json& db, const string& day, const string& time, const string& room,
-	                                  const json& meeting);
-	static bool server_isMeeting(json& db, const string& day, const string& time, const string& room);
 };
