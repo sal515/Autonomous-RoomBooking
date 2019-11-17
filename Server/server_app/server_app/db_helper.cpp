@@ -1,8 +1,8 @@
-#include "pch.h"
-#include "dbHelper.h"
-#include "time_day_room.h"
+﻿#include "pch.h"
+#include "db_helper.h"
 
-bool dbHelper::createDirectory(string relativeDirName)
+
+bool db_helper::createDirectory(string relativeDirName)
 {
 	try
 	{
@@ -13,7 +13,7 @@ bool dbHelper::createDirectory(string relativeDirName)
 		}
 		else
 		{
-			if (dbHelper::isDirectoryExist(relativeDirName))
+			if (db_helper::isDirectoryExist(relativeDirName))
 			{
 				cout << "Directory \"" << relativeDirName << "\" already exists" << endl;
 				return true;
@@ -30,7 +30,7 @@ bool dbHelper::createDirectory(string relativeDirName)
 	}
 }
 
-bool dbHelper::isDirectoryExist(string relativeDirName)
+bool db_helper::isDirectoryExist(string relativeDirName)
 {
 	try
 	{
@@ -48,17 +48,17 @@ bool dbHelper::isDirectoryExist(string relativeDirName)
 }
 
 
-string dbHelper::json_to_string(json ajson)
+string db_helper::json_to_string(json ajson)
 {
 	return ajson.dump();
 }
 
 
-bool dbHelper::removeDirectory(string relativeDirName)
+bool db_helper::removeDirectory(string relativeDirName)
 {
 	try
 	{
-		if (dbHelper::isDirectoryExist(relativeDirName))
+		if (db_helper::isDirectoryExist(relativeDirName))
 		{
 			fs::remove(relativeDirName);
 			cout << "The directory \"" << relativeDirName << "\" was removed" << endl;
@@ -73,25 +73,69 @@ bool dbHelper::removeDirectory(string relativeDirName)
 	}
 }
 
-void dbHelper::initialize_db(const string& dbPath, const bool& isClient)
+void db_helper::initialize_db(const string& dbPath, const bool& isClient)
 {
 	if (isClient)
 	{
 		//Server only
 		// json room_list;
-
 		json day;
 		json time;
 
-
-		map<string, string> time_map = time_day_room::time_map(6, 22);
-		for (const auto& element : time_map)
+		map<string, string> time_map = time_day_room::time_map(time_day_room::startTime, time_day_room::endTime);
+		for (const auto &element : time_map)
 		{
 			time[element.first] = json({});
 		}
 
 		map<string, string> day_map = time_day_room::day_map();
-		for (const auto& element : day_map)
+		for (const auto &element : day_map)
+		{
+			day[element.first] = time;
+		}
+
+		try
+		{
+			const fs::path p(dbPath);
+			if (!fs::exists(p))
+			{
+				std::ofstream writeFile(dbPath);
+				writeFile << std::setw(4) << day << std::endl;
+				writeFile.close();
+				
+				cout << "Client agenda was created" << endl;
+			}
+			else
+			{
+				cout << "Client agenda already exits" << endl;
+			}
+		}
+		catch (fstream::failure& e)
+		{
+			cout << "Exception: initialize_db method throws -> " << e.what() << endl;
+		}
+	}
+	else
+	{
+		// ============ Server ===============
+		json rooms;
+		json day;
+		json time;
+
+		vector<string> rooms_vec = time_day_room::room_vec();
+		for (string room : rooms_vec)
+		{
+			rooms[room] = json({});
+		}
+
+		map<string, string> time_map = time_day_room::time_map(time_day_room::startTime, time_day_room::endTime);
+		for (const auto &element : time_map)
+		{
+			time[element.first] = rooms;
+		}
+
+		map<string, string> day_map = time_day_room::day_map();
+		for (const auto &element : day_map)
 		{
 			day[element.first] = time;
 		}
@@ -105,26 +149,21 @@ void dbHelper::initialize_db(const string& dbPath, const bool& isClient)
 				writeFile << std::setw(4) << day << std::endl;
 				writeFile.close();
 
-				cout << "Client agenda was created" << endl;
+				cout << "Server database was created" << endl;
 			}
 			else
 			{
-				cout << "Client agenda already exits" << endl;
+				cout << "Server database already exits" << endl;
 			}
 		}
-		catch (fstream::failure & e)
+		catch (fstream::failure& e)
 		{
 			cout << "Exception: initialize_db method throws -> " << e.what() << endl;
 		}
 	}
-	else
-	{
-		//server db initialize
-	}
-
 }
 
-json dbHelper::db_to_json(const string& dbPath)
+json db_helper::db_to_json(const string& dbPath)
 {
 	try
 	{
@@ -150,14 +189,14 @@ json dbHelper::db_to_json(const string& dbPath)
 			return json({});
 		}
 	}
-	catch (fstream::failure & e)
+	catch (fstream::failure& e)
 	{
 		cout << "Exception: read_db_json method throws -> " << e.what() << endl;
 		return json({});
 	}
 }
 
-bool dbHelper::save_db(const string& dbPath, const json& db)
+bool db_helper::save_db(const string& dbPath, const json& db)
 {
 	try
 	{
@@ -175,7 +214,7 @@ bool dbHelper::save_db(const string& dbPath, const json& db)
 			return false;
 		}
 	}
-	catch (std::ofstream::failure & e)
+	catch (std::ofstream::failure& e)
 	{
 		cout << "Exception: update_meeting method throws -> " << e.what() << endl;
 		return false;
