@@ -156,7 +156,7 @@ int main(void)
 		received_data.update(json::parse(buffer));
 
 		// Process the request data 
-		processMessages(db, received_data);
+		processMessages(db, received_data, clientIP);
 
 
 		// std::cout << "Data Recieved from client IP - " << clientIP << ": " << buffer << std::endl;
