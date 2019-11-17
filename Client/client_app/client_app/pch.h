@@ -18,19 +18,25 @@
 #include <ctime>
 #include <sstream>
 #include <iomanip>
-#include "json.hpp"
 #include <vector>
 #include <string>
 #include <fstream>
 #include <filesystem>
-#include "jsonmsg.h"
-#include "dbHelper.h"
+#include <map>
 
 #include <windows.h>
 
+#include "jsonmsg.h"
+#include "db_helper.h"
+#include "app_config.h"
+#include "time_day_room.h"
+#include "meeting.h"
+
+
+#include "json.hpp"
+
 // TODO: add headers that you want to pre-compile here
 #define PCH_H
-
 
 
 #endif //PCH_H

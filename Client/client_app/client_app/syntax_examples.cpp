@@ -1,6 +1,22 @@
 #include "pch.h"
-#include "dbHelper.h"
+#include <string>
+#include "json.hpp"
+#include <filesystem>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <iomanip>
 
+namespace fs = std::experimental::filesystem;
+using json = nlohmann::json;
+using std::string;
+using std::cout;
+using std::cin;
+using std::endl;
+using std::fstream;
+using std::vector;
+
+// ================ db_helper functions ================ 
 
 void test_path()
 {
@@ -17,22 +33,22 @@ void test_path()
 	// 	}
 	// 	else
 	// 	{
-	// 		cout << "ERROR: Couldn't retrieve the executable file path" << endl;
+	// 		cout << "ERROR: Couldn't retrieve the executable file client_path" << endl;
 	// 	}
 	// }
 	// catch (...)
 	// {
-	// 	cout << "ERROR: Couldn't retrieve the executable file path" << endl;
+	// 	cout << "ERROR: Couldn't retrieve the executable file client_path" << endl;
 	// }
 
 
 	const fs::path pathToShow{fs::current_path()};
 
 	int i = 0;
-	cout << "Displaying path info for: " << pathToShow << "\n";
+	cout << "Displaying client_path info for: " << pathToShow << "\n";
 	for (const auto& part : pathToShow)
 	{
-		cout << "path part: " << i++ << " = " << part << "\n";
+		cout << "client_path part: " << i++ << " = " << part << "\n";
 	}
 
 	cout << "exists() = " << fs::exists(pathToShow) << "\n"
@@ -58,7 +74,7 @@ void test_path()
 	}
 
 
-	cout << "path concat/append:\n";
+	cout << "client_path concat/append:\n";
 	fs::path p1("C:\\temp");
 	p1 /= "user";
 	p1 /= "data";
@@ -119,10 +135,10 @@ int test_json()
 }
 
 
-void dbHelper::example_db_creator(string example_db_path)
+void example_db_creator(string example_db_path)
 {
 	//Server only
-	// json room;
+	// json room_list;
 
 	json all_days;
 	json time;
@@ -158,20 +174,20 @@ void dbHelper::example_db_creator(string example_db_path)
 	confirmedParticipantsVec.push_back(userA);
 	confirmedParticipantsVec.push_back(userB);
 
-	json event =
+	json meeting =
 	{
 		{"minimumParticipants", "min Participants"},
 		{"rq", "request number"},
 		{"mt", "meeting number"},
 		{"invitedParticipantsVec", invitedParticipantsVec},
 		{"confirmedParticipantsVec", confirmedParticipantsVec},
-		{"topic", "Some topic for the event I guess"},
+		{"topic", "Some topic for the meeting I guess"},
 		{"bookingDate", "some Date"},
 		{"requester", "requester IP"}
 	};
 
 
-	time["6"] = event;
+	time["6"] = meeting;
 	time["7"] = json({});
 	time["8"] = json({});
 	time["9"] = json({});
@@ -198,179 +214,18 @@ void dbHelper::example_db_creator(string example_db_path)
 	writeFile.close();
 
 	// server only
-	// room["EV005.251"] = all_days;
-	// room["EV02.301"] = all_days;
+	// room_list["EV005.251"] = all_days;
+	// room_list["EV02.301"] = all_days;
 
 
 	// JSON Array to Vector Example code: 
 	// =====================================
 	// string testEvent = event.dump();
-	// cout << testEvent << endl;
-	// json str2Json = json::parse(testEvent);
+	// cout << test << endl;
+	// json str2Json = json::parse(test);
 	// vector<string> jsonArr2Vector = (str2Json.at("invitedParticipantsVec"));
 	// cout << jsonArr2Vector.at(0) << endl;
 	// return  test_pause_exit();
-
-
-
 }
 
-
-dbHelper::dbHelper()
-{
-}
-
-
-dbHelper::~dbHelper()
-{
-}
-
-
-bool dbHelper::createDirectory(string relativeDirName)
-{
-	try
-	{
-		if (fs::create_directory(relativeDirName))
-		{
-			cout << "Local storage directory was created" << endl;
-			return true;
-		}
-		else
-		{
-			if (dbHelper::isDirectoryExist(relativeDirName))
-			{
-				cout << "Directory \"" << relativeDirName << "\" already exists" << endl;
-				return true;
-			}
-
-			cout << "Error: Creating file \"" << relativeDirName << "\"" << endl;
-			return false;
-		}
-	}
-	catch (fs::filesystem_error e)
-	{
-		cout << "Exception: createDirectory method throws -> " << e.what() << endl;
-		return false;
-	}
-}
-
-bool dbHelper::isDirectoryExist(string relativeDirName)
-{
-	try
-	{
-		if (fs::exists(relativeDirName))
-		{
-			return true;
-		}
-		return false;
-	}
-	catch (fs::filesystem_error e)
-	{
-		cout << "Exception: isDirectoryExist method throws -> " << e.what() << endl;
-		return false;
-	}
-}
-
-
-string dbHelper::json_to_string(json ajson)
-{
-	return ajson.dump();
-}
-
-
-bool dbHelper::removeDirectory(string relativeDirName)
-{
-	try
-	{
-		if (dbHelper::isDirectoryExist(relativeDirName))
-		{
-			fs::remove(relativeDirName);
-			cout << "The directory \"" << relativeDirName << "\" was removed" << endl;
-			return true;
-		};
-		return false;
-	}
-	catch (fs::filesystem_error e)
-	{
-		cout << "Exception: removeDirectory method throws -> " << e.what() << endl;
-		return false;
-	}
-}
-
-
-json dbHelper::db_to_json(const string& dbPath)
-{
-	// usage example
-	// json db = dbHelper::db_to_json(dbPath);
-
-	try
-	{
-		// example db path: local_storage/client_json_db/db.json 
-		const fs::path p(dbPath);
-		if (fs::exists(p))
-		{
-			std::ifstream readFile(dbPath);
-			json db;
-			readFile >> db;
-			readFile.close();
-			return db;
-
-			// example below below (tested)
-			// std::ifstream readFile("local_storage/client_json_db/storage.json");
-			// json db;
-			// readFile >> db;
-			// readFile.close();
-		}
-		else
-		{
-			// if the db.json file was not created send empty json object back
-			return json({});
-		}
-	}
-	catch (fstream::failure& e)
-	{
-		cout << "Exception: read_db_json method throws -> " << e.what() << endl;
-		return json({});
-	}
-}
-
-
-bool dbHelper::update_event(json& db, const string& day, const string& time, const json& event)
-{
-	try
-	{
-		db.at(day).at(time) = event;
-		return true;
-	}
-	catch (nlohmann::json::exception& e)
-	{
-		cout << "Exception: update_event method throws -> " << e.what() << endl;
-		return false;
-	}
-}
-
-
-bool dbHelper::update_db(const string& dbPath, const json& db)
-{
-	try
-	{
-		fs::path p(dbPath);
-		if (fs::exists(p))
-		{
-			std::ofstream writeFile(dbPath);
-			writeFile << std::setw(4) << db << std::endl;
-			writeFile.close();
-
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	catch (std::ofstream::failure& e)
-	{
-		cout << "Exception: update_event method throws -> " << e.what() << endl;
-		return false;
-	}
-}
+// ================ db_helper functions ================ 
