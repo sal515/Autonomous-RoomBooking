@@ -11,6 +11,7 @@
 #include "read_msgs.hpp"
 #include "json_messages.h"
 #include "dbHelper.h"
+#include "meeting.h"
 
 #define PCH_H
 

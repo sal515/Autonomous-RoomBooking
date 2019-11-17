@@ -2,7 +2,7 @@
 
 bool checkSchedule(std::string date, std::string time, std::string roomID, json db) {
 	try {
-		if (db.at(date).at(time).at(roomID) != NULL) {
+		if (db.at(date).at(time).at(roomID).empty()) {
 			return true;
 		}
 		else {

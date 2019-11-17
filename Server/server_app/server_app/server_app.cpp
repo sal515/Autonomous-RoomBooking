@@ -139,8 +139,9 @@ int main(void)
 			if (checkSchedule(received_data.at("day"), received_data.at("time"), "EV02.301", db)) {
 				vector<string> partIP = received_data.at("participantsIP");
 				json msgr = message.request(received_data.at("requestID"), received_data.at("day"), received_data.at("time"),
-					partIP, received_data.at("topic"), "declined", "EV02.301");
+					partIP, received_data.at("minimum"), received_data.at("topic"), "declined", "EV02.301", db);
 				string msgs = dbHelper::json_to_string(msgr);
+				//meeting meets(msgr.at("minimum"))
 				cout << "database saved to file: " <<
 					dbHelper::save_db(db_path, db)
 					<< endl;

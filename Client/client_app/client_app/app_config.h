@@ -5,7 +5,7 @@
 static const struct app_config
 {
 	// Debug IP address
-	string DEBUG_HARDCODED_SERVER_IP_IN = "192.168.0.115"; 	
+	string DEBUG_HARDCODED_SERVER_IP_IN = "192.168.1.133"; 	
 
 	// Diretory paths
 	string DIR_LOCAL_STORAGE = "local_storage";

@@ -20,16 +20,6 @@ void menu()
 {
 	int reqCounter = 1;
 	char choice;
-<<<<<<< Updated upstream
-=======
-	cout << "Please select from the following options:\n"
-		<< "b. Book a Room\n"
-		<< "i. Check your invitations\n"
-		<< "c. Cancel a Meeting\n"
-		<< "w. Withdraw from a Meeting\n"
-		<< "r. Request to Participate\n"
-		<< "e. Exit the Program\n";
->>>>>>> Stashed changes
 	bool goodInput = false;
 
 	while (true)
@@ -51,25 +41,12 @@ void menu()
 			switch (choice)
 			{
 			case 'b':
-<<<<<<< Updated upstream
 				{
 					string day;
 					// int mm, dd, yyyy, 
 					int hh;
 					int min_participants;
 					string topic;
-=======
-			{
-				string day;
-				int mm, dd, yyyy, hh;
-				int min_participants;
-				string topic;
-
-				cout << "Please provide the day of the week:\n"
-					<< "Day: ";
-				cin >> day;
-
->>>>>>> Stashed changes
 
 					cout << "Please provide the day of the week:\n"
 						<< "Day: ";
@@ -99,7 +76,6 @@ void menu()
 					cin >> min_participants;
 					vector<string> participants = list_of_participants(min_participants);
 
-<<<<<<< Updated upstream
 					//Copy into json to send to server + implement request id with incremental?
 					//variables are day, time, topic, min_participants and participants(list)
 					goodInput = true;
@@ -112,24 +88,6 @@ void menu()
 					//put in json obj.
 					break;
 				}
-=======
-				//Copy into json to send to server + implement request id with incremental?
-				//variables are day, time, topic, min_participants and participants(list)
-				goodInput = true;
-				string requestID = std::to_string(reqCounter);
-				//string timeH = std::to_string(hh);
-				string minParts = std::to_string(min_participants);
-				messages message;
-				//json reqz = message.request(requestID, day, timeH, minParts, participants, topic);
-
-				//put in json obj.
-				break;
-			}
-			case 'i':
-			{
-
-			}
->>>>>>> Stashed changes
 			case 'c':
 				{
 					string meetingID;
@@ -273,9 +231,15 @@ bool getMeetID(const string& meetingID)
 
 bool check_ip(const string& ip)
 {
-	struct sockaddr_in sa;
-	int result = inet_pton(AF_INET, ip.c_str(), &(sa.sin_addr));
-	return result != 0;
+	try {
+		struct sockaddr_in sa;
+		cout << "\n" << ip.c_str() << "\n";
+		int result = inet_pton(AF_INET, ip.c_str(), &(sa.sin_addr));
+		return result != 0;
+	}
+	catch (...) {
+		cout << ip.c_str();
+	}
 }
 
 bool check_schedule(json schedule)
@@ -285,7 +249,6 @@ bool check_schedule(json schedule)
 }
 
 // function expects the string in format dd/mm/yyyy:
-<<<<<<< Updated upstream
 // bool extract_date(const string& s, int& d, int& m, int& y)
 // {
 // 	std::istringstream is(s);
@@ -314,38 +277,6 @@ bool check_schedule(json schedule)
 // 	}
 // 	return false;
 // }
-=======
-bool extract_date(const string& s, int& d, int& m, int& y)
-{
-	std::istringstream is(s);
-	char delimiter;
-	if (is >> d >> delimiter >> m >> delimiter >> y)
-	{
-		struct tm t = { 0 };
-		tm* Tm = &t;
-		t.tm_mday = d;
-		t.tm_mon = m - 1;
-		t.tm_year = y - 1900;
-		t.tm_isdst = -1;
-
-		// normalize:
-		time_t when = mktime(&t);
-		const time_t* Time = &when;
-		errno_t norm = localtime_s(Tm, Time);
-		// the actual date would be:
-		// m = norm->tm_mon + 1;
-		// d = norm->tm_mday;
-		// y = norm->tm_year;
-		// e.g. 29/02/2013 would become 01/03/2013
-
-		// validate (is the normalized date still the same?):
-		//return (norm->tm_mday == d &&
-		//	norm->tm_mon == m - 1 &&
-		//	norm->tm_year == y - 1900);
-	}
-	return false;
-}
->>>>>>> Stashed changes
 
 // ==================  Examples  ======================================
 int test_pause_exit()

@@ -9,18 +9,25 @@ using json = nlohmann::json;
 struct messages {
 	json request(std::string requestID,
 		std::string day, std::string time,
-		std::vector<std::string> list,
-		std::string topic, std::string meetingStatus, std::string roomID) {
+		std::vector<std::string> list, std::string minimum,
+		std::string topic, std::string meetingStatus, std::string roomID,
+		json &db) {
 		json req;
+		json room;
+		
 		req["message"] = "REQUEST";
 		req["requestID"] = requestID;
 		req["day"] = day;
 		req["time"] = time;
 		json listOfPart(list);
 		req["participantsIP"] = listOfPart;
+		req["minimum"] = minimum;
 		req["topic"] = topic;
 		req["meetingStatus"] = meetingStatus;
+
 		req["roomID"] = roomID;
+		room[roomID] = req;
+		db.at(day).at(time).update(req);
 		return req;
 	}
 
