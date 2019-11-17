@@ -23,10 +23,11 @@ const auto dir_local_storage = "local_storage";
 const auto log_path = "local_storage/log.json";
 const auto db_path = "local_storage/db.json";
 const auto example_db_path = "local_storage/example_db.json";
-
+struct messages message;
 int main(void)
 {
 	dbHelper::createDirectory(dir_local_storage);
+	dbHelper::initialize_db(db_path, TRUE);
 	json db = dbHelper::db_to_json(db_path);
 
 
@@ -107,6 +108,7 @@ int main(void)
 	//keep listening for data
 	while (1)
 	{
+		db = dbHelper::db_to_json(db_path);
 		std::cout << "Waiting for data..." << std::endl;
 		fflush(stdout);
 
@@ -134,6 +136,19 @@ int main(void)
 		string msgType = received_data.at("message");
 		if (!msgType.compare("REQUEST")) {
 			// fill in info here
+			if (checkSchedule(received_data.at("day"), received_data.at("time"), "EV02.301", db)) {
+				vector<string> partIP = received_data.at("participantsIP");
+				json msgr = message.request(received_data.at("requestID"), received_data.at("day"), received_data.at("time"),
+					partIP, received_data.at("topic"), "declined", "EV02.301");
+				string msgs = dbHelper::json_to_string(msgr);
+				cout << "database saved to file: " <<
+					dbHelper::save_db(db_path, db)
+					<< endl;
+				msgs.copy(buf, msgs.size());
+			}
+			else if (checkSchedule(received_data.at("day"), received_data.at("time"), "EV005.251", db)) {
+
+			}
 		}
 		else if (!msgType.compare("CANCEL")) {
 			// do stuff
@@ -151,11 +166,11 @@ int main(void)
 		// std::cout << "Data Recieved from client IP - " << clientIP << ": " << buffer << std::endl;
 
 		// //now reply the client with the same data
-		// if (sendto(s, buf, recv_len, 0, (struct sockaddr*)&client_struct, client_struct_len) == SOCKET_ERROR)
-		// {
-		// 	std::cout << "sendto() failed with error code : " << WSAGetLastError << std::endl;
-		// 	exit(EXIT_FAILURE);
-		// }
+		if (sendto(s, buf, strlen(buf), 0, (struct sockaddr*)&server_struct, server_struct_len) == SOCKET_ERROR)
+		{
+			std::cout << "sendto() failed with error code : " << WSAGetLastError << std::endl;
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	closesocket(s);

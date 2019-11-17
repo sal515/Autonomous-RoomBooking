@@ -112,13 +112,23 @@ int main(void)
 	// delete[] SERVER;
 
 	//start communication
-	while (true)
-	{
+	//while (true)
+	//{
 		// cout << "Enter message : ";
 		// cin >> message;
 
 		json jsonMsg;
-		jsonMsg["message"] = "msg";
+		vector<string> ips;
+		ips.push_back("192.168.1.133");
+		ips.push_back("192.168.0.188");
+		json partIP(ips);
+		
+		jsonMsg["message"] = "REQUEST";
+		jsonMsg["day"] =  "monday";
+		jsonMsg["time"] = "10";
+		jsonMsg["requestID"] = "1";
+		jsonMsg["topic"] = "yomama";
+		jsonMsg["participantsIP"] = partIP;
 		message = jsonMsg.dump();
 
 		cout << message << endl;
@@ -139,18 +149,18 @@ int main(void)
 
 		//receive a reply and print it
 		//clear the buffer by filling null, it might have previously received data
-		// memset(buf, '\0', BUFLEN);
-		// //try to receive some data, this is a blocking call
-		// if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&client_struct, &client_struct_len) == SOCKET_ERROR)
-		// {
-		// 	cout << "recvfrom() failed with error code : " << WSAGetLastError << endl;
-		// 	exit(EXIT_FAILURE);
-		// }
+		 memset(buf, '\0', BUFLEN);
+		 //try to receive some data, this is a blocking call
+		 if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&client_struct, &client_struct_len) == SOCKET_ERROR)
+		 {
+		 	cout << "recvfrom() failed with error code : " << WSAGetLastError << endl;
+		 	exit(EXIT_FAILURE);
+		 }
 
-
-		// buffer = string(buf);
-		// cout << "Sent Data: " << buffer << endl;
-	}
+		 buffer = string(buf);
+		 json received_dat = json::parse(buffer);
+		 cout << "received Data: " << received_dat.at("roomID") << endl;
+	//}
 
 	closesocket(s);
 	WSACleanup(); 

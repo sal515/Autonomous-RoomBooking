@@ -21,6 +21,18 @@
     <ClInclude Include="dbHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="read_msgs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="json_messages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main_headers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="time_day_room.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -32,10 +44,13 @@
     <ClCompile Include="dbHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="read_msgs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="json_messages.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="read_msgs.cpp">
+    <ClCompile Include="time_day_room.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
