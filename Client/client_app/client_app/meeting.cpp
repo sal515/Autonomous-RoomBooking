@@ -5,8 +5,8 @@ json meeting::meetingObj_to_json(const meeting& meetInfo)
 {
 	json meeting_json;
 	meeting_json["minimumParticipants"] = meetInfo.minimumParticipants;
-	meeting_json["rq"] = meetInfo.rq;
-	meeting_json["mt"] = meetInfo.mt;
+	meeting_json["requestID"] = meetInfo.requestID;
+	meeting_json["meetingID"] = meetInfo.meetingID;
 
 	for (const string& element : meetInfo.invitedParticipantsIP)
 	{
@@ -27,10 +27,11 @@ meeting meeting::json_to_meetingObj(const json& meeting_json)
 {
 	meeting meetInfo;
 
-	meetInfo.minimumParticipants = meeting_json.at("minimumParticipants");
+	const string minimumParticipants = meeting_json.at("minimumParticipants");
+	meetInfo.minimumParticipants = minimumParticipants;
 
-	meetInfo.rq = meeting_json.at("rq");
-	meetInfo.mt = meeting_json.at("mt");
+	const string meetingID = meeting_json.at("meetingID");
+	meetInfo.meetingID = meetingID;
 
 	for (const string element : meeting_json["invitedParticipantsIP"])
 	{
@@ -67,18 +68,22 @@ meeting::meeting()
 	string requesterIP = "";
 }
 
-meeting::meeting(const int& minimumParticipants, const int& rq, const int& mt,
+meeting::meeting(const string& minimumParticipants, const string& requestID, const string& meetingID,
 	const vector<string>& invitedParticipantsIP, const vector<string>& confirmedParticipantsIP,
-	const string& roomNumber, const string& topic, const string& requesterIP)
+	const string& roomNumber, const string& topic, const string& meetingDay, const string& requesterIP,
+	const bool& meetingStatus)
 {
 	this->minimumParticipants = minimumParticipants;
-	this->rq = rq;
-	this->mt = mt;
+	this->requestID = requestID;
+	this->meetingID = meetingID;
 	this->invitedParticipantsIP = invitedParticipantsIP;
 	this->confirmedParticipantsIP = confirmedParticipantsIP;
 	this->roomNumber = roomNumber;
 	this->topic = topic;
+	this->meetingDay = meetingDay;
 	this->requesterIP = requesterIP;
+	this->requesterIP = requesterIP;
+	this->meetingStatus= meetingStatus;
 }
 
 json meeting::client_get_meeting(json& db, const string& day, const string& time)

@@ -84,7 +84,7 @@ void db_helper::initialize_db(const string& dbPath, const bool& isClient)
 		json time;
 
 
-		map<string, string> time_map = time_day_room::time_map(6, 22);
+		map<string, string> time_map = time_day_room::time_map(time_day_room::startTime, time_day_room::endTime);
 		for (const auto &element : time_map)
 		{
 			time[element.first] = json({});

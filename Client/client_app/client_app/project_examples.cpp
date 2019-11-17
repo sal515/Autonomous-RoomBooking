@@ -32,14 +32,16 @@ int Testing_dbHelper_meetingObj()
 
 	// create a meeting object
 	meeting meetObj(
-		2,
-		1,
-		2,
+		"2",
+		"2",
+		"2",
 		vector<string>{"192.165.54.1"},
 		vector<string>{"192.111.111.111"},
 		"EV005.251",
 		"First Test meeting object",
-		"192.165.54.1"
+		"friday",
+		"192.165.54.1",
+		false
 	);
 
 	cout << "meeting object updated: " <<

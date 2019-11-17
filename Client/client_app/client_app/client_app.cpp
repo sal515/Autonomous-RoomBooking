@@ -36,7 +36,7 @@ string ask_for_ip();
 int test_pause_exit();
 vector<string> list_of_participants(int min);
 void menu();
-bool getMeetID(const string& meetID);
+bool getMeetID(const string& meetingID);
 bool check_ip(const string &ip);
 bool check_schedule(json schedule);
 bool extract_date(const std::string& s, int& d, int& m, int& y);
@@ -54,6 +54,10 @@ int main(void)
 
 
 	// return Testing_dbHelper_meetingObj();
+
+
+	menu();
+	return test_pause_exit();
 
 
 
