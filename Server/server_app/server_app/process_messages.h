@@ -6,4 +6,4 @@
 // };
 
 
-void processMessages(json &db, const json &req_data, const string& reqIP);
+void processMessages(json &db, const json &req_data, const string & requesterIP);

@@ -32,10 +32,10 @@ int main(void)
 	// loading db from file to memory
 	json db = db_helper::db_to_json(config.DB_PATH);
 
-
+	string clientIp = "1.1.1.1";
 	json received_data;
 
-	// Test: messageType.request
+	// // Test: messageType.request
 	received_data.clear();
 	received_data["message"] = messageType.request;
 	received_data["requestID"] = "2";
@@ -44,9 +44,19 @@ int main(void)
 	received_data["invitedParticipantsIP"] = vector<string> {"1.1.1.1", "2.2.2.2"};
 	received_data["minimumParticipants"] = "1";
 	received_data["topic"] = "Testing request message";
+	
+	// Process the request data 
+	processMessages(db, received_data, clientIp);
+	
+
+	// Test: messageType.cancelRequest
+	received_data.clear();
+	received_data["message"] = messageType.cancelResponse;
+	received_data["meetingID"] = "1";
+	received_data["reason"] = "Testing is the reason";
 
 	// Process the request data 
-	processMessages(db, received_data);
+	processMessages(db, received_data, clientIp);
 
 
 	return test_pause_exit();
