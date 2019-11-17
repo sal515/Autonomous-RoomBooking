@@ -14,6 +14,7 @@ struct meeting
 	string roomNumber;
 	string topic;
 	string meetingDay;
+	string meetingTime;
 	string requesterIP;
 	bool meetingStatus;
 
@@ -30,6 +31,7 @@ struct meeting
 		const string& roomNumber,
 		const string& topic,
 		const string& meetingDay,
+		const string& meetingTime,
 		const string& requesterIP,
 		const bool& meetingStatus
 	);
