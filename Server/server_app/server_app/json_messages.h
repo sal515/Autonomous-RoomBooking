@@ -9,24 +9,24 @@ using json = nlohmann::json;
 struct messages {
 	json request(std::string requestID,
 		std::string day, std::string time,
-		std::vector<std::string> list, std::string minimum,
-		std::string topic, std::string meetingStatus, std::string roomID,
+		std::vector<std::string> list, std::vector<std::string> confirmed,
+		std::string minimum, std::string topic,
+		std::string meetingStatus, std::string roomNumber, std::string requesterIP,
 		json &db) {
 		json req;
-		json room;
-		
+		json listOfPart(list);
+		json listOfConf(confirmed);
 		req["message"] = "REQUEST";
 		req["requestID"] = requestID;
 		req["day"] = day;
 		req["time"] = time;
-		json listOfPart(list);
-		req["participantsIP"] = listOfPart;
+		req["invitedParticipantsIP"] = listOfPart;
+		req["confirmedParticipantsIP"] = confirmed;
 		req["minimum"] = minimum;
 		req["topic"] = topic;
 		req["meetingStatus"] = meetingStatus;
-
-		req["roomID"] = roomID;
-		room[roomID] = req;
+		req["roomNumber"] = roomNumber;
+		req["requesterIP"] = requesterIP;
 		db.at(day).at(time).update(req);
 		return req;
 	}
@@ -65,21 +65,21 @@ struct messages {
 		return deny;
 	}
 
-	json confirm_room(std::string meetingID, std::string roomID) {
+	json confirm_room(std::string meetingID, std::string roomNumber) {
 		json confirmation;
 		confirmation["message"] = "CONFIRM";
 		confirmation["meetingID"] = meetingID;
-		confirmation["roomID"] = roomID;
+		confirmation["roomNumber"] = roomNumber;
 		return confirmation;
 	}
 
 	json scheduled(std::string requestID, std::string meetingID,
-		std::string roomID, std::vector<std::string> list, std::vector<std::string> unconfirmed) {
+		std::string roomNumber, std::vector<std::string> list, std::vector<std::string> unconfirmed) {
 		json sched;
 		sched["message"] = "SCHEDULED";
 		sched["requestID"] = requestID;
 		sched["meetingID"] = meetingID;
-		sched["roomID"] = roomID;
+		sched["roomNumber"] = roomNumber;
 		json listOfPart(list);
 		sched["confirmedParticipantsIP"] = listOfPart;
 		json listUnconfirmed(unconfirmed);
@@ -139,11 +139,11 @@ struct messages {
 		return adder;
 	}
 
-	json confirm(std::string meetingID, std::string roomID) {
+	json confirm(std::string meetingID, std::string roomNumber) {
 		json confirmation;
 		confirmation["message"] = "CONFIRM";
 		confirmation["meetingID"] = meetingID;
-		confirmation["roomID"] = roomID;
+		confirmation["roomNumber"] = roomNumber;
 		return confirmation;
 	}
 
