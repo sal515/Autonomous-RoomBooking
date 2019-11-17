@@ -6,6 +6,7 @@ using json = nlohmann::json;
 
 struct meeting
 {
+	string message;
 	string minimumParticipants;
 	string requestID;
 	string meetingID;
@@ -22,6 +23,7 @@ struct meeting
 
 	meeting();
 	meeting(
+		const string& message,
 		const string& minimumParticipants,
 		const string& requestID,
 		const string& meetingID,
@@ -39,12 +41,4 @@ struct meeting
 	static bool client_update_meeting(json& db, const string& day, const string& time, const json& meeting);
 	static bool client_isMeeting(json& db, const string& day, const string& time);
 
-
-	// --------------------------------------------
-
-	// server specific meeting manipulators
-	static json server_get_meeting(json& db, const string& day, const string& time, const string& room);
-	static bool server_update_meeting(json& db, const string& day, const string& time, const string& room,
-	                                  const json& meeting);
-	static bool server_isMeeting(json& db, const string& day, const string& time, const string& room);
 };

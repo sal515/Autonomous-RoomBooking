@@ -32,6 +32,7 @@ int Testing_dbHelper_meetingObj()
 
 	// create a meeting object
 	meeting meetObj(
+		"1",
 		"2",
 		"2",
 		"2",

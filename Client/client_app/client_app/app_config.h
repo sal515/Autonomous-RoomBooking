@@ -1,6 +1,8 @@
 #pragma once
 
 #include "pch.h"
+using std::string;
+
 
 static const struct app_config
 {
