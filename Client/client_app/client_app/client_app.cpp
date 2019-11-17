@@ -32,15 +32,6 @@ string SERVER_IP_IN;
 // Function prototypes
 string ask_for_ip();
 
-// Example Function prototypes
-int test_pause_exit();
-vector<string> list_of_participants(int min);
-void menu();
-bool getMeetID(const string& meetingID);
-bool check_ip(const string &ip);
-bool check_schedule(json schedule);
-bool extract_date(const std::string& s, int& d, int& m, int& y);
-
 
 int main(void)
 {
@@ -55,12 +46,12 @@ int main(void)
 	// menu();
 	
 
-	spdlog::info("type {}", "info");
-	spdlog::debug("type {}", "debug");
-	spdlog::critical("type {}", "debug");
-	
-	return test_pause_exit();
-
+	// spdlog::info("type {}", "info");
+	// spdlog::debug("type {}", "debug");
+	// spdlog::critical("type {}", "debug");
+	//
+	// return test_pause_exit();
+	//
 
 
 	SERVER_IP_IN = ask_for_ip();
@@ -91,7 +82,6 @@ int main(void)
 		cout << "Failed. Error Code : " << WSAGetLastError() << endl;
 		exit(EXIT_FAILURE);
 	}
-
 	cout << "Initialised Winsock" << endl;
 
 	//create socket
