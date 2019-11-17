@@ -158,7 +158,6 @@
     <ClInclude Include="meeting.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="process_messages.h" />
-    <ClInclude Include="read_msgs.hpp" />
     <ClInclude Include="time_day_room.h" />
   </ItemGroup>
   <ItemGroup>
@@ -172,7 +171,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="process_messages.cpp" />
-    <ClCompile Include="read_msgs.cpp" />
     <ClCompile Include="server_app.cpp" />
     <ClCompile Include="time_day_room.cpp" />
   </ItemGroup>
