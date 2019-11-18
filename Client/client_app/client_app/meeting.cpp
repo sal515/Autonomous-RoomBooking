@@ -23,6 +23,7 @@ json meeting::meetingObj_to_json(const meeting& meetInfo)
 	meeting_json["meetingTime"] = meetInfo.meetingTime;
 	meeting_json["requesterIP"] = meetInfo.requesterIP;
 	meeting_json["meetingStatus"] = meetInfo.meetingStatus;
+	meeting_json["serverConfirmation"] = meetInfo.server_confirmation;
 	return meeting_json;
 }
 
@@ -88,7 +89,7 @@ meeting::meeting()
 meeting::meeting(const string& minimumParticipants, const string& requestID, const string& meetingID,
 	const vector<string>& invitedParticipantsIP, const vector<string>& confirmedParticipantsIP,
 	const string& roomNumber, const string& topic, const string& meetingDay, const string& meetingTime, const string& requesterIP,
-	const bool& meetingStatus)
+	const bool& meetingStatus, const bool& server_confirmation)
 {
 	this->minimumParticipants = minimumParticipants;
 	this->requestID = requestID;
@@ -101,6 +102,7 @@ meeting::meeting(const string& minimumParticipants, const string& requestID, con
 	this->meetingTime = meetingTime;
 	this->requesterIP = requesterIP;
 	this->meetingStatus = meetingStatus;
+	this->server_confirmation = server_confirmation;
 }
 
 json meeting::client_get_meeting(json& db, const string& day, const string& time)
@@ -120,7 +122,7 @@ bool meeting::client_update_meeting(json& db, const string& day, const string& t
 {
 	try
 	{
-		db.at(day).at(time).update(meeting);
+		db.at(day).at(time) = meeting;
 		// db.at(days).at(time) = meeting;
 		return true;
 	}
@@ -136,3 +138,33 @@ bool meeting::client_isMeeting(json& db, const string& day, const string& time)
 {
 	return !meeting::client_get_meeting(db, day, time).empty();
 }
+
+bool meeting::print_meeting(meeting meet)
+{
+	cout << "\nMinimum # of Participants: " << meet.minimumParticipants;
+	cout << "\nRequest ID: " << meet.requestID;
+	cout << "\nMeeting ID: " << meet.meetingID;
+	if (meet.invitedParticipantsIP.size() != 0) {
+		cout << "\nInvited Participants: ";
+		for (string var : meet.invitedParticipantsIP)
+		{
+			cout << "\n" << var;
+		}
+	}
+	if (meet.confirmedParticipantsIP.size() != 0) {
+		cout << "\Confirmed Participants";
+		for (string var : meet.confirmedParticipantsIP)
+		{
+			cout << "\n" << var;
+		}
+	}
+	cout << "\nRoom Number: " << meet.roomNumber;
+	cout << "\nTopic: " << meet.topic;
+	cout << "\nDay: " << meet.meetingDay;
+	cout << "\nTime: " << meet.meetingTime;
+	cout << "\nServer answer confirmation" << meet.server_confirmation;
+	cout << "\nMeeting Status: " << meet.meetingStatus << endl;
+	
+	return true;
+}
+

@@ -57,10 +57,10 @@ int main(void)
 	received_data["reason"] = "Testing is the reason";
 
 	// Process the request data 
-	processMessages(pending_db, received_data, clientIp);
+	//processMessages(db, received_data,"0.0.0.0");
 
 
-	return test_pause_exit();
+	//return test_pause_exit();
 
 
 

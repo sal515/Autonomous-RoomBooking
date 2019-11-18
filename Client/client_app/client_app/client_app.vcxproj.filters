@@ -30,10 +30,13 @@
     <ClInclude Include="app_config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="json_messages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="main_functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="json_messages.h">
+    <ClInclude Include="process_messages.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -62,10 +65,13 @@
     <ClCompile Include="project_examples.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="logger_example.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="main_functions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="logger_example.cpp">
+    <ClCompile Include="process_messages.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
