@@ -46,10 +46,10 @@ int main(void)
 	received_data["topic"] = "Testing request message";
 
 	// Process the request data 
-	processMessages(db, received_data);
+	//processMessages(db, received_data,"0.0.0.0");
 
 
-	return test_pause_exit();
+	//return test_pause_exit();
 
 
 

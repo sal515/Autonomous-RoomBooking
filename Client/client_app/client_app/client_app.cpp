@@ -43,14 +43,14 @@ int main(void)
 	json db = db_helper::db_to_json(config.DB_PATH);
 
 	// return Testing_dbHelper_meetingObj();
-	menu(db);
+	//menu(db);
 	
 
 	// spdlog::info("type {}", "info");
 	// spdlog::debug("type {}", "debug");
 	// spdlog::critical("type {}", "debug");
 	//
-	return test_pause_exit();
+	//return test_pause_exit();
 	//
 
 

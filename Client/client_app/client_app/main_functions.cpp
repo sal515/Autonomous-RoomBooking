@@ -112,6 +112,7 @@ void menu(json db)
 						<< "2. Accept invitation\n"
 						<< "3. Decline invitation\n"
 						<< "4. Request to join meeting\n"
+						<< "5. Withdraw from meeting\n"
 						<< "9. Go back to previous menu\n";
 					cin >> choice;
 					switch (choice) {
@@ -157,7 +158,8 @@ void menu(json db)
 						goodInput = true;
 						break;
 					}
-					case '3':		// accept invitation
+					case '3':		// decline invitation
+					case '5':		// withdraw
 						{
 							string meet_ID;
 							while (getMeetID(meet_ID, db).is_null())
