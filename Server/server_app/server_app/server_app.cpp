@@ -163,7 +163,8 @@ int main(void)
 		cout << "clientIP: " << clientIP << endl;
 		buffer = std::string(buf);
 		json received_data;
-		received_data.update(json::parse(buffer));
+		received_data = (json::parse(buffer));
+		// received_data.update(json::parse(buffer));
 
 		// Process the request data 
 		processMessages(db, received_data, clientIP);
