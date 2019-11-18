@@ -16,7 +16,7 @@ void processMessages(json& db, const json& req_data, const string& requesterIP)
 		string meetingID = std::to_string(++meetID);
 		for (string room : all_room)
 		{
-			if (!meeting::server_isMeeting(db, day, time, room))
+			if (!meeting::isMeeting(db, day, time, room))
 			{
 				// room available and can be booked - first come first server for rooms
 				// update the db
@@ -38,7 +38,7 @@ void processMessages(json& db, const json& req_data, const string& requesterIP)
 					requesterIP,
 					false
 				));
-				meeting::server_update_meeting(db, day, time, room, meetingObj);
+				meeting::update_meeting(db, day, time, room, meetingObj);
 				// db_helper::save_db(config.CONFIRMED_DB, db);
 				db_helper::save_db(config.PENDING_DB, db);
 				break;
@@ -96,7 +96,7 @@ void processMessages(json& db, const json& req_data, const string& requesterIP)
 
 			// TODO: delete from second database too 
 			// deleting the meeting object in the database 
-			meeting::server_update_meeting(
+			meeting::update_meeting(
 				db,
 				meetObj.meetingDay,
 				meetObj.meetingTime,

@@ -137,7 +137,7 @@ meeting::meeting(
 
 // server specific meeting manipulators
 
-json meeting::server_get_meeting(json& db, const string& day, const string& time, const string& room)
+json meeting::get_meeting(json& db, const string& day, const string& time, const string& room)
 {
 	try
 	{
@@ -145,13 +145,12 @@ json meeting::server_get_meeting(json& db, const string& day, const string& time
 	}
 	catch (nlohmann::json::exception& e)
 	{
-		cout << "Exception: server_get_meeting method throws -> " << e.what() << endl;
+		cout << "Exception: get_meeting method throws -> " << e.what() << endl;
 		return json({});
 	}
 }
 
-bool meeting::server_update_meeting(json& db, const string& day, const string& time, const string& room,
-                                    const json& meeting)
+bool meeting::update_meeting(json& db, const string& day, const string& time, const string& room, const json& meeting)
 {
 	try
 	{
@@ -161,13 +160,13 @@ bool meeting::server_update_meeting(json& db, const string& day, const string& t
 	}
 	catch (nlohmann::json::exception& e)
 	{
-		cout << "Exception: server_update_meeting method throws -> " << e.what() << endl;
+		cout << "Exception: update_meeting method throws -> " << e.what() << endl;
 		return false;
 	}
 }
 
 // is meetting already booked at the given time and day
-bool meeting::server_isMeeting(json& db, const string& day, const string& time, const string& room)
+bool meeting::isMeeting(json& db, const string& day, const string& time, const string& room)
 {
-	return !meeting::server_get_meeting(db, day, time, room).empty();
+	return !meeting::get_meeting(db, day, time, room).empty();
 }
