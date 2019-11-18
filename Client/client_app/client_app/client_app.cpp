@@ -37,11 +37,13 @@ int main(void)
 {
 	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
-	db_helper::initialize_db(config.DB_PATH, TRUE);
+	db_helper::initialize_db(config.DB_PATH);
 
 	// loading db from file to memory
 	json db = db_helper::db_to_json(config.DB_PATH);
 
+
+	return test_pause_exit();
 	// return Testing_dbHelper_meetingObj();
 	//menu(db);
 	

@@ -91,7 +91,7 @@ void menu(json db)
 			case '2':
 			{
 				string meetingID;
-				while (db_helper::getMeetingByID(meetingID, db).is_null())
+				while (db_helper::getMeetingByID(meetingID, db).empty())
 				{
 					cout << "\nPlease enter a meeting ID: ";
 					cin >> meetingID;
@@ -141,7 +141,7 @@ void menu(json db)
 					case '4':
 					{
 						string meet_ID;
-						while (db_helper::getMeetingByID(meet_ID, db).is_null())
+						while (db_helper::getMeetingByID(meet_ID, db).empty())
 						{
 							cout << "\nPlease enter a meeting ID: ";
 							cin >> meet_ID;
@@ -162,7 +162,7 @@ void menu(json db)
 					case '5':		// withdraw
 						{
 							string meet_ID;
-							while (db_helper::getMeetingByID(meet_ID, db).is_null())
+							while (db_helper::getMeetingByID(meet_ID, db).empty())
 							{
 								cout << "\nPlease enter a meeting ID: ";
 								cin >> meet_ID;

@@ -21,14 +21,14 @@ int Testing_dbHelper_meetingObj()
 
 	nlohmann::json db = db_helper::db_to_json(config.DB_PATH);
 
-	json meetInfo = meeting::client_get_meeting(
-		db,
-		"friday",
-		"6");
-
-	cout << "Checking if the database already exists: " <<
-		meeting::isMeeting(db, "friday", "6")
-		<< endl;
+	// json meetInfo = meeting::client_get_meeting(
+	// 	db,
+	// 	"friday",
+	// 	"6");
+	//
+	// cout << "Checking if the database already exists: " <<
+	// 	meeting::isMeeting(db, "friday", "6")
+	// 	<< endl;
 
 	// create a meeting object
 	// meeting meetObj(
@@ -68,12 +68,12 @@ int Testing_dbHelper_meetingObj()
 
 	json db_loaded_from_file_again = db_helper::db_to_json(config.DB_PATH);
 
-	json meetInfo_loaded_from_file = meeting::client_get_meeting(
-		db,
-		"friday",
-		"6");
+	// json meetInfo_loaded_from_file = meeting::client_get_meeting(
+	// 	db,
+	// 	"friday",
+	// 	"6");
 
-	meeting extracted_meetingObj_from_file = meeting::json_to_meetingObj(meetInfo_loaded_from_file);
+	// meeting extracted_meetingObj_from_file = meeting::json_to_meetingObj(meetInfo_loaded_from_file);
 
 	return 0;
 }
