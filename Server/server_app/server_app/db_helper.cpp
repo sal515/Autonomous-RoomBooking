@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "db_helper.h"
 
 
@@ -219,4 +219,33 @@ bool db_helper::save_db(const string& dbPath, const json& db)
 		cout << "Exception: update_meeting method throws -> " << e.what() << endl;
 		return false;
 	}
+}
+
+json db_helper::getMeetingByID(const json& db, const string meetingID)
+{
+	json foundMeeting = json({});
+	bool foundit = false;
+	// looping through days
+	for (auto day : db)
+	{
+		if (foundit) { break; }
+		// looping through time
+		for (auto time : day)
+		{
+			if (foundit) { break; }
+			// looping through rooms
+			for (auto room : time)
+			{
+				// if (foundit) { break; }
+				if (!meetingID.compare(room.at("meetingID")))
+				{
+					foundMeeting = (room);
+					foundit = true;
+					break;
+					// cout << foundMeeting<< endl;
+				}
+			}
+		}
+	}
+	return foundMeeting;
 }

@@ -27,4 +27,6 @@ struct db_helper
 	);
 	static json db_to_json(const string& dbPath);
 	static bool save_db(const string& dbPath, const json& db);
+
+	static json getMeetingByID(const json &db, const string meetingID);
 };
