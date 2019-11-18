@@ -117,7 +117,7 @@ json meeting::server_get_meeting(json& db, const string& day, const string& time
 	{
 		return db.at(day).at(time).at(room);
 	}
-	catch (nlohmann::json::exception& e)
+	catch (nlohmann::json::exception & e)
 	{
 		cout << "Exception: server_get_meeting method throws -> " << e.what() << endl;
 		return json({});
@@ -125,7 +125,7 @@ json meeting::server_get_meeting(json& db, const string& day, const string& time
 }
 
 bool meeting::server_update_meeting(json& db, const string& day, const string& time, const string& room,
-                                    const json& meeting)
+	const json& meeting)
 {
 	try
 	{
@@ -133,7 +133,7 @@ bool meeting::server_update_meeting(json& db, const string& day, const string& t
 		// db.at(days).at(time).at(room) = meeting;
 		return true;
 	}
-	catch (nlohmann::json::exception& e)
+	catch (nlohmann::json::exception & e)
 	{
 		cout << "Exception: server_update_meeting method throws -> " << e.what() << endl;
 		return false;

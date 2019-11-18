@@ -136,3 +136,32 @@ bool meeting::client_isMeeting(json& db, const string& day, const string& time)
 {
 	return !meeting::client_get_meeting(db, day, time).empty();
 }
+
+bool meeting::print_meeting(meeting meet)
+{
+	cout << "\nMinimum # of Participants: " << meet.minimumParticipants;
+	cout << "\nRequest ID: " << meet.requestID;
+	cout << "\nMeeting ID: " << meet.meetingID;
+	if (meet.invitedParticipantsIP.size() != 0) {
+		cout << "\nInvited Participants: ";
+		for (string var : meet.invitedParticipantsIP)
+		{
+			cout << "\n" << var;
+		}
+	}
+	if (meet.confirmedParticipantsIP.size() != 0) {
+		cout << "\Confirmed Participants";
+		for (string var : meet.confirmedParticipantsIP)
+		{
+			cout << "\n" << var;
+		}
+	}
+	cout << "\nRoom Number: " << meet.roomNumber;
+	cout << "\nTopic: " << meet.topic;
+	cout << "\nDay: " << meet.meetingDay;
+	cout << "\nTime: " << meet.meetingTime;
+	
+	cout << "\nMeeting Status: " << meet.meetingStatus << endl;
+	return true;
+}
+

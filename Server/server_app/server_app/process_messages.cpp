@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "process_messages.h"
-
-void processMessages(json& db, const json& req_data)
+int meetingID = 0;
+void processMessages(json& db, const json& req_data, const string& reqIP)
 {
 	if (!(messageType.request.compare(req_data.at("message"))))
 	{
@@ -9,7 +9,7 @@ void processMessages(json& db, const json& req_data)
 		string time = req_data.at("meetingTime");
 		vector<string> all_room = time_day_room::room_vec();
 		bool available = false;
-
+		string meetID = std::to_string(++meetingID);
 		for (string room : all_room)
 		{
 			if (!meeting::server_isMeeting(db, day, time, room))
@@ -24,14 +24,14 @@ void processMessages(json& db, const json& req_data)
 					req_data.at("message"),
 					req_data.at("minimumParticipants"),
 					req_data.at("requestID"),
-					"1",
+					meetID,
 					req_data.at("invitedParticipantsIP"),
 					vector<string>(),
 					room,
 					req_data.at("topic"),
 					day,
 					time,
-					"1.1.1.1",
+					reqIP,
 					false
 				));
 				meeting::server_update_meeting(db, day, time, room, meetingObj);
@@ -46,5 +46,20 @@ void processMessages(json& db, const json& req_data)
 				// TODO: Send response to client 
 			}
 		}
+	}
+	else if (!(messageType.accept.compare(req_data.at("message")))) {
+
+	}
+	else if (!(messageType.reject.compare(req_data.at("message")))) {
+
+	}
+	else if (!(messageType.cancelRequest.compare(req_data.at("message")))) {
+
+	}
+	else if (!(messageType.withdraw.compare(req_data.at("message")))) {
+
+	}
+	else if (!(messageType.add.compare(req_data.at("message")))) {
+
 	}
 }
