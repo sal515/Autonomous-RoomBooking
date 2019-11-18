@@ -91,7 +91,7 @@ void menu(json db)
 			case '2':
 			{
 				string meetingID;
-				while (getMeetID(meetingID, db).is_null())
+				while (getMeetID(meetingID, db).empty())
 				{
 					cout << "\nPlease enter a meeting ID: ";
 					cin >> meetingID;
@@ -313,8 +313,8 @@ json getMeetID(const string& meetingID, const json& db)
 			}
 		}
 	}
-	json emptyJ;
-	return emptyJ;
+	
+	return json({});
 }
 
 
