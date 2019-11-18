@@ -27,10 +27,11 @@ int main(void)
 {
 	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
-	db_helper::initialize_db(config.DB_PATH, false);
+	db_helper::initialize_db(config.PENDING_DB, config.CONFIRMED_DB);
 
 	// loading db from file to memory
-	json db = db_helper::db_to_json(config.DB_PATH);
+	json confirmed_db = db_helper::db_to_json(config.CONFIRMED_DB);
+	json pending_db = db_helper::db_to_json(config.PENDING_DB);
 
 	string clientIp = "1.1.1.1";
 	json received_data;
@@ -46,7 +47,7 @@ int main(void)
 	received_data["topic"] = "Testing request message";
 	
 	// Process the request data 
-	processMessages(db, received_data, clientIp);
+	processMessages(pending_db, received_data, clientIp);
 	
 
 	// Test: messageType.cancelRequest
@@ -56,7 +57,7 @@ int main(void)
 	received_data["reason"] = "Testing is the reason";
 
 	// Process the request data 
-	processMessages(db, received_data, clientIp);
+	processMessages(pending_db, received_data, clientIp);
 
 
 	return test_pause_exit();
@@ -167,7 +168,7 @@ int main(void)
 		// received_data.update(json::parse(buffer));
 
 		// Process the request data 
-		processMessages(db, received_data, clientIP);
+		processMessages(pending_db, received_data, clientIP);
 
 
 		// std::cout << "Data Recieved from client IP - " << clientIP << ": " << buffer << std::endl;
