@@ -27,7 +27,7 @@ int Testing_dbHelper_meetingObj()
 		"6");
 
 	cout << "Checking if the database already exists: " <<
-		meeting::client_isMeeting(db, "friday", "6")
+		meeting::isMeeting(db, "friday", "6")
 		<< endl;
 
 	// create a meeting object
@@ -46,7 +46,7 @@ int Testing_dbHelper_meetingObj()
 	// );
 
 	// cout << "meeting object updated: " <<
-	// 	meeting::client_update_meeting(
+	// 	meeting::update_meeting(
 	// 		db,
 	// 		"friday",
 	// 		"6",
