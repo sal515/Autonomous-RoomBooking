@@ -24,6 +24,13 @@
 #include <filesystem>
 #include <map>
 
+#include <queue>          // std::queue
+#include <thread>         // std::thread
+#include <future>         // std::async, std::future
+#include <mutex>          // std::mutex
+#include <atomic>         // std::atomic
+
+
 #include <windows.h>
 
 #include "json_messages.h"
@@ -37,6 +44,10 @@
 #include "spdlog/spdlog.h"
 // #include "spdlog/sinks/basic_file_sink.h" // support for basic file logging
 // #include "spdlog/sinks/rotating_file_sink.h" // support for rotating file logging
+
+
+
+
 
 // TODO: add headers that you want to pre-compile here
 #define PCH_H

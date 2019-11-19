@@ -151,7 +151,7 @@ void menu(json db)
 						thisMeeting.meetingStatus = true;
 						//send msg to RBMS 
 
-						meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
+						// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
 						// check if meeting in agenda
 							// put acceptance if in local agenda.
 							//store in json
@@ -172,7 +172,7 @@ void menu(json db)
 							thisMeeting.meetingStatus = false;
 							//send msg to RBMS 
 
-							meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
+							// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
 							// check if meeting in agenda
 								// put withdraw if in local agenda.
 								//store in json
@@ -191,6 +191,8 @@ void menu(json db)
 			}
 			case '9':
 			{
+				// exit_program = true;
+
 				cout << "exiting program";
 				return;
 			}
@@ -310,11 +312,11 @@ bool check_ip(const string& ip)
 	}
 }
 
-bool check_schedule(json schedule)
-{
-	//look into json file to see if available or not
-	return false;
-}
+// bool check_schedule(json schedule)
+// {
+// 	//look into json file to see if available or not
+// 	return false;
+// }
 
 
 // function expects the string in format dd/mm/yyyy:

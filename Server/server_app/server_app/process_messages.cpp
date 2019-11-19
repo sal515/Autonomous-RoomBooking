@@ -1,10 +1,8 @@
 ﻿#include "pch.h"
 #include "process_messages.h"
-int meetID = 0;
 
-void sendMessageToClients(const json& msg, const string& clientIP);
 
-void processMessages(json& db, const json& req_data, const string& requesterIP)
+void processMessages(json& db, const json& req_data, const string& requesterIP, std::atomic <int> &global_meet_id)
 {
 	// Process message type : Request 
 	if (!(messageType.request.compare(req_data.at("message"))))
@@ -13,7 +11,7 @@ void processMessages(json& db, const json& req_data, const string& requesterIP)
 		string time = req_data.at("meetingTime");
 		vector<string> all_room = time_day_room::room_vec();
 		bool available = false;
-		string meetingID = std::to_string(++meetID);
+		string meetingID = std::to_string(++global_meet_id);
 		for (string room : all_room)
 		{
 			if (!meeting::isMeeting(db, day, time, room))
@@ -39,8 +37,8 @@ void processMessages(json& db, const json& req_data, const string& requesterIP)
 					false
 				));
 				meeting::update_meeting(db, day, time, room, meetingObj);
-				// db_helper::save_db(config.CONFIRMED_DB, db);
-				db_helper::save_db(config.PENDING_DB, db);
+				// db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+				db_helper::save_db(config.PENDING_DB_PATH, db);
 				break;
 			}
 			else
@@ -91,7 +89,7 @@ void processMessages(json& db, const json& req_data, const string& requesterIP)
 			for (const string& participant : meetObj.invitedParticipantsIP)
 			{
 				// TODO: notify all participants of meeting cancellation
-				sendMessageToClients(notScheduled, participant);
+				// sendMessageToClients(notScheduled, participant);
 			}
 
 			// TODO: delete from second database too 
@@ -102,7 +100,7 @@ void processMessages(json& db, const json& req_data, const string& requesterIP)
 				meetObj.meetingTime,
 				meetObj.roomNumber,
 				json({}));
-			db_helper::save_db(config.CONFIRMED_DB, db);
+			db_helper::save_db(config.CONFIRMED_DB_PATH, db);
 		}
 	}
 	else if (!(messageType.withdraw.compare(req_data.at("message"))))
@@ -111,10 +109,4 @@ void processMessages(json& db, const json& req_data, const string& requesterIP)
 	else if (!(messageType.add.compare(req_data.at("message"))))
 	{
 	}
-}
-
-
-void sendMessageToClients(const json& msg, const string& clientIP)
-{
-	// send socket messages with the json message passed to the clients mentioned
 }
