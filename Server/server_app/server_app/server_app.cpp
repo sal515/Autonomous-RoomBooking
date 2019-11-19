@@ -243,9 +243,9 @@ void receive_message_from_client(
 			clientIP = string(printable_IP_add_buf);
 		}
 
-		// cout << "clientIP: " << clientIP << endl;
+		// TODO: DELETE Test Print when it is time
+		cout << "clientIP: " << clientIP << endl;
 		string buffer = std::string(buf);
-
 		// std::cout << "Data Recieved from client IP - " << clientIP << ": " << buffer << std::endl;
 
 		json received_data = (json::parse(buffer));

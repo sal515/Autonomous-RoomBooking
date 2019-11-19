@@ -211,36 +211,8 @@ void send_message_to_server(
 
 
 			socket_mutex.unlock();
-
 		}
-
-
-		// 	//receive a reply and print it
-		// 	//clear the buffer by filling null, it might have previously received data
-		// 	memset(buf, '\0', BUFLEN + 1);
-		// 	//try to receive some data, this is a blocking call
-		// 	if (recvfrom(s, buf, BUFLEN, 0, reinterpret_cast<struct sockaddr *>(&client_struct), &client_struct_len) ==
-		// 		SOCKET_ERROR)
-		// 	{
-		// 		cout_mutex.lock();
-		// 		cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
-		// 		cout_mutex.unlock();
-		// 		exit(EXIT_FAILURE);
-		// 	}
-		//
-		// 	string buffer = string(buf);
-		// 	json received_data = json::parse(buffer);
-		// 	{
-		// 		received_data = json({});
-		// 	}
-		// 	// Saving all the messages received in the global queue
-		// 	received_message_queue_mutex.lock();
-		// 	received_messages_queue.push(received_data);
-		// 	received_message_queue_mutex.unlock();
 	}
-	//	// cout_mutex.lock();
-	//  // cout << "exiting receiving thread" << endl;
-	//  // cout_mutex.unlock();
 }
 
 
@@ -260,7 +232,7 @@ void receive_message_from_server(
 		//receive a reply and print it
 		//clear the buffer by filling null, it might have previously received data
 		memset(buf, '\0', BUFLEN + 1);
-		
+
 		//try to receive some data, this is a blocking call
 		if (recvfrom(s, buf, BUFLEN, 0, reinterpret_cast<struct sockaddr *>(&client_struct), &client_struct_len) ==
 			SOCKET_ERROR)
@@ -283,11 +255,7 @@ void receive_message_from_server(
 		// received_message_queue_mutex.unlock();
 
 		socket_mutex.unlock();
-
 	}
-	// // cout_mutex.lock();
-	// // cout << "exiting receiving thread" << endl;
-	// // cout_mutex.unlock();
 }
 
 void create_client_socket(char* SERVER, SOCKET& s, sockaddr_in& client_struct)
