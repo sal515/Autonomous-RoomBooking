@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "db_helper.h"
 
 
@@ -73,50 +73,8 @@ bool db_helper::removeDirectory(string relativeDirName)
 	}
 }
 
-void db_helper::initialize_db(const string& dbPath, const bool& isClient)
+void db_helper::initialize_db(const string& pending_db, const string& confirmed_db)
 {
-	if (isClient)
-	{
-		//Server only
-		// json room_list;
-		json day;
-		json time;
-
-		map<string, string> time_map = time_day_room::time_map(time_day_room::startTime, time_day_room::endTime);
-		for (const auto &element : time_map)
-		{
-			time[element.first] = json({});
-		}
-
-		map<string, string> day_map = time_day_room::day_map();
-		for (const auto &element : day_map)
-		{
-			day[element.first] = time;
-		}
-
-		try
-		{
-			const fs::path p(dbPath);
-			if (!fs::exists(p))
-			{
-				std::ofstream writeFile(dbPath);
-				writeFile << std::setw(4) << day << std::endl;
-				writeFile.close();
-				
-				cout << "Client agenda was created" << endl;
-			}
-			else
-			{
-				cout << "Client agenda already exits" << endl;
-			}
-		}
-		catch (fstream::failure& e)
-		{
-			cout << "Exception: initialize_db method throws -> " << e.what() << endl;
-		}
-	}
-	else
-	{
 		// ============ Server ===============
 		json rooms;
 		json day;
@@ -142,25 +100,45 @@ void db_helper::initialize_db(const string& dbPath, const bool& isClient)
 
 		try
 		{
-			const fs::path p(dbPath);
+			const fs::path p(pending_db);
 			if (!fs::exists(p))
 			{
-				std::ofstream writeFile(dbPath);
+				std::ofstream writeFile(pending_db);
 				writeFile << std::setw(4) << day << std::endl;
 				writeFile.close();
 
-				cout << "Server database was created" << endl;
+				cout << "Server pending database was created" << endl;
 			}
 			else
 			{
-				cout << "Server database already exits" << endl;
+				cout << "Server pending database already exits" << endl;
 			}
 		}
 		catch (fstream::failure& e)
 		{
-			cout << "Exception: initialize_db method throws -> " << e.what() << endl;
+			cout << "Exception: \"pending_db\" initialize_db method throws -> " << e.what() << endl;
 		}
-	}
+	
+	try
+		{
+			const fs::path p(confirmed_db);
+			if (!fs::exists(p))
+			{
+				std::ofstream writeFile(confirmed_db);
+				writeFile << std::setw(4) << day << std::endl;
+				writeFile.close();
+
+				cout << "Server confirmed database was created" << endl;
+			}
+			else
+			{
+				cout << "Server confirmed database already exits" << endl;
+			}
+		}
+		catch (fstream::failure& e)
+		{
+			cout << "Exception: \"confirmed_db\" initialize_db method throws -> " << e.what() << endl;
+		}
 }
 
 json db_helper::db_to_json(const string& dbPath)
@@ -219,4 +197,33 @@ bool db_helper::save_db(const string& dbPath, const json& db)
 		cout << "Exception: update_meeting method throws -> " << e.what() << endl;
 		return false;
 	}
+}
+
+json db_helper::getMeetingByID(const json& db, const string meetingID)
+{
+	json foundMeeting = json({});
+	bool foundit = false;
+	// looping through days
+	for (auto day : db)
+	{
+		if (foundit) { break; }
+		// looping through time
+		for (auto time : day)
+		{
+			if (foundit) { break; }
+			// looping through rooms
+			for (auto room : time)
+			{
+				// if (foundit) { break; }
+				if (!meetingID.compare(room.at("meetingID")))
+				{
+					foundMeeting = (room);
+					foundit = true;
+					break;
+					// cout << foundMeeting<< endl;
+				}
+			}
+		}
+	}
+	return foundMeeting;
 }
