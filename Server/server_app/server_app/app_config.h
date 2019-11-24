@@ -12,6 +12,7 @@ static const struct app_config
 	// Diretory paths
 	string DIR_LOCAL_STORAGE = "local_storage";
 	string LOG_PATH = "local_storage/log.json";
-	string DB_PATH = "local_storage/db.json";
+	string CONFIRMED_DB_PATH = "local_storage/confirmed_db.json";
+	string PENDING_DB_PATH = "local_storage/pending_db.json";
 	string EXAMPLE_DB_PATH = "local_storage/example_db.json";
-}config;
+} config;

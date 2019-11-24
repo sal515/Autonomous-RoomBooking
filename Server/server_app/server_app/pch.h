@@ -26,8 +26,15 @@
 #include <map>
 #include <cstdio>
 
+#include <queue>          // std::queue
+#include <thread>         // std::thread
+#include <future>         // std::async, std::future
+#include <mutex>          // std::mutex
+#include <atomic>         // std::atomic
+
 
 #include <windows.h>
+
 
 #include "db_helper.h"
 #include "app_config.h"

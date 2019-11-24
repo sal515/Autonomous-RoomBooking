@@ -36,6 +36,12 @@
     <ClInclude Include="main_functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="process_messages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="global_variables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -66,6 +72,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main_functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="process_messages.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="global_variables.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

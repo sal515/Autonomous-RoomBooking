@@ -153,8 +153,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="app_config.h" />
+    <ClInclude Include="global_variables.h" />
     <ClInclude Include="json_messages.h" />
     <ClInclude Include="main_functions.h" />
+    <ClInclude Include="process_messages.h" />
     <ClInclude Include="time_day_room.h" />
     <ClInclude Include="db_helper.h" />
     <ClInclude Include="meeting.h" />
@@ -163,8 +165,10 @@
   <ItemGroup>
     <ClCompile Include="app_config.cpp" />
     <ClCompile Include="client_app.cpp" />
+    <ClCompile Include="global_variables.cpp" />
     <ClCompile Include="logger_example.cpp" />
     <ClCompile Include="main_functions.cpp" />
+    <ClCompile Include="process_messages.cpp" />
     <ClCompile Include="project_examples.cpp" />
     <ClCompile Include="time_day_room.cpp" />
     <ClCompile Include="db_helper.cpp" />

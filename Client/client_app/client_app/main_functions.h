@@ -1,13 +1,13 @@
 #pragma once
 #pragma once
 #include "pch.h"
+#include "global_variables.h"
 
 string ask_for_ip();
 void menu(json db);
 vector<string> list_of_participants(int min);
-json getMeetID(const string& meetingID, const json& db);
 bool check_ip(const string& ip);
-bool check_schedule(json schedule);
+// bool check_schedule(json schedule);
 // ==================  Examples  ======================================
 int test_pause_exit();
 

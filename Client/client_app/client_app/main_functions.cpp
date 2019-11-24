@@ -91,7 +91,7 @@ void menu(json db)
 			case '2':
 			{
 				string meetingID;
-				while (getMeetID(meetingID, db).is_null())
+				while (db_helper::getMeetingByID(meetingID, db).empty())
 				{
 					cout << "\nPlease enter a meeting ID: ";
 					cin >> meetingID;
@@ -112,6 +112,7 @@ void menu(json db)
 						<< "2. Accept invitation\n"
 						<< "3. Decline invitation\n"
 						<< "4. Request to join meeting\n"
+						<< "5. Withdraw from meeting\n"
 						<< "9. Go back to previous menu\n";
 					cin >> choice;
 					switch (choice) {
@@ -140,37 +141,38 @@ void menu(json db)
 					case '4':
 					{
 						string meet_ID;
-						while (getMeetID(meet_ID, db).is_null())
+						while (db_helper::getMeetingByID(meet_ID, db).empty())
 						{
 							cout << "\nPlease enter a meeting ID: ";
 							cin >> meet_ID;
 						}
-						json meetJsonObj = getMeetID(meet_ID, db);
+						json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
 						meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
 						thisMeeting.meetingStatus = true;
 						//send msg to RBMS 
 
-						meeting::client_update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
+						// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
 						// check if meeting in agenda
 							// put acceptance if in local agenda.
 							//store in json
 						goodInput = true;
 						break;
 					}
-					case '3':		// accept invitation
+					case '3':		// decline invitation
+					case '5':		// withdraw
 						{
 							string meet_ID;
-							while (getMeetID(meet_ID, db).is_null())
+							while (db_helper::getMeetingByID(meet_ID, db).empty())
 							{
 								cout << "\nPlease enter a meeting ID: ";
 								cin >> meet_ID;
 							}
-							json meetJsonObj = getMeetID(meet_ID, db);
+							json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
 							meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
 							thisMeeting.meetingStatus = false;
 							//send msg to RBMS 
 
-							meeting::client_update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
+							// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
 							// check if meeting in agenda
 								// put withdraw if in local agenda.
 								//store in json
@@ -189,6 +191,8 @@ void menu(json db)
 			}
 			case '9':
 			{
+				// exit_program = true;
+
 				cout << "exiting program";
 				return;
 			}
@@ -293,27 +297,7 @@ vector<string> list_of_participants(int min)
 	return participants;
 }
 
-json getMeetID(const string& meetingID, const json& db)
-{
-	//add funciton to look in agenda
-	json day;
-	json time;
-	map<string, string> day_map = time_day_room::day_map();
-	map<string, string> time_map = time_day_room::time_map(time_day_room::startTime, time_day_room::endTime);
-	for (const auto& element : day_map)
-	{
-		for (const auto& element1 : time_map)
-		{
-			if (!db.at(element.first).at(element1.first).empty()) {
-				if (!messageType.invite.compare(db.at(element.first).at(element1.first).at("message"))) {
-					return db.at(element.first).at(element1.first);
-				}
-			}
-		}
-	}
-	json emptyJ;
-	return emptyJ;
-}
+
 
 
 bool check_ip(const string& ip)
@@ -328,11 +312,11 @@ bool check_ip(const string& ip)
 	}
 }
 
-bool check_schedule(json schedule)
-{
-	//look into json file to see if available or not
-	return false;
-}
+// bool check_schedule(json schedule)
+// {
+// 	//look into json file to see if available or not
+// 	return false;
+// }
 
 
 // function expects the string in format dd/mm/yyyy:
