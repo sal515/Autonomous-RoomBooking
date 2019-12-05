@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="app_config.h" />
+    <ClInclude Include="global_variables.h" />
     <ClInclude Include="json_messages.h" />
     <ClInclude Include="main_functions.h" />
     <ClInclude Include="process_messages.h" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="app_config.cpp" />
     <ClCompile Include="client_app.cpp" />
+    <ClCompile Include="global_variables.cpp" />
     <ClCompile Include="logger_example.cpp" />
     <ClCompile Include="main_functions.cpp" />
     <ClCompile Include="process_messages.cpp" />

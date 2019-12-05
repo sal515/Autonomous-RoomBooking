@@ -73,21 +73,22 @@ bool db_helper::removeDirectory(string relativeDirName)
 	}
 }
 
-void db_helper::initialize_db(const string& dbPath, const bool& isClient)
+void db_helper::initialize_db(const string& dbPath)
 {
-	if (isClient)
-	{
-		//Server only
-		// json room_list;
-
+		json rooms;
 		json day;
 		json time;
 
+		vector<string> rooms_vec = time_day_room::room_vec();
+		for (string room : rooms_vec)
+		{
+			rooms[room] = json({});
+		}
 
 		map<string, string> time_map = time_day_room::time_map(time_day_room::startTime, time_day_room::endTime);
 		for (const auto &element : time_map)
 		{
-			time[element.first] = json({});
+			time[element.first] = rooms;
 		}
 
 		map<string, string> day_map = time_day_room::day_map();
@@ -116,12 +117,6 @@ void db_helper::initialize_db(const string& dbPath, const bool& isClient)
 		{
 			cout << "Exception: initialize_db method throws -> " << e.what() << endl;
 		}
-	}
-	else
-	{
-		//server db initialize
-	}
-
 }
 
 json db_helper::db_to_json(const string& dbPath)
@@ -180,4 +175,52 @@ bool db_helper::save_db(const string& dbPath, const json& db)
 		cout << "Exception: update_meeting method throws -> " << e.what() << endl;
 		return false;
 	}
+}
+
+json db_helper::getMeetingByID(const string& meetingID, const json& db)
+{
+	json foundMeeting = json({});
+	bool foundit = false;
+	// looping through days
+	for (auto day : db)
+	{
+		if (foundit) { break; }
+		// looping through time
+		for (auto time : day)
+		{
+			if (foundit) { break; }
+			// looping through rooms
+			for (auto room : time)
+			{
+				// if (foundit) { break; }
+				if (!meetingID.compare(room.at("meetingID")))
+				{
+					foundMeeting = (room);
+					foundit = true;
+					break;
+					// cout << foundMeeting<< endl;
+				}
+			}
+		}
+	}
+	return foundMeeting;
+
+	// //add funciton to look in agenda
+	// json day;
+	// json time;
+	// map<string, string> day_map = time_day_room::day_map();
+	// map<string, string> time_map = time_day_room::time_map(time_day_room::startTime, time_day_room::endTime);
+	// for (const auto& element : day_map)
+	// {
+	// 	for (const auto& element1 : time_map)
+	// 	{
+	// 		if (!db.at(element.first).at(element1.first).empty()) {
+	// 			if (!messageType.invite.compare(db.at(element.first).at(element1.first).at("message"))) {
+	// 				return db.at(element.first).at(element1.first);
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// json emptyJ;
+	// return emptyJ;
 }
