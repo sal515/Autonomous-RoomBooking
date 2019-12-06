@@ -16,10 +16,25 @@ string ask_for_ip()
 }
 
 
-void menu(json db, string ownIP)
+bool is_string_a_number(string choiceStr)
+{
+	for (char x : choiceStr)
+	{
+		if (!isdigit(x))
+		{
+			return false;
+			// break;
+		}
+	}
+	return true;
+}
+
+void menu(json db, const string& ownIP)
 {
 	int reqCounter = 1;
-	char choice;
+	string choiceStr;
+	int choice;
+	// string choice;
 	bool goodInput = false;
 
 	while (true)
@@ -31,8 +46,15 @@ void menu(json db, string ownIP)
 				<< "2. Cancel a Meeting\n"
 				<< "3. Check inbox for invitations\n"
 				<< "4. Request to Participate\n"
-				<< "9. Exit the Program\n";
-			cin >> choice;
+				<< "9. Exit the Program\n"
+				<< "10. Debug: Book a room\n";
+			cin >> choiceStr;
+
+			choice = -1;
+			if(is_string_a_number(choiceStr))
+			{
+				choice = std::stoi(choiceStr);
+			}
 
 			time_day_room possibilities;
 			map<string, string> dayMap = possibilities.day_map();
@@ -40,7 +62,7 @@ void menu(json db, string ownIP)
 
 			switch (choice)
 			{
-			case '1':
+			case 1:
 				{
 					string day;
 					// int mm, dd, yyyy, 
@@ -111,13 +133,12 @@ void menu(json db, string ownIP)
 						false
 					);
 
-					meeting::update_meeting(db,day,timeH, meeting::meetingObj_to_json(requestMetObj));
+					meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
 
-					
 
 					break;
 				}
-			case '2':
+			case 2:
 				{
 					string meetingID;
 					while (db_helper::getMeetingByID(meetingID, db).empty())
@@ -133,7 +154,7 @@ void menu(json db, string ownIP)
 					json cancel = message.cancelMeet(meetingID);
 					break;
 				}
-			case '3':
+			case 3:
 				{
 					bool subMenu = true;
 					while (subMenu)
@@ -147,7 +168,7 @@ void menu(json db, string ownIP)
 						cin >> choice;
 						switch (choice)
 						{
-						case '1': // view invitations
+						case 1: // view invitations
 							{
 								vector<json> invites;
 								for (const auto& dayz : db)
@@ -171,8 +192,8 @@ void menu(json db, string ownIP)
 								break;
 								//to test
 							}
-						case '2': // accept invitation
-						case '4':
+						case 2: // accept invitation
+						case 4:
 							{
 								string meet_ID;
 								while (db_helper::getMeetingByID(meet_ID, db).empty())
@@ -192,8 +213,8 @@ void menu(json db, string ownIP)
 								goodInput = true;
 								break;
 							}
-						case '3': // decline invitation
-						case '5': // withdraw
+						case 3: // decline invitation
+						case 5: // withdraw
 							{
 								string meet_ID;
 								while (db_helper::getMeetingByID(meet_ID, db).empty())
@@ -213,7 +234,7 @@ void menu(json db, string ownIP)
 								goodInput = true;
 								break;
 							}
-						case '9':
+						case 9:
 							{
 								cout << endl;
 								subMenu = false;
@@ -223,15 +244,58 @@ void menu(json db, string ownIP)
 					}
 					break;
 				}
-			case '9':
+			case 9:
 				{
 					// exit_program = true;
 
 					cout << "exiting program";
 					return;
 				}
+			case 10:
+				{
+					string requestID = "1";
+					string day = "friday";
+					string timeH = "10";
+					string minParts = "1";
+					vector<string> participants = {
+						"111.111.111.111",
+						"222.222.222.222"
+					};
+					string topic = "Test topic";
+
+
+					json request = messages::request(
+						requestID,
+						day,
+						timeH,
+						minParts,
+						participants,
+						topic
+					);
+
+					meeting requestMetObj = meeting(
+						messageType.request,
+						minParts,
+						requestID,
+						"",
+						participants,
+						vector<string>{},
+						"",
+						topic,
+						day,
+						timeH,
+						ownIP,
+						false,
+						false
+					);
+
+					meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
+
+					db_helper::save_db(config.DB_PATH, db);
+					break;
+				}
 			default:
-				cout << "Please enter a valid input";
+				cout << "Please enter a valid input\n";
 			}
 		}
 		goodInput = false;
