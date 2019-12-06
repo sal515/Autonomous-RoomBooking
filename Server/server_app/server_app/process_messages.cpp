@@ -1,8 +1,13 @@
 ﻿#include "pch.h"
 #include "process_messages.h"
+#define BUFLEN 32768		//Max length of buffer 
+#define PORT 45678   //The port on which to listen for incoming data
+std::mutex sendmessage_mutex;
 
 
-void processMessages(json& db, const json& req_data, const string& requesterIP, std::atomic <int> &global_meet_id)
+
+void processMessages(json& db,json& pendingdb, const json& req_data, const string& requesterIP, std::atomic <int> &global_meet_id,
+	SOCKET s, sockaddr_in server_struct, int server_struct_len, const string& messageJsonStr)
 {
 	// Process message type : Request 
 	if (!(messageType.request.compare(req_data.at("message"))))
@@ -39,6 +44,25 @@ void processMessages(json& db, const json& req_data, const string& requesterIP, 
 				meeting::update_meeting(db, day, time, room, meetingObj);
 				// db_helper::save_db(config.CONFIRMED_DB_PATH, db);
 				db_helper::save_db(config.PENDING_DB_PATH, db);
+				json meetingInv = meeting::meetingObj_to_json(meeting("invite",
+					" ",
+					" ",
+					meetingID,
+					vector<string>{},
+					vector<string>{},
+					" ",
+					req_data.at("topic"),
+					day,
+					time,
+					requesterIP,
+					false
+				)
+				);
+				string toSend = meetingInv.dump();
+				for (string ip : req_data.at("invitedParticipantsIP")) {
+					sockaddr_in client = clientMaker(ip);
+					send_message_client(s, client, sizeof(&client), toSend);
+				}
 				break;
 			}
 			else
@@ -46,15 +70,129 @@ void processMessages(json& db, const json& req_data, const string& requesterIP, 
 				// rooms not available - build unavailable reponse for the client
 				// db will not be updated
 				json unavailable = messages::response_unavail(req_data.at("requestID"));
+				sockaddr_in client = clientMaker(requesterIP);
+				string toSend = unavailable.dump();
+				send_message_client(s, client, sizeof(&client), toSend);
 				// TODO: Send response to client 
 			}
 		}
 	}
 	else if (!(messageType.accept.compare(req_data.at("message"))))
 	{
+		//check if meeting minimum has been achieved. If yes, send confirmation with room. Else, wait.
+		string meetingID = req_data.at("meetingID");
+		bool found = false;
+		json lookForMeeting = db_helper::getMeetingByID(db, meetingID);
+		// check if meeting with ID exists.
+		if (lookForMeeting != NULL) {
+			vector<string> acceptedParticipants = lookForMeeting.at("confirmedParticipantsIP");
+			vector<string> invitedParticipants = lookForMeeting.at("invitedParticipantsIP");
+			string minNum = lookForMeeting.at("minimumParticipants");
+			int min = stoi(minNum, nullptr, 10);
+			//check if requester was invited.
+			for (string confirms : invitedParticipants) {
+				if (!confirms.compare(requesterIP)) {
+					found = true;
+				}
+			}
+			if (found == false) {
+				return;
+			}
+			//check if requester had already accepted.
+			for (string confirms : acceptedParticipants) {
+				if (!confirms.compare(requesterIP)) {
+					return;
+				}
+			}
+			//check if acceptedparticipants number is larger than min. if yes, just add the accepting person to accepted array and send them confirmation
+			if ((min-1) < acceptedParticipants.size()) {
+				json accepting;
+				accepting["message"] = "confirm";
+				accepting["meetingID"] = lookForMeeting.at("meetingID");
+				accepting["roomNumber"] = lookForMeeting.at("roomNumber");
+				acceptedParticipants.push_back(requesterIP);
+				sockaddr_in client = clientMaker(requesterIP);
+				send_message_client(s, client, sizeof(&client), accepting);
+			}
+			// if just reached size of required people to accept, send confirmation to all
+			else if ((min-1) == acceptedParticipants.size()) {
+				acceptedParticipants.push_back(requesterIP);
+				json accepting;
+				accepting["message"] = "confirm";
+				accepting["meetingID"] = lookForMeeting.at("meetingID");
+				accepting["roomNumber"] = lookForMeeting.at("roomNumber");
+				for (string confirms : acceptedParticipants) {
+
+					sockaddr_in client = clientMaker(confirms);
+					send_message_client(s, client, sizeof(&client), accepting);
+				}
+				meeting::update_meeting(pendingdb, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"), json({}));
+			}
+			else {
+				//just add to accepted.
+				acceptedParticipants.push_back(requesterIP);
+			}
+			lookForMeeting.at("confirmedParticipantsIP") = acceptedParticipants;
+			meeting::update_meeting(db, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"), lookForMeeting);
+			db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+			db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+		}
 	}
 	else if (!(messageType.reject.compare(req_data.at("message"))))
 	{
+	//check if meeting minimum has been achieved. If yes, send confirmation with room. Else, wait.
+	string meetingID = req_data.at("meetingID");
+	bool found = false;
+	json lookForMeeting = db_helper::getMeetingByID(db, meetingID);
+	// check if meeting with ID exists.
+		if (lookForMeeting != NULL) {
+			vector<string> acceptedParticipants = lookForMeeting.at("confirmedParticipantsIP");
+			vector<string> invitedParticipants = lookForMeeting.at("invitedParticipantsIP");
+			string minNum = lookForMeeting.at("minimumParticipants");
+			int min = stoi(minNum, nullptr, 10);
+			//check if requester was invited.
+			for (string confirms : invitedParticipants) {
+				if (!confirms.compare(requesterIP)) {
+					found = true;
+				}
+			}
+			if (found == false) {
+				return;
+			}
+			//check if requester had already accepted.
+			for (string confirms : acceptedParticipants) {
+				if (!confirms.compare(requesterIP)) {
+					// if number dips below minimum, send cancel message.
+					if (min == acceptedParticipants.size()) {
+						vector<int>::iterator it;
+						for (auto it = acceptedParticipants.begin(); it != acceptedParticipants.end(); ++it) {
+							if (!requesterIP.compare(*it)) {
+								acceptedParticipants.erase(it);
+								break;
+							}
+						}
+						json cancel;
+						cancel["message"] = "cancel";
+						cancel["meetingID"] = lookForMeeting.at("meetingID");
+						cancel["reason"] = "Not enough members";
+						for (string confirms : acceptedParticipants) {
+							sockaddr_in client = clientMaker(confirms);
+							send_message_client(s, client, sizeof(&client), cancel);
+						}
+					}
+					//if number below or above minimum, don't send any messages. just remove participant from confirmed.
+					else {
+						vector<int>::iterator it;
+						for (auto it = acceptedParticipants.begin(); it != acceptedParticipants.end(); ++it) {
+							if (!requesterIP.compare(*it)) {
+								acceptedParticipants.erase(it);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	else if (!(messageType.cancelRequest.compare(req_data.at("message"))))
 	{
@@ -105,8 +243,44 @@ void processMessages(json& db, const json& req_data, const string& requesterIP, 
 	}
 	else if (!(messageType.withdraw.compare(req_data.at("message"))))
 	{
+
 	}
 	else if (!(messageType.add.compare(req_data.at("message"))))
 	{
 	}
+}
+
+void send_message_client(
+	SOCKET s,
+	sockaddr_in server_struct,
+	int server_struct_len,
+	const string& messageJsonStr)
+{
+	char buf[BUFLEN];
+	memset(buf, '\0', BUFLEN + 1);
+	messageJsonStr.copy(buf, messageJsonStr.size());
+
+	sendmessage_mutex.lock();
+	// //now reply the client with the same data
+	if (sendto(s, buf, strlen(buf), 0, (struct sockaddr*) & server_struct, server_struct_len) == SOCKET_ERROR)
+	{
+		cout << "sendto() failed with error code : " << WSAGetLastError << endl;
+		exit(EXIT_FAILURE);
+	}
+	sendmessage_mutex.unlock();
+}
+
+sockaddr_in clientMaker(string requesterIP) {
+	sockaddr_in client;
+	client.sin_family = AF_INET;
+	if (client.sin_addr.s_addr = inet_pton(AF_INET, requesterIP.c_str(), &client.sin_addr.s_addr) == NULL) {
+		printf("Invalid address: %s\n", requesterIP.c_str());
+		exit(EXIT_FAILURE);
+	}
+	else if (client.sin_addr.s_addr == -1) {
+		perror("inet_pton");
+		exit(EXIT_FAILURE);
+	}
+	client.sin_port = htons(PORT);
+	return client;
 }
