@@ -31,7 +31,7 @@ int test_pause_exit();
 #define LISTENING_PORT 8888   //The port on which to listen for incoming data
 
 string SERVER_IP_IN;
-
+string CLIENT_LOCAL_IP;
 // Function prototypes
 string ask_for_ip();
 
@@ -74,74 +74,8 @@ std::atomic<bool> exit_program(false);
 std::string clientIP;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Testing getIP function 
-
-// Returns hostname for the local computer 
-void checkHostName(int hostname)
-{
-	if (hostname == -1)
-	{
-		perror("gethostname");
-		exit(1);
-	}
-}
-
-// Returns host information corresponding to host name 
-void checkHostEntry(struct hostent * hostentry)
-{
-	if (hostentry == NULL)
-	{
-		perror("gethostbyname");
-		exit(1);
-	}
-}
-
-// Converts space-delimited IPv4 addresses 
-// to dotted-decimal format 
-void checkIPbuffer(char *IPbuffer)
-{
-	if (NULL == IPbuffer)
-	{
-		perror("inet_ntoa");
-		exit(1);
-	}
-}
-
-
-// Testing getIP function 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Function prototypes
+bool get_client_local_ip(SOCKET s, string& client_local_ip);
 
 
 int main(void)
@@ -154,44 +88,7 @@ int main(void)
 	json db = db_helper::db_to_json(config.DB_PATH);
 
 
-
 	// --------------- Test codes below  -------------------------
-	char hostbuffer[256];
-	char *IPbuffer;
-	struct hostent *host_entry;
-	int hostname;
-
-	addrinfo * addInfo;
-	struct addrinfo hints;
-	struct addrinfo *result = NULL;
-
-
-	// To retrieve hostname 
-	hostname = gethostname(hostbuffer, sizeof(hostbuffer));
-	checkHostName(hostname);
-
-	// To retrieve host information
-
-	getaddrinfo(hostbuffer, "8888", &hints, &result);
-
-	// result->ai_addr->sa_data;
-	// GetAddrInfoW()
-
-	// host_entry = gethostbyname(hostbuffer));
-	// checkHostEntry(host_entry);
-
-	// To convert an Internet network 
-	// address into ASCII string 
-	IPbuffer = inet_ntoa(*((struct in_addr*)
-		result->ai_addr->sa_data));
-
-	printf("Hostname: %s\n", hostbuffer);
-	printf("Host IP: %s", IPbuffer);
-
-	return 0;
-
-
-
 
 	// return Testing_dbHelper_meetingObj();
 	//menu(db);
@@ -241,6 +138,20 @@ int main(void)
 
 	// creating socket for the client to communicate with the server
 	create_client_socket(SERVER, s, client_struct);
+
+	// Get the local client ip to attach in the messages when sending request
+	if (get_client_local_ip(s, CLIENT_LOCAL_IP))
+	{
+		cout << "Client local ip is " << CLIENT_LOCAL_IP << endl;
+	}
+	else
+	{
+		cout << "Client local ip was not found." << endl;
+	};
+
+
+	test_pause_exit();
+
 
 	// free running thread for UI
 	thread thread_UI(
@@ -389,3 +300,58 @@ void create_client_socket(char* SERVER, SOCKET& s, sockaddr_in& client_struct)
 }
 
 
+bool get_client_local_ip(SOCKET s, string& client_local_ip)
+{
+	// --- Reference --- for the code below: https://stackoverflow.com/questions/49335001/get-local-ip-address-in-c/49336660
+
+	// int sock = socket(PF_INET, SOCK_DGRAM, 0);
+	sockaddr_in loopback;
+
+	// Commented out socket creation since it was already created for our program above
+
+	// if (sock == -1)
+	// {
+	// 	std::cerr << "Could not socket\n";
+	// 	exit(EXIT_FAILURE);
+	// 	return 1;
+	// }
+
+	std::memset(&loopback, 0, sizeof(loopback));
+	loopback.sin_family = AF_INET;
+	loopback.sin_addr.s_addr = INADDR_LOOPBACK; // using loopback ip address
+	loopback.sin_port = htons(9); // using debug port
+
+	if (connect(s, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1)
+	{
+		std::cerr << "Could not connect\n";
+		// exit(EXIT_FAILURE);
+		return false;
+	}
+
+	socklen_t addrlen = sizeof(loopback);
+	if (getsockname(s, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1)
+	{
+		std::cerr << "Could not getsockname\n";
+		// exit(EXIT_FAILURE);
+		return false;
+	}
+
+
+	char buf[INET_ADDRSTRLEN];
+	if (inet_ntop(AF_INET, &loopback.sin_addr, buf, INET_ADDRSTRLEN) == 0x0)
+	{
+		std::cerr << "Could not inet_ntop\n";
+		// exit(EXIT_FAILURE);
+		return false;
+	}
+	else
+	{
+		client_local_ip = string(buf);
+
+		// std::cout << "Client Local IP address: " << client_local_ip << "\n";
+	}
+
+	return true;
+
+	// --- Reference --- for the code above: https://stackoverflow.com/questions/49335001/get-local-ip-address-in-c/49336660
+}
