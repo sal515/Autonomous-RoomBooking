@@ -150,14 +150,11 @@ int main(void)
 	};
 
 
-	test_pause_exit();
-
-
 	// free running thread for UI
 	thread thread_UI(
 		menu,
 		db,
-		SERVER_IP_IN
+		ref(CLIENT_LOCAL_IP)
 	);
 
 	thread thread_send_message(
