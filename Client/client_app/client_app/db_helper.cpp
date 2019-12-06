@@ -75,20 +75,20 @@ bool db_helper::removeDirectory(string relativeDirName)
 
 void db_helper::initialize_db(const string& dbPath)
 {
-		json rooms;
+		// json rooms;
 		json day;
 		json time;
 
-		vector<string> rooms_vec = time_day_room::room_vec();
-		for (string room : rooms_vec)
-		{
-			rooms[room] = json({});
-		}
+		// vector<string> rooms_vec = time_day_room::room_vec();
+		// for (string room : rooms_vec)
+		// {
+		// 	rooms[room] = json({});
+		// }
 
 		map<string, string> time_map = time_day_room::time_map(time_day_room::startTime, time_day_room::endTime);
 		for (const auto &element : time_map)
 		{
-			time[element.first] = rooms;
+			time[element.first] = json({});
 		}
 
 		map<string, string> day_map = time_day_room::day_map();
@@ -182,25 +182,27 @@ json db_helper::getMeetingByID(const string& meetingID, const json& db)
 	json foundMeeting = json({});
 	bool foundit = false;
 	// looping through days
-	for (auto day : db)
+	for (const auto &day : db)
 	{
 		if (foundit) { break; }
 		// looping through time
-		for (auto time : day)
+		for (const auto &time : day)
 		{
-			if (foundit) { break; }
-			// looping through rooms
-			for (auto room : time)
-			{
+			// if (foundit) { break; }
+			// // looping through rooms
+			// for (auto room : time)
+			// {
 				// if (foundit) { break; }
-				if (!meetingID.compare(room.at("meetingID")))
+
+				if (!meetingID.compare(time.at("meetingID")))
 				{
-					foundMeeting = (room);
+					foundMeeting = (time);
 					foundit = true;
 					break;
 					// cout << foundMeeting<< endl;
 				}
-			}
+			
+			// }
 		}
 	}
 	return foundMeeting;

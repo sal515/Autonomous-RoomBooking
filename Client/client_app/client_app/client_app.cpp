@@ -74,6 +74,76 @@ std::atomic<bool> exit_program(false);
 std::string clientIP;
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Testing getIP function 
+
+// Returns hostname for the local computer 
+void checkHostName(int hostname)
+{
+	if (hostname == -1)
+	{
+		perror("gethostname");
+		exit(1);
+	}
+}
+
+// Returns host information corresponding to host name 
+void checkHostEntry(struct hostent * hostentry)
+{
+	if (hostentry == NULL)
+	{
+		perror("gethostbyname");
+		exit(1);
+	}
+}
+
+// Converts space-delimited IPv4 addresses 
+// to dotted-decimal format 
+void checkIPbuffer(char *IPbuffer)
+{
+	if (NULL == IPbuffer)
+	{
+		perror("inet_ntoa");
+		exit(1);
+	}
+}
+
+
+// Testing getIP function 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int main(void)
 {
 	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
@@ -84,7 +154,44 @@ int main(void)
 	json db = db_helper::db_to_json(config.DB_PATH);
 
 
+
 	// --------------- Test codes below  -------------------------
+	char hostbuffer[256];
+	char *IPbuffer;
+	struct hostent *host_entry;
+	int hostname;
+
+	addrinfo * addInfo;
+	struct addrinfo hints;
+	struct addrinfo *result = NULL;
+
+
+	// To retrieve hostname 
+	hostname = gethostname(hostbuffer, sizeof(hostbuffer));
+	checkHostName(hostname);
+
+	// To retrieve host information
+
+	getaddrinfo(hostbuffer, "8888", &hints, &result);
+
+	// result->ai_addr->sa_data;
+	// GetAddrInfoW()
+
+	// host_entry = gethostbyname(hostbuffer));
+	// checkHostEntry(host_entry);
+
+	// To convert an Internet network 
+	// address into ASCII string 
+	IPbuffer = inet_ntoa(*((struct in_addr*)
+		result->ai_addr->sa_data));
+
+	printf("Hostname: %s\n", hostbuffer);
+	printf("Host IP: %s", IPbuffer);
+
+	return 0;
+
+
+
 
 	// return Testing_dbHelper_meetingObj();
 	//menu(db);
@@ -103,7 +210,7 @@ int main(void)
 	jsonMsg["participantsIP"].push_back("192.168.0.188");
 
 
-	sending_messages_queue.push(jsonMsg);
+	// sending_messages_queue.push(jsonMsg);
 
 	// --------------- Test codes above -------------------------
 
@@ -138,7 +245,8 @@ int main(void)
 	// free running thread for UI
 	thread thread_UI(
 		menu,
-		db
+		db,
+		SERVER_IP_IN
 	);
 
 	thread thread_send_message(
@@ -279,3 +387,5 @@ void create_client_socket(char* SERVER, SOCKET& s, sockaddr_in& client_struct)
 		exit(EXIT_FAILURE);
 	};
 }
+
+
