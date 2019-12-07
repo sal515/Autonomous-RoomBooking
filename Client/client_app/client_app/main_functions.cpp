@@ -30,8 +30,6 @@ bool is_string_a_number(string choiceStr)
 	return true;
 }
 
-// SOCKET s, sockaddr_in client_struct, int client_struct_len, char buf[32768]
-// SOCKET s, sockaddr_in client_struct, int client_struct_len, char buf[32768]
 void use_socket_with_lock(
 	const string sendOrReceive,
 	json& data,
@@ -81,12 +79,9 @@ void use_socket_with_lock(
 		             &client_struct_len) ==
 			SOCKET_ERROR)
 		{
-			// cout_mutex.lock();
 			cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
-			// cout_mutex.unlock();
 			exit(EXIT_FAILURE);
 		}
-
 		string buffer = string(buf);
 		data = json::parse(buffer);
 	}
@@ -96,7 +91,7 @@ void use_socket_with_lock(
 
 void pop_from_queue(std::queue<json>& queue)
 {
-	queue_mutex.lock();
+	queue_mutex.try_lock();
 	queue.pop();
 	queue_mutex.unlock();
 }
@@ -104,7 +99,7 @@ void pop_from_queue(std::queue<json>& queue)
 
 void push_to_queue(std::queue<json>& queue, const json& data)
 {
-	queue_mutex.lock();
+	queue_mutex.try_lock();
 	queue.push(data);
 	queue_mutex.unlock();
 }
@@ -384,23 +379,12 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 					meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
 
 					db_helper::save_db(config.DB_PATH, db);
-
-
 					// json fromDb = meeting::get_meeting(db, day, timeH);
 					//
 					// string fromDbStr = fromDb.dump();
 					// cout << "meeting got from db:\n" << fromDbStr << endl;
 
-					cout << "here" << endl;
-
-
-					//send to server after saving to dB
-					// socketMutex.lock();
-
 					push_to_queue(sendingQueue, request);
-					// sendingQueue.push(request);
-					// socketMutex.unlock();
-
 
 					break;
 				}

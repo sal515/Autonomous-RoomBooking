@@ -159,9 +159,7 @@ bool meeting::update_meeting(json& db, const string& day, const string& time, co
 {
 	try
 	{
-		// db.at(day).at(time).at(room).update(meeting);
 		db.at(day).at(time) = meeting;
-		// db.at(day).at(time).at(room) = meeting;
 		return true;
 	}
 	catch (nlohmann::json::exception& e)

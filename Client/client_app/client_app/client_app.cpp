@@ -4,7 +4,6 @@
 
 #include "pch.h"
 #include "main_functions.h"
-#include "global_variables.h"
 
 
 // namespaces
@@ -55,16 +54,7 @@ void receive_message_from_server(
 
 
 // Mutexes 
-// std::mutex received_message_queue_mutex;
-// std::mutex send_message_mutex;
-
-// std::mutex socket_mutex;
-// std::mutex queue_mutex;
-// std::mutex cout_mutex;
-// std::mutex cin_mutex;
-
 std::mutex db_mutex;
-
 std::mutex socket_mutex;
 std::mutex queue_mutex;
 
@@ -95,12 +85,6 @@ int main(void)
 
 
 	// --------------- Test codes below  -------------------------
-
-	// return Testing_dbHelper_meetingObj();
-	//menu(db);
-
-	// delete[] SERVER;
-
 	json jsonMsg;
 
 	jsonMsg["message"] = "REQUEST";
@@ -111,7 +95,6 @@ int main(void)
 	jsonMsg["participantsIP"] = json::array({});
 	jsonMsg["participantsIP"].push_back("192.168.1.133");
 	jsonMsg["participantsIP"].push_back("192.168.0.188");
-
 
 	sending_messages_queue.push(jsonMsg);
 
@@ -155,7 +138,6 @@ int main(void)
 		cout << "Client local ip was not found." << endl;
 	};
 
-
 	// free running thread for UI
 	thread thread_UI(
 		menu,
@@ -174,7 +156,6 @@ int main(void)
 		ref(sending_messages_queue)
 	);
 
-
 	thread thread_receive_message(
 		receive_message_from_server,
 		s,
@@ -182,21 +163,14 @@ int main(void)
 		client_struct_len,
 		ref(received_messages_queue));
 
-
 	// TODO: Run process_messages thread
-
 
 	// Wait for all the threads to finish for safe exit of main 
 	thread_receive_message.join();
 	thread_send_message.join();
-	// thread_receive_message.detach();
-	// thread_send_message.detach();
-	// thread_UI.join();
-
 
 	closesocket(s);
 	WSACleanup();
-
 
 	return 0;
 }
@@ -207,20 +181,12 @@ void send_message_to_server(
 	int client_struct_len,
 	queue<json>& sending_messages_queue)
 {
-	// while (!exit_program)
 	while (true)
 	{
 		if (!sending_messages_queue.empty())
 		{
-			// socket_mutex.lock();
-
 			const send_receive sndOrRecv;
-
-			// json messageJsonObj = sending_messages_queue.front();
-			// pop_from_queue(sending_messages_queue);
-
 			json messageJsonObj = get_front_of_queue(sending_messages_queue);
-
 			use_socket_with_lock(
 				sndOrRecv.send,
 				messageJsonObj,
@@ -230,23 +196,6 @@ void send_message_to_server(
 				client_struct,
 				client_struct_len
 			);
-
-			// sending_messages_queue.pop();
-			// string messageJsonStr = messageJsonObj.dump();
-			// char buf[BUFLEN];
-			// memset(buf, '\0', BUFLEN + 1);
-			// messageJsonStr.copy(buf, messageJsonStr.size());
-			//
-			// //send the messageJsonStr
-			// if (sendto(s, buf, strlen(buf), 0, reinterpret_cast<struct sockaddr *>(&client_struct),
-			//            client_struct_len) == SOCKET_ERROR)
-			// {
-			// 	cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
-			// 	exit(EXIT_FAILURE);
-			// }
-
-
-			// socket_mutex.unlock();
 		}
 	}
 }
@@ -258,33 +207,10 @@ void receive_message_from_server(
 	int client_struct_len,
 	queue<json>& received_messages_queue)
 {
-	// while (!exit_program)
 	while (true)
 	{
-		// socket_mutex.lock();
-
 		const send_receive sndOrRecv;
 		json received_data = json({});
-
-		// char buf[BUFLEN];
-		// //receive a reply and print it
-		// //clear the buffer by filling null, it might have previously received data
-		// memset(buf, '\0', BUFLEN + 1);
-		//
-		// //try to receive some data, this is a blocking call
-		// if (recvfrom(s, buf, BUFLEN, 0, reinterpret_cast<struct sockaddr *>(&client_struct), &client_struct_len) ==
-		// 	SOCKET_ERROR)
-		// {
-		// 	cout_mutex.lock();
-		// 	cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
-		// 	cout_mutex.unlock();
-		// 	exit(EXIT_FAILURE);
-		// }
-
-		// string buffer = string(buf);
-		// json received_data = json::parse(buffer);
-
-
 		use_socket_with_lock(
 			sndOrRecv.receive,
 			received_data,
@@ -294,11 +220,7 @@ void receive_message_from_server(
 			client_struct,
 			client_struct_len
 		);
-		// Saving all the messages received in the global queue
-		// received_messages_queue.push(received_data);
 		push_to_queue(received_messages_queue, received_data);
-
-		// socket_mutex.unlock();
 	}
 }
 
@@ -329,17 +251,7 @@ bool get_client_local_ip(SOCKET s, string& client_local_ip)
 {
 	// --- Reference --- for the code below: https://stackoverflow.com/questions/49335001/get-local-ip-address-in-c/49336660
 
-	// int sock = socket(PF_INET, SOCK_DGRAM, 0);
 	sockaddr_in loopback;
-
-	// Commented out socket creation since it was already created for our program above
-
-	// if (sock == -1)
-	// {
-	// 	std::cerr << "Could not socket\n";
-	// 	exit(EXIT_FAILURE);
-	// 	return 1;
-	// }
 
 	std::memset(&loopback, 0, sizeof(loopback));
 	loopback.sin_family = AF_INET;
@@ -372,7 +284,6 @@ bool get_client_local_ip(SOCKET s, string& client_local_ip)
 	else
 	{
 		client_local_ip = string(buf);
-
 		// std::cout << "Client Local IP address: " << client_local_ip << "\n";
 	}
 
