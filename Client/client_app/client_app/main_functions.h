@@ -38,16 +38,16 @@ void pop_from_queue(std::queue<json>& queue);
 void push_to_queue(std::queue<json>& queue, const json& data);
 json get_front_of_queue(std::queue<json>& queue);
 
-void use_socket_with_lock(
-	const string sendOrReceive,
-	json &data,
-	std::queue<json>& queue,
-	// std::mutex& socketMutex,
-	SOCKET &s,
-	sockaddr_in &client_struct,
-	int &client_struct_len
-	// ,char buf[32768]
-);
+// void use_socket_with_lock(
+// 	const string sendOrReceive,
+// 	json &data,
+// 	std::queue<json>& queue,
+// 	// std::mutex& socketMutex,
+// 	SOCKET &s,
+// 	sockaddr_in &client_struct,
+// 	int &client_struct_len
+// 	// ,char buf[32768]
+// );
 
 
 

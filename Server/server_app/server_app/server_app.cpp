@@ -51,10 +51,10 @@ void receive_message_from_client(
 
 
 // Mutexes 
-mutex received_message_queue_mutex;
-mutex send_message_mutex;
-mutex cout_mutex;
-mutex cin_mutex;
+// mutex received_message_queue_mutex;
+// mutex send_message_mutex;
+// mutex cout_mutex;
+// mutex cin_mutex;
 
 // Global variables in use
 queue<json> messages_queue; // queues for messages from the clients
@@ -145,27 +145,27 @@ int main(void)
 	);
 
 
-	while (!exit_program)
-	{
-		if (!messages_queue.empty())
-		{
-			json messageJsonObj = messages_queue.front();
-			messages_queue.pop();
-
-
-			// TODO : create separate threads to process each message depending on ?message type?
-			// thread process_received_message(
-			// processMessages,
-			// ref(pending_db), 
-			// ref(received_data), 
-			// ref(clientIP)
-			// );
-		}
-
-	}
-	cout_mutex.lock();
-	cout << "exiting message queue processing" << endl;
-	cout_mutex.unlock();
+	// while (!exit_program)
+	// {
+	// 	if (!messages_queue.empty())
+	// 	{
+	// 		json messageJsonObj = messages_queue.front();
+	// 		messages_queue.pop();
+	//
+	//
+	// 		// TODO : create separate threads to process each message depending on ?message type?
+	// 		// thread process_received_message(
+	// 		// processMessages,
+	// 		// ref(pending_db), 
+	// 		// ref(received_data), 
+	// 		// ref(clientIP)
+	// 		// );
+	// 	}
+	//
+	// }
+	// cout_mutex.lock();
+	// cout << "exiting message queue processing" << endl;
+	// cout_mutex.unlock();
 
 	// send_message_to_client(
 	// 	s,
@@ -174,14 +174,15 @@ int main(void)
 	// 	buf);
 
 
-	closesocket(s);
-	WSACleanup();
-
-	// Wait for all the threads to finish for safe exit of main 
+		// Wait for all the threads to finish for safe exit of main 
 	thread_receive_message.join();
 	// process_received_message.join();
 
-	test_pause_exit();
+
+	closesocket(s);
+	WSACleanup();
+
+	// test_pause_exit();
 
 	return 0;
 }
@@ -191,20 +192,21 @@ void send_message_to_client(
 	SOCKET s,
 	sockaddr_in server_struct,
 	int server_struct_len,
-	const string& messageJsonStr)
+	const json& messageJsonObj)
 {
+	const string messageJsonStr = messageJsonObj.dump();
 	char buf[BUFLEN];
-	memset(buf, '\0', BUFLEN + 1);
+	memset(buf, '\0', BUFLEN);
 	messageJsonStr.copy(buf, messageJsonStr.size());
 
-	send_message_mutex.lock();
+	// send_message_mutex.lock();
 	// //now reply the client with the same data
-	if (sendto(s, buf, strlen(buf), 0, (struct sockaddr*)&server_struct, server_struct_len) == SOCKET_ERROR)
+	if (sendto(s, buf, (BUFLEN -1), 0, (struct sockaddr*)&server_struct, server_struct_len) == SOCKET_ERROR)
 	{
 		cout << "sendto() failed with error code : " << WSAGetLastError << endl;
 		exit(EXIT_FAILURE);
 	}
-	send_message_mutex.unlock();
+	// send_message_mutex.unlock();
 }
 
 void receive_message_from_client(
@@ -219,21 +221,22 @@ void receive_message_from_client(
 
 	while (!exit_program)
 	{
-		cout_mutex.lock();
+		// cout_mutex.try_lock();
 		cout << "Waiting for data..." << endl;
 		fflush(stdout);
-		cout_mutex.unlock();
+		// cout_mutex.unlock();
 
 		//clear the buffer by filling null, it might have previously received data
 		// memset(buf, '\0', BUFLEN + 1);
 		memset(buf, '\0', BUFLEN);
 
-		if ((recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&server_struct), &server_struct_len)) ==
+		if ((recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&server_struct),
+		              &server_struct_len)) ==
 			SOCKET_ERROR)
 		{
-			cout_mutex.lock();
+			// cout_mutex.try_lock();
 			cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
-			cout_mutex.unlock();
+			// cout_mutex.unlock();
 			exit(EXIT_FAILURE);
 		}
 
@@ -245,7 +248,10 @@ void receive_message_from_client(
 		}
 
 		// TODO: DELETE Test Print when it is time
+		// cout_mutex.try_lock();
 		cout << "clientIP: " << clientIP << endl;
+		// cout_mutex.unlock();
+
 		string buffer = std::string(buf);
 		// std::cout << "Data Recieved from client IP - " << clientIP << ": " << buffer << std::endl;
 
@@ -258,13 +264,20 @@ void receive_message_from_client(
 		cout << received_data << endl;
 
 		// Saving all the messages received in the global queue
-		received_message_queue_mutex.lock();
+		// received_message_queue_mutex.lock();
 		received_messages_queue.push(received_data);
-		received_message_queue_mutex.unlock();
+		// received_message_queue_mutex.unlock();
+
+		if (!received_messages_queue.empty())
+		{
+			send_message_to_client(s, server_struct, server_struct_len, received_messages_queue.front());
+		}
 	}
-	cout_mutex.lock();
+
+
+	// cout_mutex.lock();
 	cout << "exiting receiving thread" << endl;
-	cout_mutex.unlock();
+	// cout_mutex.unlock();
 }
 
 void create_n_bind_server_socket(

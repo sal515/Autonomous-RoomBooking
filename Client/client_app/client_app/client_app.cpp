@@ -31,10 +31,8 @@ int test_pause_exit();
 // #define LISTENING_PORT 8888   //The port on which to listen for incoming data
 
 
-
 // Function prototypes
 string ask_for_ip();
-
 
 
 void create_client_socket(
@@ -191,16 +189,37 @@ void send_message_to_server(
 	{
 		if (!sending_messages_queue.empty())
 		{
-			const send_receive sndOrRecv;
+			// const send_receive sndOrRecv;
 			json messageJsonObj = get_front_of_queue(sending_messages_queue);
-			use_socket_with_lock(
-				sndOrRecv.send,
-				messageJsonObj,
-				sending_messages_queue,
-				s,
-				client_struct,
-				client_struct_len
-			);
+
+
+			string messageJsonStr = messageJsonObj.dump();
+			char buf[BUFLEN];
+			// memset(buf, '\0', BUFLEN + 1);
+			memset(buf, '\0', BUFLEN);
+			messageJsonStr.copy(buf, messageJsonStr.size());
+
+			//send the messageJsonStr
+			if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&client_struct),
+			           client_struct_len) == SOCKET_ERROR)
+			{
+				cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
+				exit(EXIT_FAILURE);
+			}
+			else
+			{
+				pop_from_queue(sending_messages_queue);
+			}
+
+
+			// use_socket_with_lock(
+			// 	sndOrRecv.send,
+			// 	messageJsonObj,
+			// 	sending_messages_queue,
+			// 	s,
+			// 	client_struct,
+			// 	client_struct_len
+			// );
 		}
 	}
 }
@@ -214,16 +233,40 @@ void receive_message_from_server(
 {
 	while (true)
 	{
-		const send_receive sndOrRecv;
+		// const send_receive sndOrRecv;
 		json received_data = json({});
-		use_socket_with_lock(
-			sndOrRecv.receive,
-			received_data,
-			received_messages_queue,
-			s,
-			client_struct,
-			client_struct_len
-		);
+
+
+		char buf[BUFLEN];
+		//receive a reply and print it
+		//clear the buffer by filling null, it might have previously received data
+		memset(buf, '\0', BUFLEN);
+
+		//try to receive some data, this is a blocking call
+		if (recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&client_struct),
+		             &client_struct_len) ==
+			SOCKET_ERROR)
+		{
+			cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
+			exit(EXIT_FAILURE);
+		}
+		string buffer = string(buf);
+
+		cout << buffer << endl;
+
+		received_data = json::parse(buffer);
+
+
+		// use_socket_with_lock(
+		// 	sndOrRecv.receive,
+		// 	received_data,
+		// 	received_messages_queue,
+		// 	s,
+		// 	client_struct,
+		// 	client_struct_len
+		// );
+
+
 		push_to_queue(received_messages_queue, received_data);
 	}
 }
