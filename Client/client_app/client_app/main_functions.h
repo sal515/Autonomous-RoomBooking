@@ -5,8 +5,18 @@
 
 extern std::mutex socket_mutex;
 extern std::mutex queue_mutex;
+// extern int REQUEST_COUNTER;
+extern std::atomic<int> REQUEST_COUNTER;
+
+struct send_receive
+{
+	string send = "send";
+	string receive = "receive";
+};
+
 
 string ask_for_ip();
+
 void menu(
 	json db, 
 	std::mutex& socketMutex, 
@@ -18,6 +28,8 @@ void menu(
 vector<string> list_of_participants(int min);
 
 bool check_ip(const string& ip);
+
+bool is_string_a_number(string choiceStr);
 
 // bool check_schedule(json schedule);
 
@@ -38,11 +50,6 @@ void use_socket_with_lock(
 );
 
 
-struct send_receive
-{
-	string send = "send";
-	string receive = "receive";
-};
 
 
 // ==================  Examples  ======================================

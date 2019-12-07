@@ -30,10 +30,12 @@ int test_pause_exit();
 // #define BUFLEN 32768		//Max length of buffer including 
 // #define LISTENING_PORT 8888   //The port on which to listen for incoming data
 
-string SERVER_IP_IN;
-string CLIENT_LOCAL_IP;
+
+
 // Function prototypes
 string ask_for_ip();
+
+
 
 void create_client_socket(
 	char* SERVER,
@@ -63,9 +65,13 @@ std::mutex queue_mutex;
 std::queue<json> received_messages_queue; // queue for messages received from server
 std::queue<json> sending_messages_queue; // queue for messages to be sent from the clients
 
+string SERVER_IP_IN;
+string CLIENT_LOCAL_IP;
+std::atomic<int> REQUEST_COUNTER(0);
+
 json confirmed_db;
 json pending_db;
-std::atomic<int> global_meet_id(0);
+// std::atomic<int> REQUEST_COUNTER(0);
 std::atomic<bool> exit_program(false);
 std::string clientIP;
 
@@ -191,7 +197,6 @@ void send_message_to_server(
 				sndOrRecv.send,
 				messageJsonObj,
 				sending_messages_queue,
-				// socket_mutex,
 				s,
 				client_struct,
 				client_struct_len
@@ -215,7 +220,6 @@ void receive_message_from_server(
 			sndOrRecv.receive,
 			received_data,
 			received_messages_queue,
-			// socket_mutex,
 			s,
 			client_struct,
 			client_struct_len
