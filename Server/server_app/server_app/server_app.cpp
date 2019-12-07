@@ -225,9 +225,10 @@ void receive_message_from_client(
 		cout_mutex.unlock();
 
 		//clear the buffer by filling null, it might have previously received data
-		memset(buf, '\0', BUFLEN + 1);
+		// memset(buf, '\0', BUFLEN + 1);
+		memset(buf, '\0', BUFLEN);
 
-		if ((recvfrom(s, buf, BUFLEN, 0, reinterpret_cast<struct sockaddr *>(&server_struct), &server_struct_len)) ==
+		if ((recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&server_struct), &server_struct_len)) ==
 			SOCKET_ERROR)
 		{
 			cout_mutex.lock();

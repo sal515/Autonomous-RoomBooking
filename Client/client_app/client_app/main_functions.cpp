@@ -2,6 +2,7 @@
 
 #include "main_functions.h"
 
+
 string ask_for_ip()
 {
 	string SERVER_IP_IN;
@@ -29,7 +30,97 @@ bool is_string_a_number(string choiceStr)
 	return true;
 }
 
-void menu(json db, const string& ownIP)
+// SOCKET s, sockaddr_in client_struct, int client_struct_len, char buf[32768]
+// SOCKET s, sockaddr_in client_struct, int client_struct_len, char buf[32768]
+void use_socket_with_lock(
+	const string sendOrReceive,
+	json& data,
+	std::queue<json>& queue,
+	// std::mutex& socketMutex,
+	SOCKET& s,
+	sockaddr_in& client_struct,
+	int& client_struct_len
+	// ,char buf[32768]
+)
+{
+	const send_receive sndOrRecv;
+
+	socket_mutex.try_lock();
+
+	// send check 
+	if (!(sendOrReceive.compare(sndOrRecv.send)))
+	{
+		string messageJsonStr = data.dump();
+		char buf[BUFLEN];
+		// memset(buf, '\0', BUFLEN + 1);
+		memset(buf, '\0', BUFLEN);
+		messageJsonStr.copy(buf, messageJsonStr.size());
+
+		//send the messageJsonStr
+		if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&client_struct),
+		           client_struct_len) == SOCKET_ERROR)
+		{
+			cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
+			exit(EXIT_FAILURE);
+		}
+		else
+		{
+			pop_from_queue(queue);
+		}
+	}
+
+	if (!(sendOrReceive.compare(sndOrRecv.receive)))
+	{
+		char buf[BUFLEN];
+		//receive a reply and print it
+		//clear the buffer by filling null, it might have previously received data
+		memset(buf, '\0', BUFLEN);
+
+		//try to receive some data, this is a blocking call
+		if (recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&client_struct),
+		             &client_struct_len) ==
+			SOCKET_ERROR)
+		{
+			// cout_mutex.lock();
+			cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
+			// cout_mutex.unlock();
+			exit(EXIT_FAILURE);
+		}
+
+		string buffer = string(buf);
+		data = json::parse(buffer);
+	}
+
+	socket_mutex.unlock();
+}
+
+void pop_from_queue(std::queue<json>& queue)
+{
+	queue_mutex.lock();
+	queue.pop();
+	queue_mutex.unlock();
+}
+
+
+void push_to_queue(std::queue<json>& queue, const json& data)
+{
+	queue_mutex.lock();
+	queue.push(data);
+	queue_mutex.unlock();
+}
+
+json get_front_of_queue(std::queue<json>& queue)
+{
+	// queue_mutex.lock();
+	json msg = queue.front();
+	// queue.pop();
+	// queue_mutex.unlock();
+	return msg;
+}
+
+
+void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std::queue<json>& receivingQueue,
+          const string& ownIP)
 {
 	int reqCounter = 1;
 	string choiceStr;
@@ -51,7 +142,7 @@ void menu(json db, const string& ownIP)
 			cin >> choiceStr;
 
 			choice = -1;
-			if(is_string_a_number(choiceStr))
+			if (is_string_a_number(choiceStr))
 			{
 				choice = std::stoi(choiceStr);
 			}
@@ -135,7 +226,6 @@ void menu(json db, const string& ownIP)
 
 					meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
 					db_helper::save_db(config.DB_PATH, db);
-					
 					break;
 				}
 			case 2:
@@ -253,6 +343,8 @@ void menu(json db, const string& ownIP)
 				}
 			case 10:
 				{
+					// This is purely a test case
+
 					string requestID = "1";
 					string day = "friday";
 					string timeH = "10";
@@ -294,10 +386,21 @@ void menu(json db, const string& ownIP)
 					db_helper::save_db(config.DB_PATH, db);
 
 
-					json fromDb = meeting::get_meeting(db, day, timeH);
+					// json fromDb = meeting::get_meeting(db, day, timeH);
+					//
+					// string fromDbStr = fromDb.dump();
+					// cout << "meeting got from db:\n" << fromDbStr << endl;
 
-					string fromDbStr = fromDb.dump();
-					cout <<"meeting got from db:\n" <<  fromDbStr << endl;
+					cout << "here" << endl;
+
+
+					//send to server after saving to dB
+					// socketMutex.lock();
+
+					push_to_queue(sendingQueue, request);
+					// sendingQueue.push(request);
+					// socketMutex.unlock();
+
 
 					break;
 				}

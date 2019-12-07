@@ -27,8 +27,9 @@ int test_pause_exit();
 
 
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
-#define BUFLEN 32768		//Max length of buffer including 
-#define LISTENING_PORT 8888   //The port on which to listen for incoming data
+// Defined in PCH
+// #define BUFLEN 32768		//Max length of buffer including 
+// #define LISTENING_PORT 8888   //The port on which to listen for incoming data
 
 string SERVER_IP_IN;
 string CLIENT_LOCAL_IP;
@@ -57,11 +58,16 @@ void receive_message_from_server(
 // std::mutex received_message_queue_mutex;
 // std::mutex send_message_mutex;
 
-std::mutex socket_mutex;
-std::mutex cout_mutex;
-std::mutex cin_mutex;
+// std::mutex socket_mutex;
+// std::mutex queue_mutex;
+// std::mutex cout_mutex;
+// std::mutex cin_mutex;
 
 std::mutex db_mutex;
+
+std::mutex socket_mutex;
+std::mutex queue_mutex;
+
 
 // Global variables in use
 std::queue<json> received_messages_queue; // queue for messages received from server
@@ -107,7 +113,7 @@ int main(void)
 	jsonMsg["participantsIP"].push_back("192.168.0.188");
 
 
-	// sending_messages_queue.push(jsonMsg);
+	sending_messages_queue.push(jsonMsg);
 
 	// --------------- Test codes above -------------------------
 
@@ -154,6 +160,9 @@ int main(void)
 	thread thread_UI(
 		menu,
 		db,
+		ref(socket_mutex),
+		ref(sending_messages_queue),
+		ref(received_messages_queue),
 		ref(CLIENT_LOCAL_IP)
 	);
 
@@ -180,6 +189,8 @@ int main(void)
 	// Wait for all the threads to finish for safe exit of main 
 	thread_receive_message.join();
 	thread_send_message.join();
+	// thread_receive_message.detach();
+	// thread_send_message.detach();
 	// thread_UI.join();
 
 
@@ -196,37 +207,46 @@ void send_message_to_server(
 	int client_struct_len,
 	queue<json>& sending_messages_queue)
 {
-	char buf[BUFLEN];
-	while (!exit_program)
+	// while (!exit_program)
+	while (true)
 	{
 		if (!sending_messages_queue.empty())
 		{
-			socket_mutex.lock();
+			// socket_mutex.lock();
+
+			const send_receive sndOrRecv;
+
+			// json messageJsonObj = sending_messages_queue.front();
+			// pop_from_queue(sending_messages_queue);
+
+			json messageJsonObj = get_front_of_queue(sending_messages_queue);
+
+			use_socket_with_lock(
+				sndOrRecv.send,
+				messageJsonObj,
+				sending_messages_queue,
+				// socket_mutex,
+				s,
+				client_struct,
+				client_struct_len
+			);
+
+			// sending_messages_queue.pop();
+			// string messageJsonStr = messageJsonObj.dump();
+			// char buf[BUFLEN];
+			// memset(buf, '\0', BUFLEN + 1);
+			// messageJsonStr.copy(buf, messageJsonStr.size());
+			//
+			// //send the messageJsonStr
+			// if (sendto(s, buf, strlen(buf), 0, reinterpret_cast<struct sockaddr *>(&client_struct),
+			//            client_struct_len) == SOCKET_ERROR)
+			// {
+			// 	cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
+			// 	exit(EXIT_FAILURE);
+			// }
 
 
-			// send_message_mutex.lock();
-			json messageJsonObj = sending_messages_queue.front();
-			sending_messages_queue.pop();
-			// send_message_mutex.unlock();
-
-			string messageJsonStr = messageJsonObj.dump();
-
-			memset(buf, '\0', BUFLEN + 1);
-			messageJsonStr.copy(buf, messageJsonStr.size());
-
-			// send_message_mutex.lock();
-
-			//send the messageJsonStr
-			if (sendto(s, buf, strlen(buf), 0, reinterpret_cast<struct sockaddr *>(&client_struct),
-			           client_struct_len) == SOCKET_ERROR)
-			{
-				cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
-				exit(EXIT_FAILURE);
-			}
-			// send_message_mutex.unlock();
-
-
-			socket_mutex.unlock();
+			// socket_mutex.unlock();
 		}
 	}
 }
@@ -238,39 +258,47 @@ void receive_message_from_server(
 	int client_struct_len,
 	queue<json>& received_messages_queue)
 {
-	char buf[BUFLEN];
-
-	while (!exit_program)
+	// while (!exit_program)
+	while (true)
 	{
-		socket_mutex.lock();
+		// socket_mutex.lock();
+
+		const send_receive sndOrRecv;
+		json received_data = json({});
+
+		// char buf[BUFLEN];
+		// //receive a reply and print it
+		// //clear the buffer by filling null, it might have previously received data
+		// memset(buf, '\0', BUFLEN + 1);
+		//
+		// //try to receive some data, this is a blocking call
+		// if (recvfrom(s, buf, BUFLEN, 0, reinterpret_cast<struct sockaddr *>(&client_struct), &client_struct_len) ==
+		// 	SOCKET_ERROR)
+		// {
+		// 	cout_mutex.lock();
+		// 	cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
+		// 	cout_mutex.unlock();
+		// 	exit(EXIT_FAILURE);
+		// }
+
+		// string buffer = string(buf);
+		// json received_data = json::parse(buffer);
 
 
-		//receive a reply and print it
-		//clear the buffer by filling null, it might have previously received data
-		memset(buf, '\0', BUFLEN + 1);
-
-		//try to receive some data, this is a blocking call
-		if (recvfrom(s, buf, BUFLEN, 0, reinterpret_cast<struct sockaddr *>(&client_struct), &client_struct_len) ==
-			SOCKET_ERROR)
-		{
-			cout_mutex.lock();
-			cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
-			cout_mutex.unlock();
-			exit(EXIT_FAILURE);
-		}
-
-
-		string buffer = string(buf);
-		json received_data = json::parse(buffer);
-		{
-			received_data = json({});
-		}
+		use_socket_with_lock(
+			sndOrRecv.receive,
+			received_data,
+			received_messages_queue,
+			// socket_mutex,
+			s,
+			client_struct,
+			client_struct_len
+		);
 		// Saving all the messages received in the global queue
-		// received_message_queue_mutex.lock();
-		received_messages_queue.push(received_data);
-		// received_message_queue_mutex.unlock();
+		// received_messages_queue.push(received_data);
+		push_to_queue(received_messages_queue, received_data);
 
-		socket_mutex.unlock();
+		// socket_mutex.unlock();
 	}
 }
 
