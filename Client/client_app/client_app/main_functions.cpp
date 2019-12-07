@@ -134,8 +134,8 @@ void menu(json db, const string& ownIP)
 					);
 
 					meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
-
-
+					db_helper::save_db(config.DB_PATH, db);
+					
 					break;
 				}
 			case 2:
@@ -292,6 +292,13 @@ void menu(json db, const string& ownIP)
 					meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
 
 					db_helper::save_db(config.DB_PATH, db);
+
+
+					json fromDb = meeting::get_meeting(db, day, timeH);
+
+					string fromDbStr = fromDb.dump();
+					cout <<"meeting got from db:\n" <<  fromDbStr << endl;
+
 					break;
 				}
 			default:
