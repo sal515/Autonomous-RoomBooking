@@ -76,5 +76,15 @@ void processMessages(json& db, const json& req_data) {
 			}
 		}
 	}
-
+	else if (!messageType.invite.compare(req_data.at("message"))) {
+		for (auto day : db) {
+			for (auto time : day) {
+				if (!req_meeting.requestID.compare(time.at("requestID"))) {
+					meeting thisMeeting = meeting::json_to_meetingObj(time);
+					//thisMeeting.
+					//meeting::get_meeting(db, time.at("day"), time.at("time"),)
+				}
+			}
+		}
+	}
 }
