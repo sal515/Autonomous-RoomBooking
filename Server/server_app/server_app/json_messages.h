@@ -130,6 +130,8 @@ struct messages
 		cancel["message"] = messageType.cancelResponse;
 		cancel["meetingID"] = meetingID;
 		cancel["reason"] = reason;
+
+		return cancel;
 	}
 
 	static json not_sched(

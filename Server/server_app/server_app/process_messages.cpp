@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "process_messages.h"
 #define BUFLEN 32768		//Max length of buffer 
-#define PORT 45678   //The port on which to listen for incoming data
+#define SERVER_PORT 45678   //The port on which to listen for incoming data
 std::mutex sendmessage_mutex;
 
 
@@ -282,6 +282,6 @@ sockaddr_in clientMaker(string requesterIP) {
 		perror("inet_pton");
 		exit(EXIT_FAILURE);
 	}
-	client.sin_port = htons(PORT);
+	client.sin_port = htons(SERVER_PORT);
 	return client;
 }
