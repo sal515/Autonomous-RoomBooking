@@ -132,8 +132,11 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 			}
 			lookForMeeting.at("confirmedParticipantsIP") = acceptedParticipants;
 			meeting::update_meeting(db, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"), lookForMeeting);
-			db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-			db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+			while (!sendmessage_mutex.try_lock()) {
+				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+				db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+				sendmessage_mutex.unlock();
+			}
 		}
 	}
 	else if (!(messageType.reject.compare(req_data.at("message"))) || !(messageType.withdraw.compare(req_data.at("message"))))
@@ -189,8 +192,11 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 			}
 			lookForMeeting.at("confirmedParticipantsIP") = acceptedParticipants;
 			meeting::update_meeting(db, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"), lookForMeeting);
-			db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-			db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+			while (!sendmessage_mutex.try_lock()) {
+				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+				db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+				sendmessage_mutex.unlock();
+			}
 		}
 	}
 	else if (!(messageType.cancelRequest.compare(req_data.at("message"))))
@@ -237,7 +243,10 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 				meetObj.meetingTime,
 				meetObj.roomNumber,
 				json({}));
-			db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+			while (!sendmessage_mutex.try_lock()) {
+				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+				sendmessage_mutex.unlock();
+			}
 		}
 	}
 }
