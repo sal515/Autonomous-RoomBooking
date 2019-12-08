@@ -169,8 +169,8 @@ int main(void)
 		exit(EXIT_FAILURE);
 	};
 
-	thread sendingThread(send_to_client, ref(s), ref(clientAddrStr), ref(buf));
-	// send_to_client(s, clientAddrStr, buf);
+	// thread sendingThread(send_to_client, ref(s), ref(clientAddrStr), ref(buf));
+	// // send_to_client(s, clientAddrStr, buf);
 
 
 	// cout_mutex.try_lock();
@@ -185,13 +185,22 @@ int main(void)
 	{
 		gotSomething = false;
 
-		if ((recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&serverAddrStr),
-		              &serverAddrStr_len)) ==
-			SOCKET_ERROR)
+		try
 		{
-			cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
-			exit(EXIT_FAILURE);
+			if ((recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&serverAddrStr),
+			              &serverAddrStr_len)) ==
+				SOCKET_ERROR)
+			{
+				throw WSAGetLastError();
+				// cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
+				// exit(EXIT_FAILURE);
+			}
 		}
+		catch (int e)
+		{
+			cout << "recvfrom() failed with error code : " << e << endl;
+		}
+
 
 		//print details of the client/peer and the data received
 		char printable_IP_add_buf[INET_ADDRSTRLEN];
@@ -202,16 +211,20 @@ int main(void)
 
 		cout << "clientIP: " << clientIP << endl;
 
-		string buffer = std::string(buf);
-		cout << "received data" << endl;
-		cout << buffer << endl;
-		cout << endl;
+		while (buf[0] != '0')
+		{
+			string buffer = std::string(buf);
+			cout << "received data" << endl;
+			cout << buffer << endl;
+			cout << endl;
 
-		gotSomething = true;
+			gotSomething = true;
+			break;
+		}
 	}
 
 
-	sendingThread.join();
+	// sendingThread.join();
 
 
 	closesocket(s);
