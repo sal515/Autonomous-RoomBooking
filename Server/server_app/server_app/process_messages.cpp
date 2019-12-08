@@ -77,7 +77,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 			}
 		}
 	}
-	else if (!(messageType.accept.compare(req_data.at("message"))))
+	else if (!(messageType.accept.compare(req_data.at("message"))) || !(messageType.add.compare(req_data.at("message"))))
 	{
 		//check if meeting minimum has been achieved. If yes, send confirmation with room. Else, wait.
 		string meetingID = req_data.at("meetingID");
@@ -106,10 +106,9 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 			}
 			//check if acceptedparticipants number is larger than min. if yes, just add the accepting person to accepted array and send them confirmation
 			if ((min-1) < acceptedParticipants.size()) {
-				json accepting;
-				accepting["message"] = "confirm";
-				accepting["meetingID"] = lookForMeeting.at("meetingID");
-				accepting["roomNumber"] = lookForMeeting.at("roomNumber");
+				json accepting = messages::confirm_room(
+					lookForMeeting.at("meetingID"),
+					lookForMeeting.at("roomNumber"));
 				acceptedParticipants.push_back(requesterIP);
 				sockaddr_in client = clientMaker(requesterIP);
 				send_message_client(s, client, sizeof(&client), accepting);
@@ -117,10 +116,9 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 			// if just reached size of required people to accept, send confirmation to all
 			else if ((min-1) == acceptedParticipants.size()) {
 				acceptedParticipants.push_back(requesterIP);
-				json accepting;
-				accepting["message"] = "confirm";
-				accepting["meetingID"] = lookForMeeting.at("meetingID");
-				accepting["roomNumber"] = lookForMeeting.at("roomNumber");
+				json accepting = messages::confirm_room(
+					lookForMeeting.at("meetingID"),
+					lookForMeeting.at("roomNumber"));
 				for (string confirms : acceptedParticipants) {
 
 					sockaddr_in client = clientMaker(confirms);
@@ -138,7 +136,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 			db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
 		}
 	}
-	else if (!(messageType.reject.compare(req_data.at("message"))))
+	else if (!(messageType.reject.compare(req_data.at("message"))) || !(messageType.withdraw.compare(req_data.at("message"))))
 	{
 	//check if meeting minimum has been achieved. If yes, send confirmation with room. Else, wait.
 	string meetingID = req_data.at("meetingID");
@@ -171,10 +169,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 								break;
 							}
 						}
-						json cancel;
-						cancel["message"] = "cancel";
-						cancel["meetingID"] = lookForMeeting.at("meetingID");
-						cancel["reason"] = "Not enough members";
+						json cancel = messages::cancel(lookForMeeting.at("meetingID"), "Not enough members");
 						for (string confirms : acceptedParticipants) {
 							sockaddr_in client = clientMaker(confirms);
 							send_message_client(s, client, sizeof(&client), cancel);
@@ -192,6 +187,10 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 					}
 				}
 			}
+			lookForMeeting.at("confirmedParticipantsIP") = acceptedParticipants;
+			meeting::update_meeting(db, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"), lookForMeeting);
+			db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+			db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
 		}
 	}
 	else if (!(messageType.cancelRequest.compare(req_data.at("message"))))
@@ -215,18 +214,18 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 		if (valid)
 		{
 			// TODO: Build the message.notScheduled
-			json notScheduled = messages::not_sched(
-				meetObj.requestID,
-				meetObj.meetingDay,
-				meetObj.meetingTime,
-				meetObj.minimumParticipants,
-				meetObj.confirmedParticipantsIP,
-				meetObj.topic
+			json cancelled = messages::cancel(
+				meetObj.meetingID,
+				"cancelled"
 			);
-
+			vector<string> invited = meetObj.invitedParticipantsIP;
 			for (const string& participant : meetObj.invitedParticipantsIP)
 			{
 				// TODO: notify all participants of meeting cancellation
+				for (string ip : invited) {
+					sockaddr_in client = clientMaker(ip);
+					send_message_client(s, client, sizeof(&client), cancelled);
+				}
 				// sendMessageToClients(notScheduled, participant);
 			}
 
@@ -240,13 +239,6 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 				json({}));
 			db_helper::save_db(config.CONFIRMED_DB_PATH, db);
 		}
-	}
-	else if (!(messageType.withdraw.compare(req_data.at("message"))))
-	{
-
-	}
-	else if (!(messageType.add.compare(req_data.at("message"))))
-	{
 	}
 }
 
