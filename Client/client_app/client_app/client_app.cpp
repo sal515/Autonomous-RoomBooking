@@ -28,7 +28,7 @@ int test_pause_exit();
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 // Defined in PCH
 // #define BUFLEN 32768		//Max length of buffer including 
-// #define LISTENING_PORT 8888   //The port on which to listen for incoming data
+// #define SERVER_LISTENING_PORT 8888   //The port on which to listen for incoming data
 
 
 // Function prototypes
@@ -78,6 +78,10 @@ std::string clientIP;
 bool get_client_local_ip(SOCKET s, string& client_local_ip);
 
 
+struct sockaddr_in server_struct;
+int server_struct_len = sizeof(server_struct);
+
+
 int main(void)
 {
 	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
@@ -118,7 +122,9 @@ int main(void)
 	SOCKET s;
 
 	struct sockaddr_in client_struct;
+	// struct sockaddr_in server_struct;
 	int client_struct_len = sizeof(client_struct);
+	// int server_struct_len = sizeof(server_struct);
 
 	//Initialise winsock
 	cout << "\nInitialising Winsock... " << endl;
@@ -237,19 +243,40 @@ void receive_message_from_server(
 		json received_data = json({});
 
 
+		// server_struct.sin_family = AF_INET;
+		// server_struct.sin_port = htons(OWN_LISTENING_PORT);
+		//
+		// if (inet_pton(server_struct.sin_family, SERVER_IP_IN.c_str(), &server_struct.sin_addr.S_un.S_addr) != 1)
+		// {
+		// 	cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError() << endl;
+		// 	exit(EXIT_FAILURE);
+		// };
+
+
 		char buf[BUFLEN];
 		//receive a reply and print it
 		//clear the buffer by filling null, it might have previously received data
 		memset(buf, '\0', BUFLEN);
 
+		// //try to receive some data, this is a blocking call
+		// if (recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&server_struct),
+		//              &server_struct_len) ==
+		// 	SOCKET_ERROR)
+		// {
+		// 	cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
+		// 	exit(EXIT_FAILURE);
+		// }
+
 		//try to receive some data, this is a blocking call
-		if (recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&client_struct),
-		             &client_struct_len) ==
+		if (recvfrom(s, buf, (BUFLEN - 1), 0, NULL,
+		             NULL) ==
 			SOCKET_ERROR)
 		{
 			cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
 			exit(EXIT_FAILURE);
 		}
+
+
 		string buffer = string(buf);
 
 		cout << buffer << endl;
@@ -284,7 +311,7 @@ void create_client_socket(char* SERVER, SOCKET& s, sockaddr_in& client_struct)
 	memset(reinterpret_cast<char *>(&client_struct), 0, sizeof(client_struct));
 
 	client_struct.sin_family = AF_INET;
-	client_struct.sin_port = htons(LISTENING_PORT);
+	client_struct.sin_port = htons(SERVER_LISTENING_PORT);
 	// setup the variable: client_struct.sin_addr.S_un
 	if (inet_pton(AF_INET, SERVER, &client_struct.sin_addr.S_un.S_addr) != 1)
 	{

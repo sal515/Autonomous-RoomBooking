@@ -27,6 +27,7 @@ void threadTester(int number);
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer 
 #define PORT 8888   //The port on which to listen for incoming data
+#define CLIENT_PORT 6000   //The port on the clients listen to, for the server to send the data
 
 
 void create_n_bind_server_socket(
@@ -63,6 +64,10 @@ json pending_db;
 std::atomic<int> global_meet_id(0);
 std::atomic<bool> exit_program(false);
 string clientIP;
+
+
+struct sockaddr_in client_struct;
+int client_struct_len = sizeof(client_struct);
 
 
 int main(void)
@@ -118,10 +123,10 @@ int main(void)
 	SOCKET s;
 
 	struct sockaddr_in server_struct;
-	// struct sockaddr_in si_other;
+	// struct sockaddr_in client_struct;
 
 	int server_struct_len = sizeof(server_struct);
-	int recv_len;
+	// int recv_len;
 
 	//Initializing winsocket to win_socket_struct variable
 	cout << "\nInitialising Winsock... " << endl;
@@ -145,36 +150,7 @@ int main(void)
 	);
 
 
-	// while (!exit_program)
-	// {
-	// 	if (!messages_queue.empty())
-	// 	{
-	// 		json messageJsonObj = messages_queue.front();
-	// 		messages_queue.pop();
-	//
-	//
-	// 		// TODO : create separate threads to process each message depending on ?message type?
-	// 		// thread process_received_message(
-	// 		// processMessages,
-	// 		// ref(pending_db), 
-	// 		// ref(received_data), 
-	// 		// ref(clientIP)
-	// 		// );
-	// 	}
-	//
-	// }
-	// cout_mutex.lock();
-	// cout << "exiting message queue processing" << endl;
-	// cout_mutex.unlock();
-
-	// send_message_to_client(
-	// 	s,
-	// 	server_struct,
-	// 	server_struct_len,
-	// 	buf);
-
-
-		// Wait for all the threads to finish for safe exit of main 
+	// Wait for all the threads to finish for safe exit of main 
 	thread_receive_message.join();
 	// process_received_message.join();
 
@@ -182,7 +158,7 @@ int main(void)
 	closesocket(s);
 	WSACleanup();
 
-	// test_pause_exit();
+	test_pause_exit();
 
 	return 0;
 }
@@ -201,7 +177,7 @@ void send_message_to_client(
 
 	// send_message_mutex.lock();
 	// //now reply the client with the same data
-	if (sendto(s, buf, (BUFLEN -1), 0, (struct sockaddr*)&server_struct, server_struct_len) == SOCKET_ERROR)
+	if (sendto(s, buf, (BUFLEN - 1), 0, (struct sockaddr*)&client_struct, client_struct_len) == SOCKET_ERROR)
 	{
 		cout << "sendto() failed with error code : " << WSAGetLastError << endl;
 		exit(EXIT_FAILURE);
@@ -268,9 +244,28 @@ void receive_message_from_client(
 		received_messages_queue.push(received_data);
 		// received_message_queue_mutex.unlock();
 
-		if (!received_messages_queue.empty())
+		try
 		{
-			send_message_to_client(s, server_struct, server_struct_len, received_messages_queue.front());
+			string client_IP = "192.168.0.115";
+
+			client_struct.sin_family = AF_INET;
+			client_struct.sin_port = htons(CLIENT_PORT);
+			// setup the variable: client_struct.sin_addr.S_un
+			if (inet_pton(client_struct.sin_family, client_IP.c_str(), &client_struct.sin_addr.S_un.S_addr) != 1)
+			{
+				cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError() << endl;
+				exit(EXIT_FAILURE);
+			};
+
+			if (!received_messages_queue.empty())
+			{
+				send_message_to_client(s, client_struct, server_struct_len, received_messages_queue.front());
+				received_messages_queue.pop();
+			}
+		}
+		catch(...)
+		{
+			cout << "something here" << endl;
 		}
 	}
 
