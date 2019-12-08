@@ -26,7 +26,7 @@ void threadTester(int number);
 
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer 
-#define PORT 8888   //The port on which to listen for incoming data
+#define PORT 45678   //The port on which to listen for incoming data
 
 
 void create_n_bind_server_socket(
