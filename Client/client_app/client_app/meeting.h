@@ -46,4 +46,7 @@ struct meeting
 	static bool update_meeting(json& db, const string& day, const string& time, const json& meeting);
 	static bool isMeeting(json& db, const string& day, const string& time);
 	static bool print_meeting(meeting meet);
+
+
+
 };

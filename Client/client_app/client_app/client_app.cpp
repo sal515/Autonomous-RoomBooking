@@ -82,15 +82,17 @@ struct sockaddr_in server_struct;
 int server_struct_len = sizeof(server_struct);
 
 
+
 int main(void)
 {
 	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
 	db_helper::initialize_db(config.DB_PATH);
+	db_helper::initialize_invitations_db(config.INVITATIONS_PATH);
 
 	// loading db from file to memory
 	json db = db_helper::db_to_json(config.DB_PATH);
-
+	vector<json> invitation_db = db_helper::db_to_json(config.INVITATIONS_PATH);
 
 	// --------------- Test codes below  -------------------------
 	json jsonMsg;

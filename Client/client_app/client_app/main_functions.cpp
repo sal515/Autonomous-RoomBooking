@@ -143,6 +143,8 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 					// string topic_str = std::to_string(topic);
 
 
+					// TODO: Check if it available to request
+
 					json request = messages::request(
 						requestID,
 						day,
