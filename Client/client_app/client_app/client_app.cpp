@@ -25,13 +25,6 @@ using std::atomic;
 
 // #define SERVER_LISTENING_PORT 9999   //DEBUG: Test to send it to the client from the client
 
-struct socket_messages
-{
-	string received_from_ip;
-	json message;
-};
-
-
 // Example Function prototypes
 int test_pause_exit();
 
@@ -62,6 +55,8 @@ std::atomic<bool> exit_program(false);
 
 // Function prototypes
 bool get_client_local_ip(SOCKET s, string& client_local_ip);
+
+// Please do not call this function - Its already threaded
 void send_to_server(SOCKET s, sockaddr_in serverAddrStr);
 
 

@@ -58,16 +58,21 @@ int client_struct_len = sizeof(client_struct);
 std::queue<socket_messages> received_messages_queue; // queue for messages received from server
 std::queue<socket_messages> sending_messages_queue; // queue for messages to be sent from the clients
 
-// bool debugResendToClientAfterReceive = true;
-bool debugResendToClientAfterReceive = false;
-bool debugTestData = true;
-// bool debugTestData = false;
+bool debugResendToClientAfterReceive = true;
+// bool debugResendToClientAfterReceive = false;
+// bool debugTestData = true;
+bool debugTestData = false;
 
 
 // Function prototype
+
+// Queue Accessor function both on server and client
 socket_messages get_queue_top(std::queue<socket_messages>& queue);
 void pop_from_queue(std::queue<socket_messages>& queue);
 void push_to_queue(std::queue<socket_messages>& queue, const socket_messages& data);
+
+
+// Please do not call this function - Its already threaded
 void send_to_client(SOCKET s, sockaddr_in clientAddrStr);
 
 
