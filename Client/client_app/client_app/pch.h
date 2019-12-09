@@ -46,14 +46,6 @@
 // #include "spdlog/sinks/rotating_file_sink.h" // support for rotating file logging
 
 
-#define BUFLEN 32768		//Max length of buffer including 
-#define SERVER_LISTENING_PORT 8888   //The port on which to listen for incoming data
-#define OWN_LISTENING_PORT 9999   //The port on which to listen for incoming data
-
-#define SERVER "192.168.0.115"
-#define CLIENT "192.168.0.106"
-
-
 // TODO: add headers that you want to pre-compile here
 #define PCH_H
 

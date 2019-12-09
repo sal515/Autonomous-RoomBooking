@@ -2,68 +2,6 @@
 
 #include "main_functions.h"
 
-
-// void use_socket_with_lock(
-// 	const string sendOrReceive,
-// 	json& data,
-// 	std::queue<json>& queue,
-// 	// std::mutex& socketMutex,
-// 	SOCKET& s,
-// 	sockaddr_in& client_struct,
-// 	int& client_struct_len
-// 	// ,char buf[32768]
-// )
-// {
-// 	const send_receive sndOrRecv;
-//
-// 	if (socket_mutex.try_lock())
-// 	{
-// 		// send check 
-// 		if (!(sendOrReceive.compare(sndOrRecv.send)))
-// 		{
-// 			string messageJsonStr = data.dump();
-// 			char buf[BUFLEN];
-// 			// memset(buf, '\0', BUFLEN + 1);
-// 			memset(buf, '\0', BUFLEN);
-// 			messageJsonStr.copy(buf, messageJsonStr.size());
-//
-// 			//send the messageJsonStr
-// 			if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&client_struct),
-// 			           client_struct_len) == SOCKET_ERROR)
-// 			{
-// 				cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
-// 				exit(EXIT_FAILURE);
-// 			}
-// 			else
-// 			{
-// 				pop_from_queue(queue);
-// 			}
-// 		}
-//
-// 		if (!(sendOrReceive.compare(sndOrRecv.receive)))
-// 		{
-// 			char buf[BUFLEN];
-// 			//receive a reply and print it
-// 			//clear the buffer by filling null, it might have previously received data
-// 			memset(buf, '\0', BUFLEN);
-//
-// 			//try to receive some data, this is a blocking call
-// 			if (recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&client_struct),
-// 			             &client_struct_len) ==
-// 				SOCKET_ERROR)
-// 			{
-// 				cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
-// 				exit(EXIT_FAILURE);
-// 			}
-// 			string buffer = string(buf);
-// 			data = json::parse(buffer);
-// 		}
-//
-// 		socket_mutex.unlock();
-// 	}
-// }
-
-
 void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std::queue<json>& receivingQueue,
           const string& ownIP)
 {
@@ -486,29 +424,38 @@ bool is_string_a_number(string choiceStr)
 
 void pop_from_queue(std::queue<json>& queue)
 {
-	if (queue_mutex.try_lock())
+	bool deleted = false;
+	while (!deleted)
 	{
-		queue.pop();
-		queue_mutex.unlock();
+		if (queue_mutex.try_lock())
+		{
+			queue.pop();
+			queue_mutex.unlock();
+			deleted = true;
+			break;
+		}
 	}
 }
 
 
 void push_to_queue(std::queue<json>& queue, const json& data)
 {
-	if (queue_mutex.try_lock())
+	bool saved = false;
+	while(!saved)
 	{
-		queue.push(data);
-		queue_mutex.unlock();
+		if (queue_mutex.try_lock())
+		{
+			queue.push(data);
+			queue_mutex.unlock();
+			saved = true;
+			break;
+		}
 	}
 }
 
-json get_front_of_queue(std::queue<json>& queue)
+json get_queue_top(std::queue<json>& queue)
 {
-	// queue_mutex.lock();
 	json msg = queue.front();
-	// queue.pop();
-	// queue_mutex.unlock();
 	return msg;
 }
 

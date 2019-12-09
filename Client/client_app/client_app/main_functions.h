@@ -36,7 +36,7 @@ bool is_string_a_number(string choiceStr);
 
 void pop_from_queue(std::queue<json>& queue);
 void push_to_queue(std::queue<json>& queue, const json& data);
-json get_front_of_queue(std::queue<json>& queue);
+json get_queue_top(std::queue<json>& queue);
 
 // void use_socket_with_lock(
 // 	const string sendOrReceive,

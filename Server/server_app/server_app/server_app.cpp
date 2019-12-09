@@ -12,7 +12,6 @@ using std::cin;
 using std::endl;
 using std::fstream;
 using std::vector;
-
 using std::thread;
 using std::mutex;
 using std::queue;
@@ -26,39 +25,12 @@ void threadTester(int number);
 
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer 
-#define SERVER_PORT 8888   //The port on which to listen for incoming data
-#define CLIENT_PORT 9999   //The port on the clients listen to, for the server to send the data
-
-#define SERVER "192.168.0.115"
-// #define CLIENT "192.168.0.106"
-#define CLIENT "192.168.0.115"
-
-// #define CLIENT_IP "192.168.0.106"   //Clinet IP
-#define CLIENT_IP "192.168.0.115"
-
-
-// void create_n_bind_server_socket(
-// 	WSADATA win_socket_struct,
-// 	SOCKET& s,
-// 	sockaddr_in&
-// 	server_struct);
-//
-// void send_message_to_client(
-// 	SOCKET s,
-// 	sockaddr_in server_struct,
-// 	int server_struct_len,
-// 	const string& messageJsonStr);
-//
-// void receive_message_from_client(
-// 	SOCKET s,
-// 	sockaddr_in server_struct,
-// 	int server_struct_len,
-// 	queue<json>& messages,
-// 	string& clientIP
-// );
-
+#define SERVER_PORT 8888    //The port on which to listen for incoming data
 
 // Mutexes 
+std::mutex socket_mutex;
+std::mutex queue_mutex;
+
 // mutex received_message_queue_mutex;
 // mutex send_message_mutex;
 // mutex cout_mutex;
@@ -70,46 +42,113 @@ json confirmed_db;
 json pending_db;
 std::atomic<int> global_meet_id(0);
 std::atomic<bool> exit_program(false);
-string clientIP;
 
+string CLIENT_IP = "192.168.0.115";
+USHORT CLIENT_PORT = 9999;
+// USHORT CLIENT_PORT = 8888; // DEBUG ONLY - send it to the server itself to test data
 
 struct sockaddr_in client_struct;
 int client_struct_len = sizeof(client_struct);
 
 
-std::mutex socket_mutex;
+// Global variables in use
+std::queue<json> received_messages_queue; // queue for messages received from server
+std::queue<json> sending_messages_queue; // queue for messages to be sent from the clients
 
-bool gotSomething = false;
+bool debugResendToClientAfterReceive = true;
+// bool debugResendToClientAfterReceive = false;
+
+// bool debugTestData = true;
+bool debugTestData = false;
 
 
-void send_to_client(SOCKET s, sockaddr_in clientAddrStr, char buf[32768])
+// Function prototype
+json get_queue_top(std::queue<json>& queue);
+void pop_from_queue(std::queue<json>& queue);
+void push_to_queue(std::queue<json>& queue, const json& data);
+
+
+void send_to_client(SOCKET s, sockaddr_in clientAddrStr)
 {
-	char buff[BUFLEN];
-	string messageJsonStr = "Hello from desk Server";
-	memset(buff, '\0', BUFLEN);
-	messageJsonStr.copy(buff, messageJsonStr.size());
+	bool debug1 = false;
+	// bool debug = true;
+	char buf[BUFLEN];
 
 	while (true)
 	{
-		// if (socket_mutex.try_lock() && gotSomething)
-		if (socket_mutex.try_lock())
+		if (!(sending_messages_queue.empty()))
 		{
-			//send the messageJsonStr
-			if (sendto(s, buff, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&clientAddrStr),
-			           sizeof(clientAddrStr)) == SOCKET_ERROR)
+			// getting top of queue
+			json messageJsonObj = get_queue_top(sending_messages_queue);
+
+
+			try
 			{
-				cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
-				exit(EXIT_FAILURE);
+				clientAddrStr.sin_family = AF_INET;
+				clientAddrStr.sin_port = htons(CLIENT_PORT);
+				if (socket_mutex.try_lock())
+				{
+					// setup the variable: client_struct.sin_addr.S_un
+					if (inet_pton(clientAddrStr.sin_family, CLIENT_IP.c_str(),
+					              &clientAddrStr.sin_addr.S_un.S_addr) != 1)
+					{
+						throw WSAGetLastError();
+						// cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError() << endl;
+						// exit(EXIT_FAILURE);
+					};
+					socket_mutex.unlock();
+				}
 			}
-			socket_mutex.unlock();
+			catch (int e)
+			{
+				cout << "Failed to convert IPv4 or IPv6 to standard binary format " << e << endl;
+			}
+
+
+			try
+			{
+				// serializing it to string from json to send
+				string messageJsonStr = messageJsonObj.dump();
+
+				if (debug1)
+				{
+					json testJson;
+					testJson["Test param 1"] = "Test string to send from server";
+					testJson["Test param 2"] = "This should work";
+					messageJsonStr = testJson.dump();
+				}
+
+				memset(buf, '\0', BUFLEN);
+				messageJsonStr.copy(buf, messageJsonStr.size());
+
+
+				if (socket_mutex.try_lock())
+				{
+					//send the messageJsonStr
+					if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&clientAddrStr),
+					           sizeof(clientAddrStr)) == SOCKET_ERROR)
+					{
+						// cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
+						// exit(EXIT_FAILURE);
+						throw WSAGetLastError();
+					}
+					socket_mutex.unlock();
+				}
+				pop_from_queue(sending_messages_queue);
+			}
+			catch (int e)
+			{
+				cout << "sendto() failed with error code : " << e << endl;
+			}
+			// sleep for 5000 ms
+			// sleepcp(5000);
 		}
-		// sleep for 5000 ms
-		// sleepcp(5000);
 	}
 }
 
 int main(void)
 {
+	// ============= Initialization of database ==========================
 	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
 	db_helper::initialize_db(config.PENDING_DB_PATH, config.CONFIRMED_DB_PATH);
@@ -117,8 +156,28 @@ int main(void)
 	// loading db from file to memory
 	confirmed_db = db_helper::db_to_json(config.CONFIRMED_DB_PATH);
 	pending_db = db_helper::db_to_json(config.PENDING_DB_PATH);
+	// ============= Initialization of database ==========================
 
 
+	// --------------- Test codes below  -------------------------
+	if (debugTestData)
+	{
+		json jsonMsg;
+		jsonMsg["message"] = "REQUEST";
+		jsonMsg["day"] = "monday";
+		jsonMsg["time"] = "10";
+		jsonMsg["requestID"] = "1";
+		jsonMsg["topic"] = "yomama";
+		jsonMsg["participantsIP"] = json::array({});
+		jsonMsg["participantsIP"].push_back("192.168.1.133");
+		jsonMsg["participantsIP"].push_back("192.168.0.188");
+		push_to_queue(sending_messages_queue, jsonMsg);
+	}
+	// --------------- Test codes above -------------------------
+
+
+	// ==================== Socket setup and binding =====================
+	// Declare the socket varaibles
 	WSADATA wsaData = {};
 	SOCKET s = INVALID_SOCKET;
 
@@ -135,7 +194,7 @@ int main(void)
 	}
 	cout << "Initialised Winsock" << endl;
 
-
+	// setup server address structure 
 	int iType = SOCK_DGRAM;
 	// int iFamily = AF_INET;
 	// int iProtocol = IPPROTO_UDP;
@@ -158,36 +217,28 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
-	char buf[BUFLEN];
-
-	clientAddrStr.sin_family = AF_INET;
-	clientAddrStr.sin_port = htons(CLIENT_PORT);
-	// setup the variable: client_struct.sin_addr.S_un
-	if (inet_pton(clientAddrStr.sin_family, CLIENT, &clientAddrStr.sin_addr.S_un.S_addr) != 1)
-	{
-		cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError() << endl;
-		exit(EXIT_FAILURE);
-	};
-
-	// thread sendingThread(send_to_client, ref(s), ref(clientAddrStr), ref(buf));
-	// // send_to_client(s, clientAddrStr, buf);
+	// ==================== Socket setup and binding =====================
 
 
-	// cout_mutex.try_lock();
+	//==================== Sending thread call ===========================
+	char received_buffer[BUFLEN];
+	thread sendingThread(send_to_client, ref(s), ref(clientAddrStr));
+	//==================== Sending thread call  ===========================
+
+
+	//==================== Receiving while loop ===========================
 	cout << "Waiting for data..." << endl;
 	fflush(stdout);
 
 	//clear the buffer by filling null, it might have previously received data
-	// memset(buf, '\0', BUFLEN + 1);
-	memset(buf, '\0', BUFLEN);
+	memset(received_buffer, '\0', BUFLEN);
+
 
 	while (true)
 	{
-		gotSomething = false;
-
 		try
 		{
-			if ((recvfrom(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&serverAddrStr),
+			if ((recvfrom(s, received_buffer, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&serverAddrStr),
 			              &serverAddrStr_len)) ==
 				SOCKET_ERROR)
 			{
@@ -195,45 +246,114 @@ int main(void)
 				// cout << "recvfrom() failed with error code : " << WSAGetLastError() << endl;
 				// exit(EXIT_FAILURE);
 			}
+
+
+			//print details of the client/peer and the data received
+			char printable_IP_add_buf[INET_ADDRSTRLEN];
+			if ((inet_ntop(AF_INET, &serverAddrStr.sin_addr, printable_IP_add_buf, INET_ADDRSTRLEN)) != nullptr)
+			{
+				CLIENT_IP = string(printable_IP_add_buf);
+			}
+
+			// Debug print the client ip where data was received from if needed
+			// cout << "CLIENT_IP: " << CLIENT_IP << endl;
+
+			// while (!(buf[0] == '\0'))
+			if ((received_buffer[0] != '\0'))
+			{
+				string receivedStr = std::string(received_buffer);
+
+				// TODO: REMOVE BELOW TEST PRINT
+				cout << "======= Test Print =======" << endl;
+				cout << "Received Data" << endl;
+				cout << receivedStr << endl;
+				cout << "======= Test =======" << endl;
+				// TODO: REMOVE ABOVE TEST PRINT
+
+				push_to_queue(received_messages_queue, json::parse(receivedStr));
+
+
+				if (debugResendToClientAfterReceive)
+				{
+					// push_to_queue(sending_messages_queue, json::parse(receivedStr));
+					push_to_queue(sending_messages_queue, get_queue_top(received_messages_queue));
+				}
+			}
 		}
 		catch (int e)
 		{
-			cout << "recvfrom() failed with error code : " << e << endl;
-		}
-
-
-		//print details of the client/peer and the data received
-		char printable_IP_add_buf[INET_ADDRSTRLEN];
-		if ((inet_ntop(AF_INET, &serverAddrStr.sin_addr, printable_IP_add_buf, INET_ADDRSTRLEN)) != nullptr)
-		{
-			clientIP = string(printable_IP_add_buf);
-		}
-
-		cout << "clientIP: " << clientIP << endl;
-
-		while (buf[0] != '0')
-		{
-			string buffer = std::string(buf);
-			cout << "received data" << endl;
-			cout << buffer << endl;
-			cout << endl;
-
-			gotSomething = true;
-			break;
+			if (e == 10054)
+			{
+				// igonre this error code
+			}
+			else
+			{
+				cout << "recvfrom() failed with error code : " << e << endl;
+			}
 		}
 	}
 
+	//==================== Receiving while loop ===========================
 
-	// sendingThread.join();
 
+	//==================== Program clean up code below ===========================
 
+	sendingThread.join();
 	closesocket(s);
 	WSACleanup();
-
-	test_pause_exit();
-
 	return 0;
 }
+
+
+bool is_string_a_number(string choiceStr)
+{
+	for (char x : choiceStr)
+	{
+		if (!isdigit(x))
+		{
+			return false;
+			// break;
+		}
+	}
+	return true;
+}
+
+void pop_from_queue(std::queue<json>& queue)
+{
+	bool deleted = false;
+	while (!deleted)
+	{
+		if (queue_mutex.try_lock())
+		{
+			queue.pop();
+			queue_mutex.unlock();
+			deleted = true;
+			break;
+		}
+	}
+}
+
+void push_to_queue(std::queue<json>& queue, const json& data)
+{
+	bool saved = false;
+	while (!saved)
+	{
+		if (queue_mutex.try_lock())
+		{
+			queue.push(data);
+			queue_mutex.unlock();
+			saved = true;
+			break;
+		}
+	}
+}
+
+json get_queue_top(std::queue<json>& queue)
+{
+	json msg = queue.front();
+	return msg;
+}
+
 
 // ==================  Examples  ======================================
 int test_pause_exit()
