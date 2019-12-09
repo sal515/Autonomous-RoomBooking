@@ -23,6 +23,13 @@ int test_pause_exit();
 void threadTester(int number);
 
 
+struct socket_messages
+{
+	string ip_for_message;
+	json message;
+};
+
+
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer 
 #define SERVER_PORT 8888    //The port on which to listen for incoming data
@@ -31,11 +38,6 @@ void threadTester(int number);
 std::mutex socket_mutex;
 std::mutex queue_mutex;
 
-// mutex received_message_queue_mutex;
-// mutex send_message_mutex;
-// mutex cout_mutex;
-// mutex cin_mutex;
-
 // Global variables in use
 queue<json> messages_queue; // queues for messages from the clients
 json confirmed_db;
@@ -43,8 +45,9 @@ json pending_db;
 std::atomic<int> global_meet_id(0);
 std::atomic<bool> exit_program(false);
 
-string CLIENT_IP = "192.168.0.115";
-USHORT CLIENT_PORT = 9999;
+// string CLIENT_IP;
+string CLIENT_IP = "192.168.0.115";  // TODO: Delete this debug one
+USHORT CLIENT_PORT = 9999;			
 // USHORT CLIENT_PORT = 8888; // DEBUG ONLY - send it to the server itself to test data
 
 struct sockaddr_in client_struct;
@@ -52,99 +55,21 @@ int client_struct_len = sizeof(client_struct);
 
 
 // Global variables in use
-std::queue<json> received_messages_queue; // queue for messages received from server
-std::queue<json> sending_messages_queue; // queue for messages to be sent from the clients
+std::queue<socket_messages> received_messages_queue; // queue for messages received from server
+std::queue<socket_messages> sending_messages_queue; // queue for messages to be sent from the clients
 
-bool debugResendToClientAfterReceive = true;
-// bool debugResendToClientAfterReceive = false;
-
-// bool debugTestData = true;
-bool debugTestData = false;
+// bool debugResendToClientAfterReceive = true;
+bool debugResendToClientAfterReceive = false;
+bool debugTestData = true;
+// bool debugTestData = false;
 
 
 // Function prototype
-json get_queue_top(std::queue<json>& queue);
-void pop_from_queue(std::queue<json>& queue);
-void push_to_queue(std::queue<json>& queue, const json& data);
+socket_messages get_queue_top(std::queue<socket_messages>& queue);
+void pop_from_queue(std::queue<socket_messages>& queue);
+void push_to_queue(std::queue<socket_messages>& queue, const socket_messages& data);
+void send_to_client(SOCKET s, sockaddr_in clientAddrStr);
 
-
-void send_to_client(SOCKET s, sockaddr_in clientAddrStr)
-{
-	bool debug1 = false;
-	// bool debug = true;
-	char buf[BUFLEN];
-
-	while (true)
-	{
-		if (!(sending_messages_queue.empty()))
-		{
-			// getting top of queue
-			json messageJsonObj = get_queue_top(sending_messages_queue);
-
-
-			try
-			{
-				clientAddrStr.sin_family = AF_INET;
-				clientAddrStr.sin_port = htons(CLIENT_PORT);
-				if (socket_mutex.try_lock())
-				{
-					// setup the variable: client_struct.sin_addr.S_un
-					if (inet_pton(clientAddrStr.sin_family, CLIENT_IP.c_str(),
-					              &clientAddrStr.sin_addr.S_un.S_addr) != 1)
-					{
-						throw WSAGetLastError();
-						// cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError() << endl;
-						// exit(EXIT_FAILURE);
-					};
-					socket_mutex.unlock();
-				}
-			}
-			catch (int e)
-			{
-				cout << "Failed to convert IPv4 or IPv6 to standard binary format " << e << endl;
-			}
-
-
-			try
-			{
-				// serializing it to string from json to send
-				string messageJsonStr = messageJsonObj.dump();
-
-				if (debug1)
-				{
-					json testJson;
-					testJson["Test param 1"] = "Test string to send from server";
-					testJson["Test param 2"] = "This should work";
-					messageJsonStr = testJson.dump();
-				}
-
-				memset(buf, '\0', BUFLEN);
-				messageJsonStr.copy(buf, messageJsonStr.size());
-
-
-				if (socket_mutex.try_lock())
-				{
-					//send the messageJsonStr
-					if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&clientAddrStr),
-					           sizeof(clientAddrStr)) == SOCKET_ERROR)
-					{
-						// cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
-						// exit(EXIT_FAILURE);
-						throw WSAGetLastError();
-					}
-					socket_mutex.unlock();
-				}
-				pop_from_queue(sending_messages_queue);
-			}
-			catch (int e)
-			{
-				cout << "sendto() failed with error code : " << e << endl;
-			}
-			// sleep for 5000 ms
-			// sleepcp(5000);
-		}
-	}
-}
 
 int main(void)
 {
@@ -171,7 +96,26 @@ int main(void)
 		jsonMsg["participantsIP"] = json::array({});
 		jsonMsg["participantsIP"].push_back("192.168.1.133");
 		jsonMsg["participantsIP"].push_back("192.168.0.188");
-		push_to_queue(sending_messages_queue, jsonMsg);
+		string iptemp = "111.111.111.111";
+
+		socket_messages sockMsg;
+		sockMsg.message = jsonMsg;
+		sockMsg.ip_for_message = CLIENT_IP;
+		push_to_queue(sending_messages_queue, sockMsg);
+		
+		jsonMsg["message"] = "REQUEST";
+		jsonMsg["day"] = "monday";
+		jsonMsg["time"] = "10";
+		jsonMsg["requestID"] = "1";
+		jsonMsg["topic"] = "checking second multiple client";
+		jsonMsg["participantsIP"] = json::array({});
+		jsonMsg["participantsIP"].push_back("192.168.1.133");
+		jsonMsg["participantsIP"].push_back("192.168.0.188");
+		iptemp = "111.111.111.111";
+
+		sockMsg.message = jsonMsg;
+		sockMsg.ip_for_message = "192.168.0.106";
+		push_to_queue(sending_messages_queue, sockMsg);
 	}
 	// --------------- Test codes above -------------------------
 
@@ -256,7 +200,7 @@ int main(void)
 			}
 
 			// Debug print the client ip where data was received from if needed
-			// cout << "CLIENT_IP: " << CLIENT_IP << endl;
+			cout << "Received from CLIENT_IP: " << CLIENT_IP << endl;
 
 			// while (!(buf[0] == '\0'))
 			if ((received_buffer[0] != '\0'))
@@ -270,12 +214,16 @@ int main(void)
 				cout << "======= Test =======" << endl;
 				// TODO: REMOVE ABOVE TEST PRINT
 
-				push_to_queue(received_messages_queue, json::parse(receivedStr));
+				// storing received message to the received queue
+				socket_messages socketMsgToPush;
+				socketMsgToPush.message = json::parse(receivedStr);
+				socketMsgToPush.ip_for_message = CLIENT_IP;
+				push_to_queue(received_messages_queue, socketMsgToPush);
 
 
 				if (debugResendToClientAfterReceive)
 				{
-					// push_to_queue(sending_messages_queue, json::parse(receivedStr));
+					// push_to_queue(sending_messages_queue, socketMsgToPush);
 					push_to_queue(sending_messages_queue, get_queue_top(received_messages_queue));
 				}
 			}
@@ -305,6 +253,87 @@ int main(void)
 }
 
 
+void send_to_client(SOCKET s, sockaddr_in clientAddrStr)
+{
+	bool debug1 = false;
+	// bool debug = true;
+	char buf[BUFLEN];
+
+	while (true)
+	{
+		if (!(sending_messages_queue.empty()))
+		{
+			// getting top of queue
+			socket_messages socket_message = get_queue_top(sending_messages_queue);
+
+			json messageJsonObj = socket_message.message;
+			string client_IP_to_send = socket_message.ip_for_message;
+
+			try
+			{
+				clientAddrStr.sin_family = AF_INET;
+				clientAddrStr.sin_port = htons(CLIENT_PORT);
+				if (socket_mutex.try_lock())
+				{
+					// setup the variable: client_struct.sin_addr.S_un
+					if (inet_pton(clientAddrStr.sin_family, client_IP_to_send.c_str(),
+					              &clientAddrStr.sin_addr) != 1)
+					{
+						throw WSAGetLastError();
+						// cout << "Failed to convert IPv4 or IPv6 to standard binary format " << WSAGetLastError() << endl;
+						// exit(EXIT_FAILURE);
+					};
+					socket_mutex.unlock();
+				}
+			}
+			catch (int e)
+			{
+				cout << "Failed to convert IPv4 or IPv6 to standard binary format " << e << endl;
+			}
+
+
+			try
+			{
+				// serializing it to string from json to send
+				string messageJsonStr = messageJsonObj.dump();
+
+				if (debug1)
+				{
+					json testJson;
+					testJson["Test param 1"] = "Test string to send from server";
+					testJson["Test param 2"] = "This should work";
+					messageJsonStr = testJson.dump();
+				}
+
+				memset(buf, '\0', BUFLEN);
+				messageJsonStr.copy(buf, messageJsonStr.size());
+
+
+				if (socket_mutex.try_lock())
+				{
+					//send the messageJsonStr
+					if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&clientAddrStr),
+					           sizeof(clientAddrStr)) == SOCKET_ERROR)
+					{
+						// cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
+						// exit(EXIT_FAILURE);
+						throw WSAGetLastError();
+					}
+					socket_mutex.unlock();
+				}
+				pop_from_queue(sending_messages_queue);
+			}
+			catch (int e)
+			{
+				cout << "sendto() failed with error code : " << e << endl;
+			}
+			// sleep for 5000 ms
+			// sleepcp(5000);
+		}
+	}
+}
+
+
 bool is_string_a_number(string choiceStr)
 {
 	for (char x : choiceStr)
@@ -318,7 +347,7 @@ bool is_string_a_number(string choiceStr)
 	return true;
 }
 
-void pop_from_queue(std::queue<json>& queue)
+void pop_from_queue(std::queue<socket_messages>& queue)
 {
 	bool deleted = false;
 	while (!deleted)
@@ -333,7 +362,7 @@ void pop_from_queue(std::queue<json>& queue)
 	}
 }
 
-void push_to_queue(std::queue<json>& queue, const json& data)
+void push_to_queue(std::queue<socket_messages>& queue, const socket_messages& data)
 {
 	bool saved = false;
 	while (!saved)
@@ -348,9 +377,10 @@ void push_to_queue(std::queue<json>& queue, const json& data)
 	}
 }
 
-json get_queue_top(std::queue<json>& queue)
+
+socket_messages get_queue_top(std::queue<socket_messages>& queue)
 {
-	json msg = queue.front();
+	socket_messages msg = queue.front();
 	return msg;
 }
 

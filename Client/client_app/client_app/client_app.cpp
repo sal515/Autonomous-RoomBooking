@@ -25,10 +25,8 @@ using std::atomic;
 
 // #define SERVER_LISTENING_PORT 9999   //DEBUG: Test to send it to the client from the client
 
-// #define SERVER "192.168.0.115"
-
-
-struct socket_messages {
+struct socket_messages
+{
 	string received_from_ip;
 	json message;
 };
@@ -49,7 +47,8 @@ std::queue<json> sending_messages_queue; // queue for messages to be sent from t
 
 // bool debugResendToClientAfterReceive = false;
 bool debugResendToClientAfterReceive = true;
-
+bool debugTestData = true;
+// bool debugTestData = false;
 
 string SERVER_IP_IN;
 std::string CLIENT_IP;
@@ -63,59 +62,8 @@ std::atomic<bool> exit_program(false);
 
 // Function prototypes
 bool get_client_local_ip(SOCKET s, string& client_local_ip);
+void send_to_server(SOCKET s, sockaddr_in serverAddrStr);
 
-
-
-
-
-void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
-{
-	bool debug = false;
-	// bool debug = true;
-	char buf[BUFLEN];
-
-	while (true)
-	{
-		try
-		{
-			if (!(sending_messages_queue.empty()))
-			{
-				// getting top of queue and serializing it to string from json to send
-				json messageJsonObj = get_queue_top(sending_messages_queue);
-				string messageJsonStr = messageJsonObj.dump();
-
-				if (debug)
-				{
-					json testJson;
-					testJson["Test param 1"] = "Test string to send from client";
-					testJson["Test param 2"] = "This should work";
-					messageJsonStr = testJson.dump();
-				}
-
-				memset(buf, '\0', BUFLEN);
-				messageJsonStr.copy(buf, messageJsonStr.size());
-
-				if (socket_mutex.try_lock())
-				{
-					// sending the serialized string
-					if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&serverAddrStr),
-					           sizeof(serverAddrStr)) == SOCKET_ERROR)
-					{
-						cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
-						exit(EXIT_FAILURE);
-					}
-					socket_mutex.unlock();
-				}
-
-				pop_from_queue(sending_messages_queue);
-			}
-		}
-		catch (int e)
-		{
-			cout << "sendto() failed with error code : " << e << endl;
-		}
-	}
-}
 
 int main(void)
 {
@@ -132,7 +80,7 @@ int main(void)
 
 
 	// --------------- Test codes below  -------------------------
-	if (debugResendToClientAfterReceive)
+	if (debugTestData)
 	{
 		json jsonMsg;
 		jsonMsg["message"] = "REQUEST";
@@ -296,7 +244,59 @@ int main(void)
 	}
 }
 
-//==================== Receiving while loop ===========================
+
+void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
+{
+	bool debug = false;
+	// bool debug = true;
+	char buf[BUFLEN];
+
+	while (true)
+	{
+		if (!(sending_messages_queue.empty()))
+		{
+			// getting top of queue
+			json messageJsonObj = get_queue_top(sending_messages_queue);
+
+			try
+			{
+				// serializing it to string from json to send
+				string messageJsonStr = messageJsonObj.dump();
+
+				if (debug)
+				{
+					json testJson;
+					testJson["Test param 1"] = "Test string to send from client";
+					testJson["Test param 2"] = "This should work";
+					messageJsonStr = testJson.dump();
+				}
+
+				memset(buf, '\0', BUFLEN);
+				messageJsonStr.copy(buf, messageJsonStr.size());
+
+				if (socket_mutex.try_lock())
+				{
+					// sending the serialized string
+					if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&serverAddrStr),
+					           sizeof(serverAddrStr)) == SOCKET_ERROR)
+					{
+						cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
+						exit(EXIT_FAILURE);
+					}
+					socket_mutex.unlock();
+				}
+
+				pop_from_queue(sending_messages_queue);
+			}
+			catch (int e)
+			{
+				cout << "sendto() failed with error code : " << e << endl;
+			}
+		}
+	}
+}
+
+
 bool get_client_local_ip(SOCKET s, string& client_local_ip)
 {
 	// --- Reference --- for the code below: https://stackoverflow.com/questions/49335001/get-local-ip-address-in-c/49336660
