@@ -135,6 +135,32 @@ int test_json()
 }
 
 
+
+void test_invitaiton_db(vector<json> invitation_db)
+{
+	invitation_db.push_back(meeting::meetingObj_to_json(meeting()));
+	invitation_db.push_back(meeting::meetingObj_to_json(meeting()));
+	invitation_db.push_back(meeting::meetingObj_to_json(meeting()));
+	invitation_db.push_back(meeting::meetingObj_to_json(meeting()));
+	invitation_db.push_back(meeting::meetingObj_to_json(meeting()));
+
+
+	db_helper::save_db(config.INVITATIONS_PATH, invitation_db);
+
+	meeting meet = meeting();
+	db_helper::find_invitation("POS2", meet, invitation_db);
+	db_helper::print_invitations(invitation_db);
+
+	meet.meetingDay = "Day";
+
+	db_helper::add_invitation(meet, invitation_db);
+
+	db_helper::remove_invitation("POS2", invitation_db);
+
+	db_helper::save_db(config.INVITATIONS_PATH, invitation_db);
+}
+
+
 void example_db_creator(string example_db_path)
 {
 	//Server only

@@ -42,9 +42,11 @@ struct meeting
 
 	// client specific meeting manipulators
 
-	static json get_meeting(json& db, const string& day, const string& time, const string& room);
-	static bool update_meeting(json& db, const string& day, const string& time, const string& room,
-		const json& meeting);
-	static bool isMeeting(json& db, const string& day, const string& time, const string& room);
+	static json get_meeting(json& db, const string& day, const string& time);
+	static bool update_meeting(json& db, const string& day, const string& time, const json& meeting);
+	static bool isMeeting(json& db, const string& day, const string& time);
 	static bool print_meeting(meeting meet);
+
+
+
 };

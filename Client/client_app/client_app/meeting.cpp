@@ -141,11 +141,12 @@ meeting::meeting(
 	this->server_confirmation = server_confirmation;
 }
 
-json meeting::get_meeting(json& db, const string& day, const string& time, const string& room)
+json meeting::get_meeting(json& db, const string& day, const string& time)
 {
 	try
 	{
-		return db.at(day).at(time).at(room);
+		return db.at(day).at(time);
+		// return db.at(day).at(time).at(room);
 	}
 	catch (nlohmann::json::exception& e)
 	{
@@ -154,12 +155,11 @@ json meeting::get_meeting(json& db, const string& day, const string& time, const
 	}
 }
 
-bool meeting::update_meeting(json& db, const string& day, const string& time, const string& room, const json& meeting)
+bool meeting::update_meeting(json& db, const string& day, const string& time, const json& meeting)
 {
 	try
 	{
-		// db.at(day).at(time).at(room).update(meeting);
-		db.at(day).at(time).at(room) = meeting;
+		db.at(day).at(time) = meeting;
 		return true;
 	}
 	catch (nlohmann::json::exception& e)
@@ -170,9 +170,10 @@ bool meeting::update_meeting(json& db, const string& day, const string& time, co
 }
 
 // is meetting already booked at the given time and day
-bool meeting::isMeeting(json& db, const string& day, const string& time, const string& room)
+bool meeting::isMeeting(json& db, const string& day, const string& time)
 {
-	return !meeting::get_meeting(db, day, time, room).empty();
+	return !meeting::get_meeting(db, day, time).empty();
+	// return !meeting::get_meeting(db, day, time, room).empty();
 }
 
 bool meeting::print_meeting(meeting meet)
