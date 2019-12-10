@@ -44,11 +44,19 @@
 
 
 #include "json.hpp"
+
 // #include "spdlog/spdlog.h"
 // #include "spdlog/sinks/basic_file_sink.h" // support for basic file logging
 // #include "spdlog/sinks/rotating_file_sink.h" // support for rotating file logging
 #define PCH_H
-
+#ifndef _MSG
+#define _MSG
+struct socket_messages
+{
+	std::string ip_for_message;
+	nlohmann::json message;
+};
+#endif //_MSG
 // TODO: add headers that you want to pre-compile here
 
 #endif //PCH_H

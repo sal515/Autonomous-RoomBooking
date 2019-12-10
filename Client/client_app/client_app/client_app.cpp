@@ -79,18 +79,18 @@ int main(void)
 	{
 		json jsonMsg;
 		jsonMsg["message"] = "REQUEST";
-		jsonMsg["day"] = "monday";
-		jsonMsg["time"] = "10";
+		jsonMsg["meetingDay"] = "monday";
+		jsonMsg["meetingTime"] = "10";
 		jsonMsg["requestID"] = "1";
 		jsonMsg["topic"] = "yomama";
-		jsonMsg["participantsIP"] = json::array({});
-		jsonMsg["participantsIP"].push_back("192.168.1.133");
-		jsonMsg["participantsIP"].push_back("192.168.0.188");
-
+		jsonMsg["invitedParticipantsIP"] = json::array({});
+		jsonMsg["invitedParticipantsIP"].push_back("192.168.1.133");
+		jsonMsg["invitedParticipantsIP"].push_back("192.168.0.188");
+		jsonMsg["minimumParticipants"] = "1";
 		sending_messages_queue.push(jsonMsg);
 		sending_messages_queue.push(jsonMsg);
-		sending_messages_queue.push(jsonMsg);
-		sending_messages_queue.push(jsonMsg);
+		//sending_messages_queue.push(jsonMsg);
+		//sending_messages_queue.push(jsonMsg);
 	}
 	// --------------- Test codes above -------------------------
 

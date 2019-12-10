@@ -23,11 +23,7 @@ int test_pause_exit();
 void threadTester(int number);
 
 
-struct socket_messages
-{
-	string ip_for_message;
-	json message;
-};
+
 
 
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
@@ -74,7 +70,8 @@ void push_to_queue(std::queue<socket_messages>& queue, const socket_messages& da
 
 // Please do not call this function - Its already threaded
 void send_to_client(SOCKET s, sockaddr_in clientAddrStr);
-
+void processMsg(std::queue<socket_messages>& received_messages_queue, std::queue<socket_messages>& sending_messages_queue,
+	json& db, json& pendingdb, SOCKET s, sockaddr_in server_struct, int server_struct_len);
 
 int main(void)
 {
@@ -172,6 +169,7 @@ int main(void)
 	//==================== Sending thread call ===========================
 	char received_buffer[BUFLEN];
 	thread sendingThread(send_to_client, ref(s), ref(clientAddrStr));
+	thread processingThread(processMsg, ref(received_messages_queue), ref(sending_messages_queue), ref(confirmed_db), ref(pending_db), ref(s), ref(clientAddrStr), (sizeof(clientAddrStr)));
 	//==================== Sending thread call  ===========================
 
 
@@ -250,11 +248,23 @@ int main(void)
 
 
 	//==================== Program clean up code below ===========================
-
+	processingThread.detach();
 	sendingThread.join();
+	
 	closesocket(s);
 	WSACleanup();
 	return 0;
+}
+
+void processMsg(std::queue<socket_messages>& received_messages_queue, std::queue<socket_messages>& sending_messages_queue,
+	json& db,json& pendingdb, SOCKET s, sockaddr_in server_struct, int server_struct_len) {
+	while (true) {
+		if (!received_messages_queue.empty()) {
+			processMessages(db, pendingdb, received_messages_queue.front().message, received_messages_queue.front().ip_for_message, global_meet_id,
+				s, server_struct, server_struct_len, sending_messages_queue);
+			received_messages_queue.pop();
+		}
+	}
 }
 
 
