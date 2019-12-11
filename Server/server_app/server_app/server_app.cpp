@@ -42,8 +42,8 @@ std::atomic<int> global_meet_id(0);
 std::atomic<bool> exit_program(false);
 
 // string CLIENT_IP;
-string CLIENT_IP = "192.168.0.115";  // TODO: Delete this debug one
-USHORT CLIENT_PORT = 9999;			
+string CLIENT_IP = "192.168.0.115"; // TODO: Delete this debug one
+USHORT CLIENT_PORT = 9999;
 // USHORT CLIENT_PORT = 8888; // DEBUG ONLY - send it to the server itself to test data
 
 struct sockaddr_in client_struct;
@@ -70,8 +70,11 @@ void push_to_queue(std::queue<socket_messages>& queue, const socket_messages& da
 
 // Please do not call this function - Its already threaded
 void send_to_client(SOCKET s, sockaddr_in clientAddrStr);
-void processMsg(std::queue<socket_messages>& received_messages_queue, std::queue<socket_messages>& sending_messages_queue,
-	json& db, json& pendingdb, SOCKET s, sockaddr_in server_struct, int server_struct_len);
+void processMsg(std::queue<socket_messages>& received_messages_queue,
+                std::queue<socket_messages>& sending_messages_queue,
+                json& db, json& pendingdb, SOCKET s, sockaddr_in server_struct, int server_struct_len);
+
+
 
 int main(void)
 {
@@ -79,6 +82,8 @@ int main(void)
 	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
 	db_helper::initialize_db(config.PENDING_DB_PATH, config.CONFIRMED_DB_PATH);
+	logger::initialize_log_file(config.SENT_RECEIVED_LOG_PATH);
+
 
 	// loading db from file to memory
 	confirmed_db = db_helper::db_to_json(config.CONFIRMED_DB_PATH);
@@ -86,13 +91,39 @@ int main(void)
 	// ============= Initialization of database ==========================
 
 
+	// TODO: Delete test =====================
+	//
+	// json jsonMsg;
+	// jsonMsg["message"] = "REQUEST";
+	// jsonMsg["meetingDay"] = "monday";
+	// jsonMsg["meetingTime"] = "10";
+	// jsonMsg["requestID"] = "1";
+	// jsonMsg["topic"] = "yomama";
+	// jsonMsg["participantsIP"] = json::array({});
+	// jsonMsg["participantsIP"].push_back("192.168.1.133");
+	// jsonMsg["participantsIP"].push_back("192.168.0.188");
+	// string iptemp = "111.111.111.111";
+	//
+	//
+	// socket_messages sock;
+	// sock.message = jsonMsg;
+	// sock.ip_for_message = iptemp;
+	// logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, sock);
+	//
+	// test_pause_exit();
+	//
+	// return 0;
+
+	// TODO: Delete test =====================
+
+
 	// --------------- Test codes below  -------------------------
 	if (debugTestData)
 	{
 		json jsonMsg;
 		jsonMsg["message"] = "REQUEST";
-		jsonMsg["day"] = "monday";
-		jsonMsg["time"] = "10";
+		jsonMsg["meetingDay"] = "monday";
+		jsonMsg["meetingTime"] = "10";
 		jsonMsg["requestID"] = "1";
 		jsonMsg["topic"] = "yomama";
 		jsonMsg["participantsIP"] = json::array({});
@@ -104,7 +135,7 @@ int main(void)
 		sockMsg.message = jsonMsg;
 		sockMsg.ip_for_message = CLIENT_IP;
 		push_to_queue(sending_messages_queue, sockMsg);
-		
+
 		jsonMsg["message"] = "REQUEST";
 		jsonMsg["day"] = "monday";
 		jsonMsg["time"] = "10";
@@ -169,7 +200,8 @@ int main(void)
 	//==================== Sending thread call ===========================
 	char received_buffer[BUFLEN];
 	thread sendingThread(send_to_client, ref(s), ref(clientAddrStr));
-	thread processingThread(processMsg, ref(received_messages_queue), ref(sending_messages_queue), ref(confirmed_db), ref(pending_db), ref(s), ref(clientAddrStr), (sizeof(clientAddrStr)));
+	thread processingThread(processMsg, ref(received_messages_queue), ref(sending_messages_queue), ref(confirmed_db),
+	                        ref(pending_db), ref(s), ref(clientAddrStr), (sizeof(clientAddrStr)));
 	//==================== Sending thread call  ===========================
 
 
@@ -222,6 +254,7 @@ int main(void)
 				socketMsgToPush.message = json::parse(receivedStr);
 				socketMsgToPush.ip_for_message = CLIENT_IP;
 				push_to_queue(received_messages_queue, socketMsgToPush);
+				logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, socketMsgToPush);
 
 
 				if (debugResendToClientAfterReceive)
@@ -250,18 +283,23 @@ int main(void)
 	//==================== Program clean up code below ===========================
 	processingThread.detach();
 	sendingThread.join();
-	
+
 	closesocket(s);
 	WSACleanup();
 	return 0;
 }
 
-void processMsg(std::queue<socket_messages>& received_messages_queue, std::queue<socket_messages>& sending_messages_queue,
-	json& db,json& pendingdb, SOCKET s, sockaddr_in server_struct, int server_struct_len) {
-	while (true) {
-		if (!received_messages_queue.empty()) {
-			processMessages(db, pendingdb, received_messages_queue.front().message, received_messages_queue.front().ip_for_message, global_meet_id,
-				s, server_struct, server_struct_len, sending_messages_queue);
+void processMsg(std::queue<socket_messages>& received_messages_queue,
+                std::queue<socket_messages>& sending_messages_queue,
+                json& db, json& pendingdb, SOCKET s, sockaddr_in server_struct, int server_struct_len)
+{
+	while (true)
+	{
+		if (!received_messages_queue.empty())
+		{
+			processMessages(db, pendingdb, received_messages_queue.front().message,
+			                received_messages_queue.front().ip_for_message, global_meet_id,
+			                s, server_struct, server_struct_len, sending_messages_queue);
 			received_messages_queue.pop();
 		}
 	}
@@ -336,7 +374,10 @@ void send_to_client(SOCKET s, sockaddr_in clientAddrStr)
 					}
 					socket_mutex.unlock();
 				}
+
+				socket_messages sockMsgToLog = get_queue_top(sending_messages_queue);
 				pop_from_queue(sending_messages_queue);
+				logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sockMsgToLog);
 			}
 			catch (int e)
 			{
