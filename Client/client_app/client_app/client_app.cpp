@@ -58,7 +58,7 @@ bool get_client_local_ip(SOCKET s, string& client_local_ip);
 
 // Please do not call this function - Its already threaded
 void send_to_server(SOCKET s, sockaddr_in serverAddrStr);
-
+void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue);
 
 int main(void)
 {
@@ -175,6 +175,7 @@ int main(void)
 
 	//==================== Sending thread call ===========================
 	thread sendingThread(send_to_server, ref(s), ref(serverAddrStr));
+	thread processThread(processMsg, ref(db), ref(invitation_db), ref(received_messages_queue), ref(sending_messages_queue));
 	//==================== Sending thread call  ===========================
 
 	//==================== Free running UI thread call ===========================
@@ -239,6 +240,14 @@ int main(void)
 	}
 }
 
+void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue){
+	while (true) {
+		if (!received_messages_queue.empty()) {
+			processMessages(db, invitations_db, received_messages_queue, sending_messages_queue);
+			received_messages_queue.pop();
+		}
+	}
+}
 
 void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 {
