@@ -38,7 +38,7 @@
 #include "app_config.h"
 #include "time_day_room.h"
 #include "meeting.h"
-
+#include "process_messages.h"
 
 #include "json.hpp"
 #include "spdlog/spdlog.h"

@@ -58,7 +58,7 @@ bool get_client_local_ip(SOCKET s, string& client_local_ip);
 
 // Please do not call this function - Its already threaded
 void send_to_server(SOCKET s, sockaddr_in serverAddrStr);
-
+void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue);
 
 int main(void)
 {
@@ -79,18 +79,18 @@ int main(void)
 	{
 		json jsonMsg;
 		jsonMsg["message"] = "REQUEST";
-		jsonMsg["day"] = "monday";
-		jsonMsg["time"] = "10";
+		jsonMsg["meetingDay"] = "monday";
+		jsonMsg["meetingTime"] = "10";
 		jsonMsg["requestID"] = "1";
 		jsonMsg["topic"] = "yomama";
-		jsonMsg["participantsIP"] = json::array({});
-		jsonMsg["participantsIP"].push_back("192.168.1.133");
-		jsonMsg["participantsIP"].push_back("192.168.0.188");
-
+		jsonMsg["invitedParticipantsIP"] = json::array({});
+		jsonMsg["invitedParticipantsIP"].push_back("192.168.1.133");
+		jsonMsg["invitedParticipantsIP"].push_back("192.168.0.188");
+		jsonMsg["minimumParticipants"] = "1";
 		sending_messages_queue.push(jsonMsg);
 		sending_messages_queue.push(jsonMsg);
-		sending_messages_queue.push(jsonMsg);
-		sending_messages_queue.push(jsonMsg);
+		//sending_messages_queue.push(jsonMsg);
+		//sending_messages_queue.push(jsonMsg);
 	}
 	// --------------- Test codes above -------------------------
 
@@ -175,6 +175,7 @@ int main(void)
 
 	//==================== Sending thread call ===========================
 	thread sendingThread(send_to_server, ref(s), ref(serverAddrStr));
+	thread processThread(processMsg, ref(db), ref(invitation_db), ref(received_messages_queue), ref(sending_messages_queue));
 	//==================== Sending thread call  ===========================
 
 	//==================== Free running UI thread call ===========================
@@ -239,6 +240,14 @@ int main(void)
 	}
 }
 
+void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue){
+	while (true) {
+		if (!received_messages_queue.empty()) {
+			processMessages(db, invitations_db, received_messages_queue, sending_messages_queue);
+			received_messages_queue.pop();
+		}
+	}
+}
 
 void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 {

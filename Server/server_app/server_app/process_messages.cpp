@@ -7,7 +7,7 @@ std::mutex sendmessage_mutex;
 
 
 void processMessages(json& db,json& pendingdb, const json& req_data, const string& requesterIP, std::atomic <int> &global_meet_id,
-	SOCKET s, sockaddr_in server_struct, int server_struct_len, const string& messageJsonStr)
+	SOCKET s, sockaddr_in server_struct, int server_struct_len, std::queue<socket_messages>& sending_messages_queue)
 {
 	// Process message type : Request 
 	if (!(messageType.request.compare(req_data.at("message"))))
@@ -61,7 +61,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 				string toSend = meetingInv.dump();
 				for (string ip : req_data.at("invitedParticipantsIP")) {
 					sockaddr_in client = clientMaker(ip);
-					send_message_client(s, client, sizeof(&client), toSend);
+					send_message_client(s, ip,sending_messages_queue, toSend);
 				}
 				break;
 			}
@@ -72,7 +72,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 				json unavailable = messages::response_unavail(req_data.at("requestID"));
 				sockaddr_in client = clientMaker(requesterIP);
 				string toSend = unavailable.dump();
-				send_message_client(s, client, sizeof(&client), toSend);
+				send_message_client(s, requesterIP,sending_messages_queue, toSend);
 				// TODO: Send response to client 
 			}
 		}
@@ -111,7 +111,8 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 					lookForMeeting.at("roomNumber"));
 				acceptedParticipants.push_back(requesterIP);
 				sockaddr_in client = clientMaker(requesterIP);
-				send_message_client(s, client, sizeof(&client), accepting);
+				string toSend = accepting.dump();
+				send_message_client(s, requesterIP,sending_messages_queue, toSend);
 			}
 			// if just reached size of required people to accept, send confirmation to all
 			else if ((min-1) == acceptedParticipants.size()) {
@@ -122,7 +123,8 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 				for (string confirms : acceptedParticipants) {
 
 					sockaddr_in client = clientMaker(confirms);
-					send_message_client(s, client, sizeof(&client), accepting);
+					string toSend = accepting.dump();
+					send_message_client(s, confirms,sending_messages_queue, toSend);
 				}
 				meeting::update_meeting(pendingdb, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"), json({}));
 			}
@@ -175,7 +177,8 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 						json cancel = messages::cancel(lookForMeeting.at("meetingID"), "Not enough members");
 						for (string confirms : acceptedParticipants) {
 							sockaddr_in client = clientMaker(confirms);
-							send_message_client(s, client, sizeof(&client), cancel);
+							string toSend = cancel.dump();
+							send_message_client(s, confirms,sending_messages_queue, toSend);
 						}
 					}
 					//if number below or above minimum, don't send any messages. just remove participant from confirmed.
@@ -230,7 +233,8 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 				// TODO: notify all participants of meeting cancellation
 				for (string ip : invited) {
 					sockaddr_in client = clientMaker(ip);
-					send_message_client(s, client, sizeof(&client), cancelled);
+					string toSend = cancelled.dump();
+					send_message_client(s, participant, sending_messages_queue, toSend);
 				}
 				// sendMessageToClients(notScheduled, participant);
 			}
@@ -253,21 +257,23 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 
 void send_message_client(
 	SOCKET s,
-	sockaddr_in server_struct,
-	int server_struct_len,
-	const string& messageJsonStr)
+	string ip,
+	std::queue<socket_messages>& sending_messages_queue,
+	string& msg)
 {
 	char buf[BUFLEN];
 	memset(buf, '\0', BUFLEN + 1);
-	messageJsonStr.copy(buf, messageJsonStr.size());
-
+	socket_messages newmsg;
+	newmsg.ip_for_message = ip;
+	newmsg.message = msg;
 	sendmessage_mutex.lock();
 	// //now reply the client with the same data
-	if (sendto(s, buf, strlen(buf), 0, (struct sockaddr*) & server_struct, server_struct_len) == SOCKET_ERROR)
-	{
-		cout << "sendto() failed with error code : " << WSAGetLastError << endl;
-		exit(EXIT_FAILURE);
-	}
+	//if (sendto(s, buf, strlen(buf), 0, (struct sockaddr*) & server_struct, server_struct_len) == SOCKET_ERROR)
+	//{
+	//	cout << "sendto() failed with error code : " << WSAGetLastError << endl;
+	//	exit(EXIT_FAILURE);
+	//}
+	sending_messages_queue.push(newmsg);
 	sendmessage_mutex.unlock();
 }
 
