@@ -67,11 +67,33 @@ int main(void)
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
 	db_helper::initialize_db(config.DB_PATH);
 	db_helper::initialize_invitations_db(config.INVITATIONS_PATH);
+	logger::initialize_log_file(config.SENT_RECEIVED_LOG_PATH);
 
 	// loading db from file to memory
 	json db = db_helper::db_to_json(config.DB_PATH);
 	vector<json> invitation_db = db_helper::db_to_json(config.INVITATIONS_PATH);
 	// ============= Initialization of database ==========================
+
+
+	// TODO: Delete test =====================
+
+	// json jsonMsg;
+	// jsonMsg["message"] = "REQUEST";
+	// jsonMsg["meetingDay"] = "monday";
+	// jsonMsg["meetingTime"] = "10";
+	// jsonMsg["requestID"] = "1";
+	// jsonMsg["topic"] = "yomama";
+	// jsonMsg["participantsIP"] = json::array({});
+	// jsonMsg["participantsIP"].push_back("192.168.1.133");
+	// jsonMsg["participantsIP"].push_back("192.168.0.188");
+	//
+	// logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, jsonMsg);
+	//
+	// test_pause_exit();
+	//
+	// return 0;
+
+	// TODO: Delete test =====================
 
 
 	// --------------- Test codes below  -------------------------
@@ -216,7 +238,11 @@ int main(void)
 				cout << "======= Test =======" << endl;
 				// TODO: REMOVE ABOVE TEST PRINT
 
-				push_to_queue(received_messages_queue, json::parse(receivedStr));
+
+				json receivedMsg = json::parse(receivedStr);
+				push_to_queue(received_messages_queue, receivedMsg);
+
+				logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, receivedMsg);
 
 				if (debugResendToClientAfterReceive)
 				{
@@ -280,8 +306,10 @@ void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 					}
 					socket_mutex.unlock();
 				}
-
+				json sentMessageToPop = get_queue_top(sending_messages_queue);
 				pop_from_queue(sending_messages_queue);
+
+				logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sentMessageToPop);
 			}
 			catch (int e)
 			{
