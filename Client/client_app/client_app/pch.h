@@ -40,6 +40,7 @@
 #include "meeting.h"
 #include "process_messages.h"
 
+#include "logger.h"
 #include "json.hpp"
 #include "spdlog/spdlog.h"
 // #include "spdlog/sinks/basic_file_sink.h" // support for basic file logging

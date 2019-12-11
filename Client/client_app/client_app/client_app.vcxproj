@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="app_config.h" />
     <ClInclude Include="json_messages.h" />
+    <ClInclude Include="logger.h" />
     <ClInclude Include="main_functions.h" />
     <ClInclude Include="process_messages.h" />
     <ClInclude Include="time_day_room.h" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="app_config.cpp" />
     <ClCompile Include="client_app.cpp" />
+    <ClCompile Include="logger.cpp" />
     <ClCompile Include="logger_example.cpp" />
     <ClCompile Include="main_functions.cpp" />
     <ClCompile Include="process_messages.cpp" />
