@@ -61,7 +61,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 				string toSend = meetingInv.dump();
 				for (string ip : req_data.at("invitedParticipantsIP")) {
 					sockaddr_in client = clientMaker(ip);
-					send_message_client(s, ip,sending_messages_queue, toSend);
+					send_message_client(ip,sending_messages_queue, toSend);
 				}
 				break;
 			}
@@ -72,7 +72,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 				json unavailable = messages::response_unavail(req_data.at("requestID"));
 				sockaddr_in client = clientMaker(requesterIP);
 				string toSend = unavailable.dump();
-				send_message_client(s, requesterIP,sending_messages_queue, toSend);
+				send_message_client(requesterIP,sending_messages_queue, toSend);
 				// TODO: Send response to client 
 			}
 		}
@@ -112,7 +112,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 				acceptedParticipants.push_back(requesterIP);
 				sockaddr_in client = clientMaker(requesterIP);
 				string toSend = accepting.dump();
-				send_message_client(s, requesterIP,sending_messages_queue, toSend);
+				send_message_client(requesterIP,sending_messages_queue, toSend);
 			}
 			// if just reached size of required people to accept, send confirmation to all
 			else if ((min-1) == acceptedParticipants.size()) {
@@ -124,7 +124,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 
 					sockaddr_in client = clientMaker(confirms);
 					string toSend = accepting.dump();
-					send_message_client(s, confirms,sending_messages_queue, toSend);
+					send_message_client(confirms,sending_messages_queue, toSend);
 				}
 				meeting::update_meeting(pendingdb, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"), json({}));
 			}
@@ -178,7 +178,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 						for (string confirms : acceptedParticipants) {
 							sockaddr_in client = clientMaker(confirms);
 							string toSend = cancel.dump();
-							send_message_client(s, confirms,sending_messages_queue, toSend);
+							send_message_client(confirms,sending_messages_queue, toSend);
 						}
 					}
 					//if number below or above minimum, don't send any messages. just remove participant from confirmed.
@@ -234,7 +234,7 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 				for (string ip : invited) {
 					sockaddr_in client = clientMaker(ip);
 					string toSend = cancelled.dump();
-					send_message_client(s, participant, sending_messages_queue, toSend);
+					send_message_client(participant, sending_messages_queue, toSend);
 				}
 				// sendMessageToClients(notScheduled, participant);
 			}
@@ -256,25 +256,18 @@ void processMessages(json& db,json& pendingdb, const json& req_data, const strin
 }
 
 void send_message_client(
-	SOCKET s,
 	string ip,
 	std::queue<socket_messages>& sending_messages_queue,
 	string& msg)
 {
-	char buf[BUFLEN];
-	memset(buf, '\0', BUFLEN + 1);
+	// char buf[BUFLEN];
+	// memset(buf, '\0', BUFLEN + 1);
 	socket_messages newmsg;
 	newmsg.ip_for_message = ip;
 	newmsg.message = msg;
-	sendmessage_mutex.lock();
-	// //now reply the client with the same data
-	//if (sendto(s, buf, strlen(buf), 0, (struct sockaddr*) & server_struct, server_struct_len) == SOCKET_ERROR)
-	//{
-	//	cout << "sendto() failed with error code : " << WSAGetLastError << endl;
-	//	exit(EXIT_FAILURE);
-	//}
-	sending_messages_queue.push(newmsg);
-	sendmessage_mutex.unlock();
+
+	queueHelper::push_to_queue(sending_messages_queue, newmsg);
+
 }
 
 sockaddr_in clientMaker(string requesterIP) {

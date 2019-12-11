@@ -23,16 +23,13 @@ int test_pause_exit();
 void threadTester(int number);
 
 
-
-
-
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer 
 #define SERVER_PORT 8888    //The port on which to listen for incoming data
 
 // Mutexes 
 std::mutex socket_mutex;
-std::mutex queue_mutex;
+// std::mutex queue_mutex;
 
 // Global variables in use
 queue<json> messages_queue; // queues for messages from the clients
@@ -62,13 +59,12 @@ bool resetDatabases = false;
 // bool resetDatabases = true;
 
 
-
 // Function prototype
 
 // Queue Accessor function both on server and client
-socket_messages get_queue_top(std::queue<socket_messages>& queue);
-void pop_from_queue(std::queue<socket_messages>& queue);
-void push_to_queue(std::queue<socket_messages>& queue, const socket_messages& data);
+// socket_messages get_queue_top(std::queue<socket_messages>& queue);
+// void pop_from_queue(std::queue<socket_messages>& queue);
+// void push_to_queue(std::queue<socket_messages>& queue, const socket_messages& data);
 
 
 // Please do not call this function - Its already threaded
@@ -76,7 +72,6 @@ void send_to_client(SOCKET s, sockaddr_in clientAddrStr);
 void processMsg(std::queue<socket_messages>& received_messages_queue,
                 std::queue<socket_messages>& sending_messages_queue,
                 json& db, json& pendingdb, SOCKET s, sockaddr_in server_struct, int server_struct_len);
-
 
 
 int main(void)
@@ -151,7 +146,8 @@ int main(void)
 		socket_messages sockMsg;
 		sockMsg.message = jsonMsg;
 		sockMsg.ip_for_message = CLIENT_IP;
-		push_to_queue(sending_messages_queue, sockMsg);
+		// push_to_queue(sending_messages_queue, sockMsg);
+		queueHelper::push_to_queue(sending_messages_queue, sockMsg);
 
 		jsonMsg["message"] = "REQUEST";
 		jsonMsg["day"] = "monday";
@@ -165,7 +161,7 @@ int main(void)
 
 		sockMsg.message = jsonMsg;
 		sockMsg.ip_for_message = "192.168.0.106";
-		push_to_queue(sending_messages_queue, sockMsg);
+		queueHelper::push_to_queue(sending_messages_queue, sockMsg);
 	}
 	// --------------- Test codes above -------------------------
 
@@ -270,14 +266,15 @@ int main(void)
 				socket_messages socketMsgToPush;
 				socketMsgToPush.message = json::parse(receivedStr);
 				socketMsgToPush.ip_for_message = CLIENT_IP;
-				push_to_queue(received_messages_queue, socketMsgToPush);
+				queueHelper::push_to_queue(received_messages_queue, socketMsgToPush);
 				logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, socketMsgToPush);
 
 
 				if (debugResendToClientAfterReceive)
 				{
 					// push_to_queue(sending_messages_queue, socketMsgToPush);
-					push_to_queue(sending_messages_queue, get_queue_top(received_messages_queue));
+					queueHelper::push_to_queue(sending_messages_queue,
+					                           queueHelper::get_queue_top(received_messages_queue));
 				}
 			}
 		}
@@ -314,10 +311,16 @@ void processMsg(std::queue<socket_messages>& received_messages_queue,
 	{
 		if (!received_messages_queue.empty())
 		{
-			processMessages(db, pendingdb, received_messages_queue.front().message,
-			                received_messages_queue.front().ip_for_message, global_meet_id,
-			                s, server_struct, server_struct_len, sending_messages_queue);
-			received_messages_queue.pop();
+			processMessages(db,
+			                pendingdb,
+			                received_messages_queue.front().message,
+			                received_messages_queue.front().ip_for_message,
+			                global_meet_id,
+			                s,
+			                server_struct, server_struct_len,
+			                sending_messages_queue);
+			queueHelper::pop_from_queue(received_messages_queue);
+			// received_messages_queue.pop();
 		}
 	}
 }
@@ -334,7 +337,7 @@ void send_to_client(SOCKET s, sockaddr_in clientAddrStr)
 		if (!(sending_messages_queue.empty()))
 		{
 			// getting top of queue
-			socket_messages socket_message = get_queue_top(sending_messages_queue);
+			socket_messages socket_message = queueHelper::get_queue_top(sending_messages_queue);
 
 			json messageJsonObj = socket_message.message;
 			string client_IP_to_send = socket_message.ip_for_message;
@@ -392,8 +395,8 @@ void send_to_client(SOCKET s, sockaddr_in clientAddrStr)
 					socket_mutex.unlock();
 				}
 
-				socket_messages sockMsgToLog = get_queue_top(sending_messages_queue);
-				pop_from_queue(sending_messages_queue);
+				socket_messages sockMsgToLog = queueHelper::get_queue_top(sending_messages_queue);
+				queueHelper::pop_from_queue(sending_messages_queue);
 				logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sockMsgToLog);
 			}
 			catch (int e)
@@ -420,42 +423,42 @@ bool is_string_a_number(string choiceStr)
 	return true;
 }
 
-void pop_from_queue(std::queue<socket_messages>& queue)
-{
-	bool deleted = false;
-	while (!deleted)
-	{
-		if (queue_mutex.try_lock())
-		{
-			queue.pop();
-			queue_mutex.unlock();
-			deleted = true;
-			break;
-		}
-	}
-}
-
-void push_to_queue(std::queue<socket_messages>& queue, const socket_messages& data)
-{
-	bool saved = false;
-	while (!saved)
-	{
-		if (queue_mutex.try_lock())
-		{
-			queue.push(data);
-			queue_mutex.unlock();
-			saved = true;
-			break;
-		}
-	}
-}
-
-
-socket_messages get_queue_top(std::queue<socket_messages>& queue)
-{
-	socket_messages msg = queue.front();
-	return msg;
-}
+// void pop_from_queue(std::queue<socket_messages>& queue)
+// {
+// 	bool deleted = false;
+// 	while (!deleted)
+// 	{
+// 		if (queue_mutex.try_lock())
+// 		{
+// 			queue.pop();
+// 			queue_mutex.unlock();
+// 			deleted = true;
+// 			break;
+// 		}
+// 	}
+// }
+//
+// void push_to_queue(std::queue<socket_messages>& queue, const socket_messages& data)
+// {
+// 	bool saved = false;
+// 	while (!saved)
+// 	{
+// 		if (queue_mutex.try_lock())
+// 		{
+// 			queue.push(data);
+// 			queue_mutex.unlock();
+// 			saved = true;
+// 			break;
+// 		}
+// 	}
+// }
+//
+//
+// socket_messages get_queue_top(std::queue<socket_messages>& queue)
+// {
+// 	socket_messages msg = queue.front();
+// 	return msg;
+// }
 
 
 // ==================  Examples  ======================================

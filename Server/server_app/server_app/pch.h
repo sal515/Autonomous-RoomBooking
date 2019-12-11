@@ -37,6 +37,7 @@
 
 #include <windows.h>
 
+#include "queueHelper.h"
 #include "logger.h"
 #include "db_helper.h"
 #include "app_config.h"
