@@ -3,14 +3,14 @@
 
 // void (json& db, const json& req_data) {
 
-void processMessages(json& db, vector<json> invitations_db, const json& req_data)
+void processMessages(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue)
 {
 	// scheduled that meeting is happening
 	// not_scheduled
 	// response unavailable
 	// confirmed x
 	// invitation
-
+	json req_data = received_messages_queue.front();
 	bool exit = false;
 	//meeting req_meeting = meeting::json_to_meetingObj(req_data);
 
