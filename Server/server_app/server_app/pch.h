@@ -17,6 +17,7 @@
 
 // Other libraries
 #include <ctime>
+#include <ctype.h>
 #include <chrono>
 #include <sstream>
 #include <iomanip>

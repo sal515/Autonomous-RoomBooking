@@ -38,10 +38,13 @@ std::mutex queue_mutex;
 std::queue<json> received_messages_queue; // queue for messages received from server
 std::queue<json> sending_messages_queue; // queue for messages to be sent from the clients
 
-// bool debugResendToClientAfterReceive = false;
-bool debugResendToClientAfterReceive = true;
-bool debugTestData = true;
-// bool debugTestData = false;
+// debug variables
+bool debugResendToClientAfterReceive = false;
+// bool debugResendToClientAfterReceive = true;
+bool debugTestData = false;
+// bool debugTestData = true;
+bool resetDatabases = false;
+// bool resetDatabases = true;
 
 string SERVER_IP_IN;
 std::string CLIENT_IP;
@@ -58,12 +61,26 @@ bool get_client_local_ip(SOCKET s, string& client_local_ip);
 
 // Please do not call this function - Its already threaded
 void send_to_server(SOCKET s, sockaddr_in serverAddrStr);
-void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue);
+void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue,
+                std::queue<json>& sending_messages_queue);
 
 int main(void)
 {
 	// ============= Initialization of database ==========================
-	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
+
+	if (resetDatabases)
+	{
+		cout << "Reset databases: (y/n)" << endl;
+		char resetDB;
+		cin >> resetDB;
+		resetDB = tolower(resetDB);
+		if (resetDB == 'y')
+		{
+			db_helper::removeDirectory(config.DIR_LOCAL_STORAGE);
+		}
+	}
+
+
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
 	db_helper::initialize_db(config.DB_PATH);
 	db_helper::initialize_invitations_db(config.INVITATIONS_PATH);
@@ -197,7 +214,8 @@ int main(void)
 
 	//==================== Sending thread call ===========================
 	thread sendingThread(send_to_server, ref(s), ref(serverAddrStr));
-	thread processThread(processMsg, ref(db), ref(invitation_db), ref(received_messages_queue), ref(sending_messages_queue));
+	thread processThread(processMsg, ref(db), ref(invitation_db), ref(received_messages_queue),
+	                     ref(sending_messages_queue));
 	//==================== Sending thread call  ===========================
 
 	//==================== Free running UI thread call ===========================
@@ -266,9 +284,13 @@ int main(void)
 	}
 }
 
-void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue){
-	while (true) {
-		if (!received_messages_queue.empty()) {
+void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue,
+                std::queue<json>& sending_messages_queue)
+{
+	while (true)
+	{
+		if (!received_messages_queue.empty())
+		{
 			processMessages(db, invitations_db, received_messages_queue, sending_messages_queue);
 			received_messages_queue.pop();
 		}

@@ -54,10 +54,13 @@ int client_struct_len = sizeof(client_struct);
 std::queue<socket_messages> received_messages_queue; // queue for messages received from server
 std::queue<socket_messages> sending_messages_queue; // queue for messages to be sent from the clients
 
-bool debugResendToClientAfterReceive = true;
-// bool debugResendToClientAfterReceive = false;
-// bool debugTestData = true;
+bool debugResendToClientAfterReceive = false;
+// bool debugResendToClientAfterReceive = true;
 bool debugTestData = false;
+// bool debugTestData = true;
+bool resetDatabases = false;
+// bool resetDatabases = true;
+
 
 
 // Function prototype
@@ -79,6 +82,20 @@ void processMsg(std::queue<socket_messages>& received_messages_queue,
 int main(void)
 {
 	// ============= Initialization of database ==========================
+
+	if (resetDatabases)
+	{
+		cout << "Reset databases: (y/n)" << endl;
+		char resetDB;
+		cin >> resetDB;
+		resetDB = tolower(resetDB);
+		if (resetDB == 'y')
+		{
+			db_helper::removeDirectory(config.DIR_LOCAL_STORAGE);
+		}
+	}
+
+
 	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
 	db_helper::initialize_db(config.PENDING_DB_PATH, config.CONFIRMED_DB_PATH);

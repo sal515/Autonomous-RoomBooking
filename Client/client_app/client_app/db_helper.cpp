@@ -6,7 +6,9 @@ bool db_helper::createDirectory(string relativeDirName)
 {
 	try
 	{
-		if (fs::create_directory(relativeDirName))
+		const fs::path p(relativeDirName);
+
+		if (fs::create_directory(p))
 		{
 			cout << "Local storage directory was created" << endl;
 			return true;
@@ -34,7 +36,9 @@ bool db_helper::isDirectoryExist(string relativeDirName)
 {
 	try
 	{
-		if (fs::exists(relativeDirName))
+		const fs::path p(relativeDirName);
+
+		if (fs::exists(p))
 		{
 			return true;
 		}
@@ -58,9 +62,12 @@ bool db_helper::removeDirectory(string relativeDirName)
 {
 	try
 	{
+		const fs::path p(relativeDirName);
+
 		if (db_helper::isDirectoryExist(relativeDirName))
 		{
-			fs::remove(relativeDirName);
+			// fs::remove(p);
+			fs::remove_all(p);
 			cout << "The directory \"" << relativeDirName << "\" was removed" << endl;
 			return true;
 		};
