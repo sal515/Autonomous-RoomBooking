@@ -1,15 +1,12 @@
 #include "pch.h"
 #include "process_messages.h"
+#include "main_functions.h"
 
 // void (json& db, const json& req_data) {
 
-void processMessages(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue)
+void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue)
 {
-	// scheduled that meeting is happening
-	// not_scheduled
-	// response unavailable
-	// confirmed x
-	// invitation
+
 	json req_data = received_messages_queue.front();
 	bool exit = false;
 	//meeting req_meeting = meeting::json_to_meetingObj(req_data);
@@ -17,11 +14,27 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 	//invite
 	if (!(messageType.invite.compare(req_data.at("message"))))
 	{
-		meeting myMeeting = meeting(req_data.at("message"), "", "", req_data.at("meetingID"), {}, {}, "",
+		string day = req_data.at("meetingDay");
+		string time = req_data.at("meetingTime");
+		string meetingId = req_data.at("meetingID");
+		meeting myMeeting = meeting(req_data.at("message"), "", "", meetingId, {}, {}, "",
 		                            req_data.at("topic"),
-		                            req_data.at("meetingDay"), req_data.at("meetingTime"), req_data.at("requesterIP"),
+		                            day, time, req_data.at("requesterIP"),
 		                            false, false);
 		db_helper::add_invitation(myMeeting, invitations_db);
+
+
+		//If calendar empty, accept. Otherwise reject the invitation.
+		if (meeting::get_meeting(db, day, time).empty()) {
+
+			json accept = messages::accept_inv(meetingId);
+			push_to_queue(sending_messages_queue,accept);
+		}
+		else {
+			json reject = messages::reject_inv(meetingId);
+			push_to_queue(sending_messages_queue, reject);
+		}
+
 	}
 		//confirm
 	else if (!(messageType.confirm.compare(req_data.at("message"))))

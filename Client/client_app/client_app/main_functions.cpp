@@ -2,7 +2,7 @@
 
 #include "main_functions.h"
 
-void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std::queue<json>& receivingQueue,
+void menu(json& db, vector<json>& invitations_db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std::queue<json>& receivingQueue,
           const string& ownIP)
 {
 	string choiceStr;
@@ -17,8 +17,9 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 			cout << "Please select from the following options:\n"
 				<< "1. Book a Room\n"
 				<< "2. Cancel a Meeting\n"
-				<< "3. Check inbox for invitations\n"
+				//<< "3. Check inbox for invitations\n"
 				<< "4. Request to Participate\n"
+				<< "5. Withdraw from a meeting"
 				<< "9. Exit the Program\n"
 				<< "10. Debug: Book a room\n";
 			cin >> choiceStr;
@@ -37,8 +38,7 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 			{
 			case 1:
 				{
-					string day;
-					// int mm, dd, yyyy, 
+					string day; 
 					int hh;
 					int min_participants;
 					string topic;
@@ -58,12 +58,25 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 					cout << "\nTime of meeting between " << time_day_room::startTime << " and " << time_day_room::
 						endTime << ": " << endl;
 					cin >> hh;
-					while (hh > time_day_room::endTime || hh < time_day_room::startTime)
-					{
-						cout << "\nPlease input a valid time between " << time_day_room::startTime << " and " <<
-							time_day_room::endTime << ": " << endl;
-						cin >> hh;
+					bool available = false;
+					if (meeting::get_meeting(db, day, std::to_string(hh)).empty()) {
+						available = true;
 					}
+					else {
+						while (hh > time_day_room::endTime || hh < time_day_room::startTime || !available)
+						{
+							cout << "\nPlease input a valid time between " << time_day_room::startTime << " and " <<
+								time_day_room::endTime << " in which you are available: " << endl;
+							cin >> hh;
+							if (meeting::get_meeting(db, day, std::to_string(hh)).empty()) {
+								available = true;
+							}
+						}
+					}
+
+
+					// TODO: Check if answer from server UNAVAILABLE
+					
 
 					cout << "\nTopic of meeting: ";
 					cin >> topic;
@@ -71,8 +84,6 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 					cin >> min_participants;
 					vector<string> participants = list_of_participants(min_participants);
 
-					//Copy into json to send to server + implement request id with incremental?
-					//variables are day, time, topic, min_participants and participants(list)
 					goodInput = true;
 					// string dayStr = std::to_string(day);
 					string requestID = std::to_string(REQUEST_COUNTER++);
@@ -81,7 +92,6 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 					// string topic_str = std::to_string(topic);
 
 
-					// TODO: Check if it available to request
 
 					json request = messages::request(
 						requestID,
@@ -115,20 +125,23 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 
 					break;
 				}
-			case 2:
+			case 2: //Cancel a Meeting
 				{
 					string meetingID;
 					while (db_helper::getMeetingByID(meetingID, db).empty())
 					{
-						cout << "\nPlease enter a meeting ID: ";
+						cout << "\nPlease enter a valid meeting ID: ";
 						cin >> meetingID;
 					}
-					//check if meeting in agenda.
-					//check if meeting creator is same IP.
-					//if it is, send cancellation.
-					goodInput = true;
-					messages message;
-					json cancel = message.cancelMeet(meetingID);
+					
+					json myMeeting = db_helper::getMeetingByID(meetingID, db);
+					
+					if (myMeeting.at("server_confirmation") && !ownIP.compare(myMeeting.at("requesterIP"))) {
+
+						json cancel = messages::cancelMeet(meetingID);
+						push_to_queue(sendingQueue, cancel);
+					}
+
 					break;
 				}
 			case 3:
@@ -137,8 +150,8 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 					while (subMenu)
 					{
 						cout << "\n1. View your invitations (Accepted and Rejected)\n"
-							<< "2. Accept invitation\n"
-							<< "3. Decline invitation\n"
+							//<< "2. Accept invitation\n"
+							//<< "3. Decline invitation\n"
 							<< "4. Request to join meeting\n"
 							<< "5. Withdraw from meeting\n"
 							<< "9. Go back to previous menu\n";
@@ -148,38 +161,21 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 						case 1: // view invitations
 							{
 								vector<json> invites;
-								for (const auto& dayz : db)
-								{
-									for (const auto& timez : dayz)
-									{
-										if (!(timez).empty())
-										{
-											if (!messageType.invite.compare((timez).at("message")))
-											{
-												invites.push_back((timez));
-											}
-										}
-									}
-								}
-								for (int i = 0; i < invites.size(); i++)
-								{
-									meeting thisMeet = meeting::json_to_meetingObj(invites.at(i));
-									meeting::print_meeting(thisMeet);
-								}
-								break;
-								//to test
+								db_helper::print_invitations(invitations_db);
+							
 							}
-						case 2: // accept invitation
-						case 4:
+						case 4: // join meeting request
 							{
 								string meet_ID;
-								while (db_helper::getMeetingByID(meet_ID, db).empty())
+								meeting thisMeeting;
+								bool meet = true;
+								while (db_helper::find_invitation(meet_ID, thisMeeting, invitations_db) || meet)
 								{
-									cout << "\nPlease enter a meeting ID: ";
+									cout << "\nPlease enter a valid meeting ID or c to cancel: ";
 									cin >> meet_ID;
 								}
-								json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
-								meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
+								
+								if(
 								thisMeeting.meetingStatus = true;
 								//send msg to RBMS 
 
@@ -190,7 +186,6 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 								goodInput = true;
 								break;
 							}
-						case 3: // decline invitation
 						case 5: // withdraw
 							{
 								string meet_ID;
@@ -294,7 +289,7 @@ vector<string> list_of_participants(int min)
 {
 	vector<string> participants;
 	string participants_menu =
-		"\na. add new participant\n v. view participants\n f. finish\n Please enter your selection: ";
+		"\na. add new participant\n v. view list of participants\n s. submit list of participants\n Please enter your selection: ";
 	string ip;
 	bool loop = true;
 	char choice = 'm';
@@ -304,11 +299,8 @@ vector<string> list_of_participants(int min)
 		cin >> choice;
 		switch (choice)
 		{
-			// case 'm': //show menu
-			// 	cout << participants_menu;
-			// 	cin >> choice;
-			// 	break;
-		case 'a': //add participants
+
+		case 'a': //add new participant
 			{
 				cout << "IP: ";
 				cin >> ip;
@@ -320,7 +312,7 @@ vector<string> list_of_participants(int min)
 					}
 					else
 					{
-						cout << "IP address is not valid.\n";
+						cout << "IP address is not valid.\n"; //TODO: UDP should not check if address valid or not
 					}
 				}
 				else
@@ -353,7 +345,7 @@ vector<string> list_of_participants(int min)
 				}
 				break;
 			}
-		case 'f':
+		case 's':
 			{
 				//check if list is complete
 				if (min <= static_cast<int>(participants.size()))
