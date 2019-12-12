@@ -246,17 +246,15 @@ void menu(
 				{
 					// This is purely a test case
 
-
-					// db.
-
-
 					string requestID = std::to_string(REQUEST_COUNTER++);
 					string day = "friday";
 					string timeH = "10";
 					string minParts = "1";
 					vector<string> participants = {
-						"111.111.111.111",
-						"222.222.222.222"
+						"192.168.0.183",
+						"192.168.0.106",
+						"172.31.8.16",
+						"192.168.1.133"
 					};
 					string topic = "Test topic";
 
@@ -289,6 +287,7 @@ void menu(
 
 					if (!db.at(requestMetObj.meetingDay).at(requestMetObj.meetingTime).empty())
 					{
+						REQUEST_COUNTER--;
 						cout << "A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting." << endl;
 						break;
 					};
