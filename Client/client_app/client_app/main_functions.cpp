@@ -111,7 +111,7 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 					meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
 					db_helper::save_db(config.DB_PATH, db);
 
-					push_to_queue(sendingQueue, request);
+					queueHelper::push_to_queue(sendingQueue, request);
 
 					break;
 				}
@@ -277,7 +277,7 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 					// string fromDbStr = fromDb.dump();
 					// cout << "meeting got from db:\n" << fromDbStr << endl;
 
-					push_to_queue(sendingQueue, request);
+					queueHelper::push_to_queue(sendingQueue, request);
 
 					break;
 				}

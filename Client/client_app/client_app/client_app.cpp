@@ -31,7 +31,6 @@ int test_pause_exit();
 // Mutexes 
 // std::mutex db_mutex;
 std::mutex socket_mutex;
-std::mutex queue_mutex;
 
 
 // Global variables in use
@@ -43,8 +42,8 @@ bool debugResendToClientAfterReceive = false;
 // bool debugResendToClientAfterReceive = true;
 bool debugTestData = false;
 // bool debugTestData = true;
-bool resetDatabases = false;
-// bool resetDatabases = true;
+// bool resetDatabases = false;
+bool resetDatabases = true;
 
 string SERVER_IP_IN;
 std::string CLIENT_IP;
@@ -72,7 +71,8 @@ int main(void)
 	{
 		cout << "Reset databases: (y/n)" << endl;
 		char resetDB;
-		cin >> resetDB;
+		// TODO : Uncomment resetDB
+		// cin >> resetDB;
 		resetDB = tolower(resetDB);
 		if (resetDB == 'y')
 		{
@@ -126,10 +126,11 @@ int main(void)
 		jsonMsg["invitedParticipantsIP"].push_back("192.168.1.133");
 		jsonMsg["invitedParticipantsIP"].push_back("192.168.0.188");
 		jsonMsg["minimumParticipants"] = "1";
-		sending_messages_queue.push(jsonMsg);
-		sending_messages_queue.push(jsonMsg);
+		// sending_messages_queue.push(jsonMsg);
+		// sending_messages_queue.push(jsonMsg);
 		//sending_messages_queue.push(jsonMsg);
 		//sending_messages_queue.push(jsonMsg);
+		queueHelper::push_to_queue(sending_messages_queue, jsonMsg);
 	}
 	// --------------- Test codes above -------------------------
 
@@ -259,14 +260,14 @@ int main(void)
 
 
 				json receivedMsg = json::parse(receivedStr);
-				push_to_queue(received_messages_queue, receivedMsg);
+				queueHelper::push_to_queue(received_messages_queue, receivedMsg);
 
 				logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, receivedMsg);
 
 				if (debugResendToClientAfterReceive)
 				{
 					// push_to_queue(sending_messages_queue, json::parse(receivedStr));
-					push_to_queue(sending_messages_queue, get_queue_top(received_messages_queue));
+					queueHelper::push_to_queue(sending_messages_queue, queueHelper::get_queue_top(received_messages_queue));
 				}
 			}
 		}
@@ -292,7 +293,9 @@ void processMsg(json& db, vector<json> invitations_db, std::queue<json>& receive
 		if (!received_messages_queue.empty())
 		{
 			processMessages(db, invitations_db, received_messages_queue, sending_messages_queue);
-			received_messages_queue.pop();
+
+			queueHelper::pop_from_queue(received_messages_queue);
+			// received_messages_queue.pop();
 		}
 	}
 }
@@ -308,7 +311,7 @@ void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 		if (!(sending_messages_queue.empty()))
 		{
 			// getting top of queue
-			json messageJsonObj = get_queue_top(sending_messages_queue);
+			json messageJsonObj = queueHelper::get_queue_top(sending_messages_queue);
 
 			try
 			{
@@ -337,8 +340,8 @@ void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 					}
 					socket_mutex.unlock();
 				}
-				json sentMessageToPop = get_queue_top(sending_messages_queue);
-				pop_from_queue(sending_messages_queue);
+				json sentMessageToPop = queueHelper::get_queue_top(sending_messages_queue);
+				queueHelper::pop_from_queue(sending_messages_queue);
 
 				logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sentMessageToPop);
 			}

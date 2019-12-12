@@ -4,7 +4,6 @@
 
 
 extern std::mutex socket_mutex;
-extern std::mutex queue_mutex;
 // extern int REQUEST_COUNTER;
 extern std::atomic<int> REQUEST_COUNTER;
 
@@ -34,9 +33,10 @@ bool is_string_a_number(string choiceStr);
 // bool check_schedule(json schedule);
 
 
-void pop_from_queue(std::queue<json>& queue);
-void push_to_queue(std::queue<json>& queue, const json& data);
-json get_queue_top(std::queue<json>& queue);
+// void pop_from_queue(std::queue<json>& queue);
+// void push_to_queue(std::queue<json>& queue, const json& data);
+// json get_queue_top(std::queue<json>& queue);
+
 
 // void use_socket_with_lock(
 // 	const string sendOrReceive,
