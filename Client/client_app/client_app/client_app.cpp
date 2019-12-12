@@ -43,7 +43,7 @@ bool debugResendToClientAfterReceive = false;
 bool debugTestData = false;
 // bool debugTestData = true;
 // bool resetDatabases = false;
-bool resetDatabases = false;
+bool resetDatabases = true;
 
 string SERVER_IP_IN;
 std::string CLIENT_IP;
@@ -72,7 +72,7 @@ int main(void)
 		cout << "Reset databases: (y/n)" << endl;
 		char resetDB = 'y';
 		// TODO : Uncomment resetDB
-		cin >> resetDB;
+		// cin >> resetDB;
 		resetDB = tolower(resetDB);
 		if (resetDB == 'y')
 		{
@@ -89,7 +89,7 @@ int main(void)
 
 	// loading db from file to memory
 	json db = db_helper::db_to_json(config.DB_PATH);
-	vector<json> invitation_db = db_helper::db_to_json(config.INVITATIONS_PATH);
+	vector<json> invitation_db = db_helper::db_to_jsonArr(config.INVITATIONS_PATH);
 	// ============= Initialization of database ==========================
 
 
@@ -264,12 +264,17 @@ int main(void)
 				json receivedMsg = json::parse(receivedStr);
 				queueHelper::push_to_queue(received_messages_queue, receivedMsg);
 
-				logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, receivedMsg);
+				if (logFileMutex.try_lock())
+				{
+					logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, receivedMsg);
+					logFileMutex.unlock();
+				}
 
 				if (debugResendToClientAfterReceive)
 				{
 					// push_to_queue(sending_messages_queue, json::parse(receivedStr));
-					queueHelper::push_to_queue(sending_messages_queue, queueHelper::get_queue_top(received_messages_queue));
+					queueHelper::push_to_queue(sending_messages_queue,
+					                           queueHelper::get_queue_top(received_messages_queue));
 				}
 			}
 		}
@@ -344,8 +349,12 @@ void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 				}
 				json sentMessageToPop = queueHelper::get_queue_top(sending_messages_queue);
 				queueHelper::pop_from_queue(sending_messages_queue);
-
-				logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sentMessageToPop);
+				
+				if (logFileMutex.try_lock())
+				{
+					logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sentMessageToPop);
+					logFileMutex.unlock();
+				}
 			}
 			catch (int e)
 			{

@@ -223,7 +223,6 @@ int main(void)
 	fflush(stdout);
 
 
-
 	while (true)
 	{
 		//clear the buffer by filling null, it might have previously received data
@@ -268,8 +267,12 @@ int main(void)
 				socketMsgToPush.message = json::parse(receivedStr);
 				socketMsgToPush.ip_for_message = CLIENT_IP;
 				queueHelper::push_to_queue(received_messages_queue, socketMsgToPush);
-				logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, socketMsgToPush);
-
+				
+				if (logFileMutex.try_lock())
+				{
+					logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, socketMsgToPush);
+					logFileMutex.unlock();
+				}
 
 				if (debugResendToClientAfterReceive)
 				{
@@ -396,7 +399,12 @@ void send_to_client(SOCKET s, sockaddr_in clientAddrStr)
 
 				socket_messages sockMsgToLog = queueHelper::get_queue_top(sending_messages_queue);
 				queueHelper::pop_from_queue(sending_messages_queue);
-				logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sockMsgToLog);
+
+				if (logFileMutex.try_lock())
+				{
+					logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sockMsgToLog);
+					logFileMutex.unlock();
+				}
 			}
 			catch (int e)
 			{

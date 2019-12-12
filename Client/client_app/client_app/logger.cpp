@@ -29,7 +29,7 @@ void logger::initialize_log_file(std::string logPath)
 
 void logger::add_received_log(std::string logPath, const json& msg)
 {
-	json log_db = db_helper::db_to_json(logPath);
+	json log_db = db_helper::db_to_jsonArr(logPath);
 
 	json newLogObj = json({});
 	newLogObj["received at time"] = get_time();
@@ -49,7 +49,7 @@ void logger::add_received_log(std::string logPath, const json& msg)
 
 void logger::add_sent_log(std::string logPath, const json& msg)
 {
-	json log_db = db_helper::db_to_json(logPath);
+	json log_db = db_helper::db_to_jsonArr (logPath);
 
 	json newLogObj = json({});
 	newLogObj["sent at time"] = get_time();

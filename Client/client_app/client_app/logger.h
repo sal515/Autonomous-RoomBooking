@@ -12,6 +12,9 @@ using std::fstream;
 using std::vector;
 using std::map;
 
+static std::mutex logFileMutex;
+
+
 struct logger
 {
 	static void initialize_log_file(std::string logPath);

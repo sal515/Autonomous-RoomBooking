@@ -180,9 +180,42 @@ json db_helper::db_to_json(const string& dbPath)
 	}
 }
 
+json db_helper::db_to_jsonArr(const string& dbPath)
+{
+	try
+	{
+		const fs::path p(dbPath);
+		if (fs::exists(p))
+		{
+			std::ifstream readFile(dbPath);
+			json db = json::array();
+			readFile >> db;
+			// readFile.close();
+			return db;
+
+			// example below below (tested)
+			// std::ifstream readFile("local_storage/client_json_db/storage.json");
+			// json db;
+			// readFile >> db;
+			// readFile.close();
+		}
+		else
+		{
+			// if the db.json file was not created send empty json object back
+			return json({});
+		}
+	}
+	catch (fstream::failure& e)
+	{
+		cout << "Exception: read_db_jsonArr method throws -> " << e.what() << endl;
+		return json({});
+	}
+}
+
 bool db_helper::save_db(const string& dbPath, const json& db)
 {
-	if (!dbPath.compare(config.INVITATIONS_PATH))
+	if (!dbPath.compare(config.INVITATIONS_PATH) || 
+		!dbPath.compare(config.SENT_RECEIVED_LOG_PATH))
 	{
 		json arr = json::array();
 		arr = db;
