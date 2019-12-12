@@ -43,7 +43,7 @@ bool debugResendToClientAfterReceive = false;
 bool debugTestData = false;
 // bool debugTestData = true;
 // bool resetDatabases = false;
-bool resetDatabases = true;
+bool resetDatabases = false;
 
 string SERVER_IP_IN;
 std::string CLIENT_IP;
@@ -72,7 +72,7 @@ int main(void)
 		cout << "Reset databases: (y/n)" << endl;
 		char resetDB = 'y';
 		// TODO : Uncomment resetDB
-		// cin >> resetDB;
+		cin >> resetDB;
 		resetDB = tolower(resetDB);
 		if (resetDB == 'y')
 		{

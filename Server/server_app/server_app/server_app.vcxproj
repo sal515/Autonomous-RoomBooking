@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="app_config.h" />
     <ClInclude Include="db_helper.h" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="json_messages.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="meeting.h" />

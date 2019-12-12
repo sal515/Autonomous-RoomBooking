@@ -68,6 +68,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 				if (!(time.empty()) && !abs(requestId.compare(time.at("requestID"))))
 				{
 					meeting::update_meeting(db, time.at("meetingDay"), time.at("meetingTime"), json({}));
+					
 					db_helper::save_db(config.DB_PATH, db);
 					//TODO  log Request denied
 					//cout << endl << "----------" << "Request " << requestId << " denied. Room is unavailable." << endl;
@@ -77,6 +78,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 			}
 			if (exit)
 			{
+				exit = false;
 				break;
 			}
 		}
@@ -107,6 +109,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 			}
 			if (exit)
 			{
+				exit = false;
 				break;
 			}
 		}
@@ -166,6 +169,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 			}
 			if (exit)
 			{
+				exit = false;
 				break;
 			}
 		}
@@ -209,6 +213,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 			}
 			if (exit)
 			{
+				exit = false;
 				break;
 			}
 		}
@@ -240,6 +245,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 			}
 			if (exit)
 			{
+				exit = false;
 				break;
 			}
 		}
