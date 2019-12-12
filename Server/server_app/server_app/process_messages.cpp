@@ -63,8 +63,11 @@ void processMessages(
 				// string toSend = meetingInv.dump();
 				for (string ip : req_data.at("invitedParticipantsIP"))
 				{
-					// sockaddr_in client = clientMaker(ip);
-					send_message_client(ip, sending_messages_queue, meetingInv);
+					if(abs(ip.compare(requesterIP)))
+					{
+						// sockaddr_in client = clientMaker(ip);
+						send_message_client(ip, sending_messages_queue, meetingInv);
+					}
 				}
 				break;
 			}
