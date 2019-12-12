@@ -222,12 +222,13 @@ int main(void)
 	cout << "Waiting for data..." << endl;
 	fflush(stdout);
 
-	//clear the buffer by filling null, it might have previously received data
-	memset(received_buffer, '\0', BUFLEN);
 
 
 	while (true)
 	{
+		//clear the buffer by filling null, it might have previously received data
+		memset(received_buffer, '\0', BUFLEN);
+
 		try
 		{
 			if ((recvfrom(s, received_buffer, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&serverAddrStr),
