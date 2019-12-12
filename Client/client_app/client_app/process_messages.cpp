@@ -11,11 +11,12 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 	// confirmed x
 	// invitation
 	json req_data = received_messages_queue.front();
+
 	bool exit = false;
 	//meeting req_meeting = meeting::json_to_meetingObj(req_data);
 
 	//invite
-	if (!(messageType.invite.compare(req_data.at("message"))))
+	if (!abs(messageType.invite.compare(req_data.at("message"))))
 	{
 		meeting myMeeting = meeting(req_data.at("message"), "", "", req_data.at("meetingID"), {}, {}, "",
 		                            req_data.at("topic"),
@@ -24,7 +25,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		db_helper::add_invitation(myMeeting, invitations_db);
 	}
 		//confirm
-	else if (!(messageType.confirm.compare(req_data.at("message"))))
+	else if (!abs(messageType.confirm.compare(req_data.at("message"))))
 	{
 		meeting myMeeting = meeting();
 
@@ -42,7 +43,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		}
 	}
 		//cancel
-	else if (!(messageType.cancelResponse.compare(req_data.at("message"))))
+	else if (!abs(messageType.cancelResponse.compare(req_data.at("message"))))
 	{
 		meeting myMeeting = meeting();
 		if (db_helper::find_invitation(req_data.at("meetingID"), myMeeting, invitations_db))
@@ -54,7 +55,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		}
 	}
 		//response unavailable
-	else if (!(messageType.response.compare(req_data.at("message"))))
+	else if (!abs(messageType.response.compare(req_data.at("message"))))
 	{
 		string requestId = req_data.at("requestID");
 		for (auto day : db)

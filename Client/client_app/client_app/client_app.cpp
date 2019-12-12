@@ -70,7 +70,7 @@ int main(void)
 	if (resetDatabases)
 	{
 		cout << "Reset databases: (y/n)" << endl;
-		char resetDB;
+		char resetDB = 'y';
 		// TODO : Uncomment resetDB
 		// cin >> resetDB;
 		resetDB = tolower(resetDB);
@@ -85,6 +85,7 @@ int main(void)
 	db_helper::initialize_db(config.DB_PATH);
 	db_helper::initialize_invitations_db(config.INVITATIONS_PATH);
 	logger::initialize_log_file(config.SENT_RECEIVED_LOG_PATH);
+
 
 	// loading db from file to memory
 	json db = db_helper::db_to_json(config.DB_PATH);
