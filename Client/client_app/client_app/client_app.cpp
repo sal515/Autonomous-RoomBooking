@@ -73,7 +73,7 @@ int main(void)
 		char resetDB = 'y';
 		// TODO : Uncomment resetDB
 		// cin >> resetDB;
-		resetDB = tolower(resetDB);
+		resetDB = std::tolower(resetDB);
 		if (resetDB == 'y')
 		{
 			db_helper::removeDirectory(config.DIR_LOCAL_STORAGE);
@@ -177,7 +177,7 @@ int main(void)
 	SERVER_IP_IN = ask_for_ip();
 
 	//Initialise winsock
-	cout << "\nInitialising Winsock... " << endl;
+	cout << "\nInitializing Winsock... " << endl;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
 		cout << "Failed. Error Code : " << WSAGetLastError() << endl;

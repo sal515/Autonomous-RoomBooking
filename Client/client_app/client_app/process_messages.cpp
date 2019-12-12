@@ -3,7 +3,8 @@
 
 // void (json& db, const json& req_data) {
 
-void processMessages(json& db, vector<json> &invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue)
+void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& received_messages_queue,
+                     std::queue<json>& sending_messages_queue)
 {
 	// scheduled that meeting is happening
 	// not_scheduled
@@ -61,17 +62,17 @@ void processMessages(json& db, vector<json> &invitations_db, std::queue<json>& r
 		cout << requestId << endl;
 
 
-		for (auto day : db)
+		for (const auto& day : db)
 		{
 			for (auto time : day)
 			{
 				if (!(time.empty()) && !abs(requestId.compare(time.at("requestID"))))
 				{
 					meeting::update_meeting(db, time.at("meetingDay"), time.at("meetingTime"), json({}));
-					
+
 					db_helper::save_db(config.DB_PATH, db);
 					//TODO  log Request denied
-					//cout << endl << "----------" << "Request " << requestId << " denied. Room is unavailable." << endl;
+					cout << endl << "----------" << "Request " << requestId << " denied. Room is unavailable. Removed from agenda." << endl;
 					exit = true;
 					break;
 				}
