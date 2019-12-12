@@ -3,7 +3,7 @@
 #include "main_functions.h"
 
 void menu(
-	json db,
+	json& db,
 	std::mutex& socketMutex,
 	std::queue<json>& sendingQueue,
 	std::queue<json>& receivingQueue,

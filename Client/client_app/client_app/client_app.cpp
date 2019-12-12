@@ -223,7 +223,7 @@ int main(void)
 
 	thread thread_UI(
 		menu,
-		db,
+		ref(db),
 		ref(socket_mutex),
 		ref(sending_messages_queue),
 		ref(received_messages_queue),

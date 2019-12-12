@@ -22,7 +22,7 @@ struct send_receive
 string ask_for_ip();
 
 void menu(
-	json db, 
+	json& db, 
 	std::mutex& socketMutex, 
 	std::queue<json>& sendingQueue, 
 	std::queue<json>& receivingQueue,
