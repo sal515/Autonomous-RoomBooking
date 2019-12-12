@@ -46,7 +46,6 @@ bool debugTestData = false;
 bool resetDatabases = true;
 
 string SERVER_IP_IN;
-std::string CLIENT_IP;
 
 // string CLIENT_LOCAL_IP;
 std::atomic<int> REQUEST_COUNTER(0);

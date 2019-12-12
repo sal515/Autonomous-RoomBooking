@@ -41,6 +41,7 @@
 #include "meeting.h"
 #include "process_messages.h"
 
+#include "main_functions.h"
 #include "queueHelper.h"
 #include "logger.h"
 #include "json.hpp"

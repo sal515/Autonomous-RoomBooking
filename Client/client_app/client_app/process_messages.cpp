@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "process_messages.h"
+#include "main_functions.h"
+
 
 // void (json& db, const json& req_data) {
 
@@ -59,8 +61,6 @@ void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& r
 	else if (!abs(messageType.response.compare(req_data.at("message"))))
 	{
 		string requestId = req_data.at("requestID");
-		cout << requestId << endl;
-
 
 		for (const auto& day : db)
 		{
@@ -73,6 +73,7 @@ void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& r
 					db_helper::save_db(config.DB_PATH, db);
 					//TODO  log Request denied
 					cout << endl << "----------" << "Request " << requestId << " denied. Room is unavailable. Removed from agenda." << endl;
+					
 					exit = true;
 					break;
 				}

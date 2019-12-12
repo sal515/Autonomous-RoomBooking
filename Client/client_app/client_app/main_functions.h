@@ -2,10 +2,15 @@
 #pragma once
 #include "pch.h"
 
+using json = nlohmann::json;
+
 
 extern std::mutex socket_mutex;
 // extern int REQUEST_COUNTER;
 extern std::atomic<int> REQUEST_COUNTER;
+
+static std::string CLIENT_IP;
+
 
 struct send_receive
 {
