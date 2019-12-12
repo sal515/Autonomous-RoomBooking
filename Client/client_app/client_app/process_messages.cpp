@@ -3,7 +3,7 @@
 
 // void (json& db, const json& req_data) {
 
-void processMessages(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue)
+void processMessages(json& db, vector<json> &invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue)
 {
 	// scheduled that meeting is happening
 	// not_scheduled

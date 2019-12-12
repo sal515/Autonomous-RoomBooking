@@ -236,9 +236,10 @@ int main(void)
 
 	//==================== Receiving while loop ===========================
 	char receive_buffer[BUFLEN];
-	memset(receive_buffer, '\0', BUFLEN);
 	while (true)
 	{
+		memset(receive_buffer, '\0', BUFLEN);
+
 		try
 		{
 			if (recvfrom(s, receive_buffer, (BUFLEN - 1), 0, NULL, NULL) == SOCKET_ERROR)
