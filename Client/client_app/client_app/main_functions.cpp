@@ -2,8 +2,12 @@
 
 #include "main_functions.h"
 
-void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std::queue<json>& receivingQueue,
-          const string& ownIP)
+void menu(
+	json db,
+	std::mutex& socketMutex,
+	std::queue<json>& sendingQueue,
+	std::queue<json>& receivingQueue,
+	const string& ownIP)
 {
 	string choiceStr;
 	int choice;
@@ -46,7 +50,7 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 					cout << "Please provide the day of the week:\n"
 						<< "Day: ";
 					cin >> day;
-					day_it = dayMap.find(day);
+					day_it = dayMap.find((day));
 					while (day_it == dayMap.end())
 					{
 						cout << "Please provide the day of the week eg. friday :\n"
@@ -55,15 +59,25 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 						day_it = dayMap.find(day);
 					}
 
+
 					cout << "\nTime of meeting between " << time_day_room::startTime << " and " << time_day_room::
 						endTime << ": " << endl;
 					cin >> hh;
+
 					while (hh > time_day_room::endTime || hh < time_day_room::startTime)
 					{
 						cout << "\nPlease input a valid time between " << time_day_room::startTime << " and " <<
 							time_day_room::endTime << ": " << endl;
 						cin >> hh;
 					}
+
+					if(!db.at(day).at(std::to_string(hh)).empty())
+					{
+						cout << "A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting." << endl;
+
+						break;
+					};
+
 
 					cout << "\nTopic of meeting: ";
 					cin >> topic;
@@ -272,13 +286,16 @@ void menu(json db, std::mutex& socketMutex, std::queue<json>& sendingQueue, std:
 						false
 					);
 
+
+					if (!db.at(requestMetObj.meetingDay).at(requestMetObj.meetingTime).empty())
+					{
+						cout << "A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting." << endl;
+						break;
+					};
+
 					meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
 
 					db_helper::save_db(config.DB_PATH, db);
-					// json fromDb = meeting::get_meeting(db, day, timeH);
-					//
-					// string fromDbStr = fromDb.dump();
-					// cout << "meeting got from db:\n" << fromDbStr << endl;
 
 					queueHelper::push_to_queue(sendingQueue, request);
 
@@ -444,7 +461,7 @@ void pop_from_queue(std::queue<json>& queue)
 void push_to_queue(std::queue<json>& queue, const json& data)
 {
 	bool saved = false;
-	while(!saved)
+	while (!saved)
 	{
 		if (queue_mutex.try_lock())
 		{
