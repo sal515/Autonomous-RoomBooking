@@ -331,6 +331,8 @@ ASALocalRun/
 
 JSON/
 
+local_storage
+
 Client/client_app/client_app/local_storage/
 
 Server/server_app/server_app/local_storage/
