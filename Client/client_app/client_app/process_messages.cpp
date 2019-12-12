@@ -21,11 +21,22 @@ void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& r
 	//invite
 	if (!abs(messageType.invite.compare(req_data.at("message"))))
 	{
-		meeting myMeeting = meeting(req_data.at("message"), "", "", req_data.at("meetingID"), {}, {}, "",
-		                            req_data.at("topic"),
-		                            req_data.at("meetingDay"), req_data.at("meetingTime"), req_data.at("requesterIP"),
-		                            false, false);
+		meeting myMeeting = meeting(
+			req_data.at("message"),
+			"",
+			"",
+			req_data.at("meetingID"),
+			{},
+			{},
+			"",
+			req_data.at("topic"),
+			req_data.at("meetingDay"),
+			req_data.at("meetingTime"),
+			req_data.at("requesterIP"),
+			false,
+			false);
 		db_helper::add_invitation(myMeeting, invitations_db);
+		db_helper::save_db(config.INVITATIONS_PATH, invitations_db);
 	}
 		//confirm
 	else if (!abs(messageType.confirm.compare(req_data.at("message"))))
@@ -72,8 +83,9 @@ void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& r
 
 					db_helper::save_db(config.DB_PATH, db);
 					//TODO  log Request denied
-					cout << endl << "----------" << "Request " << requestId << " denied. Room is unavailable. Removed from agenda." << endl;
-					
+					cout << endl << "----------" << "Request " << requestId <<
+						" denied. Room is unavailable. Meeting removed from MS or agenda." << endl;
+
 					exit = true;
 					break;
 				}
