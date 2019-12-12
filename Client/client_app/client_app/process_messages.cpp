@@ -58,11 +58,14 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 	else if (!abs(messageType.response.compare(req_data.at("message"))))
 	{
 		string requestId = req_data.at("requestID");
+		cout << requestId << endl;
+
+
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!requestId.compare(time.at("requestID")))
+				if (!(time.empty()) && !abs(requestId.compare(time.at("requestID"))))
 				{
 					meeting::update_meeting(db, time.at("meetingDay"), time.at("meetingTime"), json({}));
 					db_helper::save_db(config.DB_PATH, db);
@@ -79,14 +82,14 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		}
 	}
 		//Meeting Not Scheduled
-	else if (!(messageType.notScheduled.compare(req_data.at("message"))))
+	else if (!abs(messageType.notScheduled.compare(req_data.at("message"))))
 	{
 		string requestId = req_data.at("requestID");
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!requestId.compare(time.at("requestID")))
+				if (!(time.empty()) && !abs(requestId.compare(time.at("requestID"))))
 				{
 					meeting db_meeting = meeting::json_to_meetingObj(time);
 
@@ -109,14 +112,14 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		}
 	}
 		//Meeting scheduled successful
-	else if (!messageType.scheduled.compare(req_data.at("message")))
+	else if (!abs(messageType.scheduled.compare(req_data.at("message"))))
 	{
 		string requestId = req_data.at("requestID");
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!requestId.compare(time.at("requestID")))
+				if (!(time.empty()) && !abs(requestId.compare(time.at("requestID"))))
 				{
 					meeting thisMeeting = meeting::json_to_meetingObj(time);
 					string meetingId = req_data.at("meetingID");
@@ -139,14 +142,14 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		}
 	}
 		//Added Participant to Meeting
-	else if (!messageType.added.compare(req_data.at("message")))
+	else if (!abs(messageType.added.compare(req_data.at("message"))))
 	{
 		string meetingId = req_data.at("meetingID");
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!meetingId.compare(time.at("meetingID")))
+				if (!(time.empty()) && !abs(meetingId.compare(time.at("meetingID"))))
 				{
 					meeting thisMeeting = meeting::json_to_meetingObj(time);
 
@@ -168,14 +171,14 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		}
 	}
 		//Withdraw from Meeting (Requester side)
-	else if (!messageType.withdrawNotify.compare(req_data.at("message")))
+	else if (!abs(messageType.withdrawNotify.compare(req_data.at("message"))))
 	{
 		string meetingId = req_data.at("meetingID");
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!meetingId.compare(time.at("meetingID")))
+				if (!(time.empty()) && !abs(meetingId.compare(time.at("meetingID"))))
 				{
 					meeting thisMeeting = meeting::json_to_meetingObj(time);
 
@@ -184,7 +187,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 					for (const string element : thisMeeting.confirmedParticipantsIP)
 					{
 						counter += 1;
-						if (!element.compare(req_data.at("IP")))
+						if (!abs(element.compare(req_data.at("IP"))))
 						{
 							thisMeeting.confirmedParticipantsIP.erase(
 								thisMeeting.confirmedParticipantsIP.begin() + counter);
@@ -211,14 +214,14 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		}
 	}
 		//Room_Change
-	else if (!messageType.roomChange.compare(req_data.at("message")))
+	else if (!abs(messageType.roomChange.compare(req_data.at("message"))))
 	{
 		string meetingId = req_data.at("meetingID");
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!meetingId.compare(time.at("meetingID")))
+				if (!(time.empty()) && !abs(meetingId.compare(time.at("meetingID"))))
 				{
 					meeting thisMeeting = meeting::json_to_meetingObj(time);
 
