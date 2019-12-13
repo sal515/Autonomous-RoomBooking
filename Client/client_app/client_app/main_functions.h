@@ -2,11 +2,15 @@
 #pragma once
 #include "pch.h"
 
+using json = nlohmann::json;
+
 
 extern std::mutex socket_mutex;
-extern std::mutex queue_mutex;
 // extern int REQUEST_COUNTER;
 extern std::atomic<int> REQUEST_COUNTER;
+
+static std::string CLIENT_IP;
+
 
 struct send_receive
 {
@@ -18,7 +22,7 @@ struct send_receive
 string ask_for_ip();
 
 void menu(
-	json db, 
+	json& db, 
 	std::mutex& socketMutex, 
 	std::queue<json>& sendingQueue, 
 	std::queue<json>& receivingQueue,
@@ -34,9 +38,10 @@ bool is_string_a_number(string choiceStr);
 // bool check_schedule(json schedule);
 
 
-void pop_from_queue(std::queue<json>& queue);
-void push_to_queue(std::queue<json>& queue, const json& data);
-json get_queue_top(std::queue<json>& queue);
+// void pop_from_queue(std::queue<json>& queue);
+// void push_to_queue(std::queue<json>& queue, const json& data);
+// json get_queue_top(std::queue<json>& queue);
+
 
 // void use_socket_with_lock(
 // 	const string sendOrReceive,

@@ -159,6 +159,7 @@ bool meeting::update_meeting(json& db, const string& day, const string& time, co
 {
 	try
 	{
+		// db.at(day).at(time).clear();
 		db.at(day).at(time) = meeting;
 		return true;
 	}

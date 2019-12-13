@@ -31,20 +31,21 @@ int test_pause_exit();
 // Mutexes 
 // std::mutex db_mutex;
 std::mutex socket_mutex;
-std::mutex queue_mutex;
 
 
 // Global variables in use
 std::queue<json> received_messages_queue; // queue for messages received from server
 std::queue<json> sending_messages_queue; // queue for messages to be sent from the clients
 
-// bool debugResendToClientAfterReceive = false;
-bool debugResendToClientAfterReceive = true;
-bool debugTestData = true;
-// bool debugTestData = false;
+// debug variables
+bool debugResendToClientAfterReceive = false;
+// bool debugResendToClientAfterReceive = true;
+bool debugTestData = false;
+// bool debugTestData = true;
+// bool resetDatabases = false;
+bool resetDatabases = true;
 
 string SERVER_IP_IN;
-std::string CLIENT_IP;
 
 // string CLIENT_LOCAL_IP;
 std::atomic<int> REQUEST_COUNTER(0);
@@ -58,20 +59,58 @@ bool get_client_local_ip(SOCKET s, string& client_local_ip);
 
 // Please do not call this function - Its already threaded
 void send_to_server(SOCKET s, sockaddr_in serverAddrStr);
-void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue);
+void processMsg(json& db, vector<json>& invitations_db, std::queue<json>& received_messages_queue,
+                std::queue<json>& sending_messages_queue);
 
 int main(void)
 {
 	// ============= Initialization of database ==========================
-	// db_helper::removeDirectory(clientPath.DIR_LOCAL_STORAGE);
+
+	if (resetDatabases)
+	{
+		cout << "Reset databases: (y/n)" << endl;
+		char resetDB = 'y';
+		// TODO : Uncomment resetDB
+		// cin >> resetDB;
+		resetDB = std::tolower(resetDB);
+		if (resetDB == 'y')
+		{
+			db_helper::removeDirectory(config.DIR_LOCAL_STORAGE);
+		}
+	}
+
+
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
 	db_helper::initialize_db(config.DB_PATH);
 	db_helper::initialize_invitations_db(config.INVITATIONS_PATH);
+	logger::initialize_log_file(config.SENT_RECEIVED_LOG_PATH);
+
 
 	// loading db from file to memory
 	json db = db_helper::db_to_json(config.DB_PATH);
-	vector<json> invitation_db = db_helper::db_to_json(config.INVITATIONS_PATH);
+	vector<json> invitation_db = db_helper::db_to_jsonArr(config.INVITATIONS_PATH);
 	// ============= Initialization of database ==========================
+
+
+	// TODO: Delete test =====================
+
+	// json jsonMsg;
+	// jsonMsg["message"] = "REQUEST";
+	// jsonMsg["meetingDay"] = "monday";
+	// jsonMsg["meetingTime"] = "10";
+	// jsonMsg["requestID"] = "1";
+	// jsonMsg["topic"] = "yomama";
+	// jsonMsg["participantsIP"] = json::array({});
+	// jsonMsg["participantsIP"].push_back("192.168.1.133");
+	// jsonMsg["participantsIP"].push_back("192.168.0.188");
+	//
+	// logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, jsonMsg);
+	//
+	// test_pause_exit();
+	//
+	// return 0;
+
+	// TODO: Delete test =====================
 
 
 	// --------------- Test codes below  -------------------------
@@ -87,10 +126,11 @@ int main(void)
 		jsonMsg["invitedParticipantsIP"].push_back("192.168.1.133");
 		jsonMsg["invitedParticipantsIP"].push_back("192.168.0.188");
 		jsonMsg["minimumParticipants"] = "1";
-		sending_messages_queue.push(jsonMsg);
-		sending_messages_queue.push(jsonMsg);
+		// sending_messages_queue.push(jsonMsg);
+		// sending_messages_queue.push(jsonMsg);
 		//sending_messages_queue.push(jsonMsg);
 		//sending_messages_queue.push(jsonMsg);
+		queueHelper::push_to_queue(sending_messages_queue, jsonMsg);
 	}
 	// --------------- Test codes above -------------------------
 
@@ -136,7 +176,7 @@ int main(void)
 	SERVER_IP_IN = ask_for_ip();
 
 	//Initialise winsock
-	cout << "\nInitialising Winsock... " << endl;
+	cout << "\nInitializing Winsock... " << endl;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
 		cout << "Failed. Error Code : " << WSAGetLastError() << endl;
@@ -166,7 +206,7 @@ int main(void)
 	ownAddrStr.sin_port = htons(OWN_LISTENING_PORT);
 	ownAddrStr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 	//Bind Socket
-	if (bind(s, (struct sockaddr *)&ownAddrStr, sizeof(ownAddrStr)) == SOCKET_ERROR)
+	if (bind(s, (struct sockaddr*)&ownAddrStr, sizeof(ownAddrStr)) == SOCKET_ERROR)
 	{
 		cout << "Bind failed with error code : " << WSAGetLastError() << endl;
 		exit(EXIT_FAILURE);
@@ -174,15 +214,25 @@ int main(void)
 
 
 	//==================== Sending thread call ===========================
-	thread sendingThread(send_to_server, ref(s), ref(serverAddrStr));
-	thread processThread(processMsg, ref(db), ref(invitation_db), ref(received_messages_queue), ref(sending_messages_queue));
+	thread sendingThread(
+		send_to_server,
+		ref(s),
+		ref(serverAddrStr));
+
+	
+	thread processThread(
+		processMsg,
+		ref(db),
+		ref(invitation_db),
+		ref(received_messages_queue),
+		ref(sending_messages_queue));
 	//==================== Sending thread call  ===========================
 
 	//==================== Free running UI thread call ===========================
 
 	thread thread_UI(
 		menu,
-		db,
+		ref(db),
 		ref(socket_mutex),
 		ref(sending_messages_queue),
 		ref(received_messages_queue),
@@ -194,9 +244,10 @@ int main(void)
 
 	//==================== Receiving while loop ===========================
 	char receive_buffer[BUFLEN];
-	memset(receive_buffer, '\0', BUFLEN);
 	while (true)
 	{
+		memset(receive_buffer, '\0', BUFLEN);
+
 		try
 		{
 			if (recvfrom(s, receive_buffer, (BUFLEN - 1), 0, NULL, NULL) == SOCKET_ERROR)
@@ -217,12 +268,21 @@ int main(void)
 				cout << "======= Test =======" << endl;
 				// TODO: REMOVE ABOVE TEST PRINT
 
-				push_to_queue(received_messages_queue, json::parse(receivedStr));
+
+				json receivedMsg = json::parse(receivedStr);
+				queueHelper::push_to_queue(received_messages_queue, receivedMsg);
+
+				if (logFileMutex.try_lock())
+				{
+					logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, receivedMsg);
+					logFileMutex.unlock();
+				}
 
 				if (debugResendToClientAfterReceive)
 				{
 					// push_to_queue(sending_messages_queue, json::parse(receivedStr));
-					push_to_queue(sending_messages_queue, get_queue_top(received_messages_queue));
+					queueHelper::push_to_queue(sending_messages_queue,
+					                           queueHelper::get_queue_top(received_messages_queue));
 				}
 			}
 		}
@@ -240,11 +300,17 @@ int main(void)
 	}
 }
 
-void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue){
-	while (true) {
-		if (!received_messages_queue.empty()) {
+void processMsg(json& db, vector<json>& invitations_db, std::queue<json>& received_messages_queue,
+                std::queue<json>& sending_messages_queue)
+{
+	while (true)
+	{
+		if (!received_messages_queue.empty())
+		{
 			processMessages(db, invitations_db, received_messages_queue, sending_messages_queue);
-			received_messages_queue.pop();
+
+			queueHelper::pop_from_queue(received_messages_queue);
+			// received_messages_queue.pop();
 		}
 	}
 }
@@ -260,7 +326,7 @@ void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 		if (!(sending_messages_queue.empty()))
 		{
 			// getting top of queue
-			json messageJsonObj = get_queue_top(sending_messages_queue);
+			json messageJsonObj = queueHelper::get_queue_top(sending_messages_queue);
 
 			try
 			{
@@ -281,7 +347,7 @@ void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 				if (socket_mutex.try_lock())
 				{
 					// sending the serialized string
-					if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&serverAddrStr),
+					if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr*>(&serverAddrStr),
 					           sizeof(serverAddrStr)) == SOCKET_ERROR)
 					{
 						cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
@@ -289,8 +355,14 @@ void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 					}
 					socket_mutex.unlock();
 				}
+				json sentMessageToPop = queueHelper::get_queue_top(sending_messages_queue);
+				queueHelper::pop_from_queue(sending_messages_queue);
 
-				pop_from_queue(sending_messages_queue);
+				if (logFileMutex.try_lock())
+				{
+					logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sentMessageToPop);
+					logFileMutex.unlock();
+				}
 			}
 			catch (int e)
 			{
