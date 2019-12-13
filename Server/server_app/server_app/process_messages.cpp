@@ -347,7 +347,7 @@ void discarder(json& pendingdb,
 	std::queue<socket_messages>& sending_messages_queue) {
 	std::this_thread::sleep_for(std::chrono::seconds(30));
 	if (pendingdb.at(meetingDay).at(meetingTime).at("requestID") == requestID
-		&& pendingdb.at(meetingDay).at(meetingTime).at("requesterID") == requesterID) {
+		&& pendingdb.at(meetingDay).at(meetingTime).at("requesterIP") == requesterID) {
 		vector<string> ips;
 		for (auto& invitees : pendingdb.at(meetingDay).at(meetingTime).at("invitedParticipantsIP")) {
 			ips.push_back(invitees.dump());
@@ -362,7 +362,7 @@ void discarder(json& pendingdb,
 		}
 		std::this_thread::sleep_for(std::chrono::seconds(30));
 		if (pendingdb.at(meetingDay).at(meetingTime).at("requestID") == requestID
-			&& pendingdb.at(meetingDay).at(meetingTime).at("requesterID") == requesterID) {
+			&& pendingdb.at(meetingDay).at(meetingTime).at("requesterIP") == requesterID) {
 				json cancelled;
 				cancelled["requestID"] = requestID;
 				cancelled["message"] = "CANCEL";
@@ -372,7 +372,7 @@ void discarder(json& pendingdb,
 				send_message_client(invitees, sending_messages_queue, cancelled);
 			}
 			for (auto& requests : pendingdb.at(meetingDay).at(meetingTime)) {
-				if (requests.at("requestID") == requestID && requests.at("requesterID") == requesterID) {
+				if (requests.at("requestID") == requestID && requests.at("requesterIP") == requesterID) {
 					requests = json({});
 					break;
 				}
