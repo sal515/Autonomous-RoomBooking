@@ -67,26 +67,26 @@ void processMessages(
 				// string toSend = meetingInv.dump();
 				for (string ip : req_data.at("invitedParticipantsIP"))
 				{
-					if(abs(ip.compare(requesterIP)))
+					if (abs(ip.compare(requesterIP)))
 					{
 						// sockaddr_in client = clientMaker(ip);
 						send_message_client(ip, sending_messages_queue, meetingInv);
 					}
 				}
-				std::thread discards(discarder, ref(pendingdb), ref(req_data.at("requestID")), 
-					ref(req_data.at("meetingDay")), ref(req_data.at("meetingTime")), ref(req_data.at("requesterIP")), ref(sending_messages_queue));
+				string reqID = req_data.at("requestID");
+				string day = req_data.at("meetingDay");
+				string times = req_data.at("meetingTime");
+				std::thread discards(discarder, ref(pendingdb), ref(reqID), 
+					ref(day), ref(times), ref(requesterIP), ref(sending_messages_queue));
 				discards.detach();
-				break;
-			}
-			else
-			{
-				// rooms not available - build unavailable reponse for the client
-				// db will not be updated
-				json unavailable = messages::response_unavail(req_data.at("requestID"));
-				// sockaddr_in client = clientMaker(requesterIP);
-				send_message_client(requesterIP, sending_messages_queue, unavailable);
+				return;
 			}
 		}
+		// rooms not available - build unavailable reponse for the client
+		// db will not be updated
+		json unavailable = messages::response_unavail(req_data.at("requestID"));
+		// sockaddr_in client = clientMaker(requesterIP);
+		send_message_client(requesterIP, sending_messages_queue, unavailable);
 	}
 	else if (!(messageType.accept.compare(req_data.at("message"))) || !(messageType.add.compare(req_data.at("message")))
 	)
@@ -155,11 +155,17 @@ void processMessages(
 			lookForMeeting.at("confirmedParticipantsIP") = acceptedParticipants;
 			meeting::update_meeting(db, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"),
 			                        lookForMeeting);
-			while (!sendmessage_mutex.try_lock())
+
+			bool saved = false;
+			while (!saved)
 			{
-				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-				db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
-				sendmessage_mutex.unlock();
+				if (sendmessage_mutex.try_lock())
+				{
+					db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+					db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+					saved = true;
+					sendmessage_mutex.unlock();
+				}
 			}
 		}
 	}
@@ -231,11 +237,16 @@ void processMessages(
 			lookForMeeting.at("confirmedParticipantsIP") = acceptedParticipants;
 			meeting::update_meeting(db, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"),
 			                        lookForMeeting);
-			while (!sendmessage_mutex.try_lock())
+			bool saved = false;
+			while (!saved)
 			{
-				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-				db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
-				sendmessage_mutex.unlock();
+				if (sendmessage_mutex.try_lock())
+				{
+					db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+					db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+					saved = true;
+					sendmessage_mutex.unlock();
+				}
 			}
 		}
 	}
@@ -284,17 +295,23 @@ void processMessages(
 				meetObj.meetingTime,
 				meetObj.roomNumber,
 				json({}));
-			while (!sendmessage_mutex.try_lock())
+
+			bool saved = false;
+			while (!saved)
 			{
-				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-				sendmessage_mutex.unlock();
+				if (sendmessage_mutex.try_lock())
+				{
+					db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+					saved = true;
+					sendmessage_mutex.unlock();
+				}
 			}
 		}
 	}
 }
 
 void send_message_client(
-	const string &ip,
+	const string& ip,
 	std::queue<socket_messages>& sending_messages_queue,
 	const json& msg)
 {

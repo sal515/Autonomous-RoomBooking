@@ -271,10 +271,15 @@ int main(void)
 				json receivedMsg = json::parse(receivedStr);
 				queueHelper::push_to_queue(received_messages_queue, receivedMsg);
 
-				if (logFileMutex.try_lock())
+				bool saved = false;
+				while (!saved)
 				{
-					logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, receivedMsg);
-					logFileMutex.unlock();
+					if (logFileMutex.try_lock())
+					{
+						logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, receivedMsg);
+						saved = true;
+						logFileMutex.unlock();
+					}
 				}
 
 				if (debugResendToClientAfterReceive)
@@ -357,10 +362,15 @@ void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 				json sentMessageToPop = queueHelper::get_queue_top(sending_messages_queue);
 				queueHelper::pop_from_queue(sending_messages_queue);
 
-				if (logFileMutex.try_lock())
+				bool saved = false;
+				while (!saved)
 				{
-					logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sentMessageToPop);
-					logFileMutex.unlock();
+					if (logFileMutex.try_lock())
+					{
+						logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sentMessageToPop);
+						saved = true;
+						logFileMutex.unlock();
+					}
 				}
 			}
 			catch (int e)
