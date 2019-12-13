@@ -274,19 +274,16 @@ bool db_helper::save_db(const string& dbPath, const json& db)
 json db_helper::getMeetingByID(const string& meetingID, const json& db)
 {
 	json foundMeeting = json({});
-	bool foundit = false;
 	// looping through days
 	for (const auto& day : db)
 	{
-		if (foundit) { break; }
 		// looping through time
 		for (const auto& time : day)
 		{
 			if (!meetingID.compare(time.at("meetingID")))
 			{
 				foundMeeting = (time);
-				foundit = true;
-				break;
+				return foundMeeting;
 			}
 		}
 	}
