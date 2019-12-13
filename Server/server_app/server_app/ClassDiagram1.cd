@@ -1,0 +1,830 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="nlohmann::detail::exception" Collapsed="true">
+    <Position X="5.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAEAEAAAgAAAAAAAgA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::parse_error" Collapsed="true">
+    <Position X="1" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAEAAAAAAAAAAAAAABAAAAAAAg=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::invalid_iterator" Collapsed="true">
+    <Position X="3.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::type_error" Collapsed="true">
+    <Position X="5.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAgAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::out_of_range" Collapsed="true">
+    <Position X="7.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::other_error" Collapsed="true">
+    <Position X="10" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAEAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::iteration_proxy_value&lt;IteratorType&gt;" Collapsed="true">
+    <Position X="26.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAQAAEAQAAAAABACCAAAQgAAABBAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::iteration_proxy&lt;IteratorType&gt;" Collapsed="true">
+    <Position X="25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAACAAAAAAAAAAAAAAAQAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::file_input_adapter" Collapsed="true">
+    <Position X="3.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAECAAAAAAAAAAAAgABAAABA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::input_stream_adapter" Collapsed="true">
+    <Position X="5.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAACAgAAAEAAAAAAAAAAQAAgAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::input_buffer_adapter" Collapsed="true">
+    <Position X="7.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAQEAAAAEAAAAAAAAkAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::wide_string_input_adapter&lt;WideStringType&gt;" Collapsed="true">
+    <Position X="1" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAACAgAAAAAAEAEQAAAAAACAAAAAAAAAAABA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::input_adapter" Collapsed="true">
+    <Position X="21.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAgAAAACAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::json_sax_dom_parser&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="23.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAJAAAAAwBAAAABAMAkQAAEAAAQEggCEAAgAAQAAAI=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::json_sax_dom_callback_parser&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="21.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABJAQAAAwBAAAAAAMAkQAQEAAAQAggCEAIgAARAAAY=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::json_sax_acceptor&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="19.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAJAAAAAgBAAAAAAAAEQAAEAAAAAgAAEAAAAAQAAAI=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::binary_reader&lt;BasicJsonType, SAX&gt;" Collapsed="true">
+    <Position X="18" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEEAQBMEAEgAAgCOBAAATJAAgCAAFABgAEBoARIgBAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::lexer&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ADAAACEEASUCCCACFIAAYEIAoACgAAAAQAApAAEGAEA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::parser&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="28.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAQACAAAAAEgAAAEAgAAAAAAAAAAAAAAABABAAIAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::primitive_iterator_t" Collapsed="true">
+    <Position X="16.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAgAAAAQAEAAQAAAAhEAAAAAQAgAAAAAIA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::iter_impl&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="23.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAQAEEAwAAgAlEACAgAAAgAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::json_reverse_iterator&lt;Base&gt;" Collapsed="true">
+    <Position X="18" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAQAEEAQAAAAEAACAAAAAgAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::json_ref&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="16.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAABgAAAAAgAQAAAABgAACAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::output_vector_adapter&lt;CharType&gt;" Collapsed="true">
+    <Position X="1" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAABABBAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::output_stream_adapter&lt;CharType&gt;" Collapsed="true">
+    <Position X="3.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAACAAEBAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::output_string_adapter&lt;CharType, StringType&gt;" Collapsed="true">
+    <Position X="5.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAADAAAAAABAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::output_adapter&lt;CharType, StringType&gt;" Collapsed="true">
+    <Position X="26.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::binary_writer&lt;BasicJsonType, CharType&gt;" Collapsed="true">
+    <Position X="19.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAKQQAAgAgAAAAAABAFAhgAAgBIABEAgAUAAICIUGg=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::detail::serializer&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="18" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AECAAAAAIAgAAASAAAAACAACAAQCEABBLAAwAAQAgAI=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::basic_json" Collapsed="true">
+    <Position X="16.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>jAAAMAAAACCAQECGAAhEQAAAgKEBBAAAAEBgAEAIAIA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="nlohmann::json_pointer&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="28.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAACAAEgAQoCCAAAAACAIAEAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="std::tuple_size&lt;::nlohmann::detail::iteration_proxy_value&lt;IteratorType&gt;&gt;" Collapsed="true">
+    <Position X="21.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="std::tuple_element&lt;N, ::nlohmann::detail::iteration_proxy_value&lt;IteratorType&gt;&gt;" Collapsed="true">
+    <Position X="19.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="app_config">
+    <Position X="25" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAQAAAABAAgAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAA=</HashCode>
+      <FileName>app_config.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="db_helper" Collapsed="true">
+    <Position X="28.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAEwgAIACAABAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>db_helper.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="from_json_fn" Collapsed="true">
+    <Position X="21.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="messageType">
+    <Position X="25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAECAAAAAAAAAcAAAAAKQAASBBABAAAAAgAACAAA=</HashCode>
+      <FileName>json_messages.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="messages">
+    <Position X="26.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAFBAAAAAAAAAAAAUAQAAACAGAALBABAAAAAAEACAAA=</HashCode>
+      <FileName>json_messages.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="logger">
+    <Position X="25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACAAIAACAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>logger.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="meeting">
+    <Position X="23.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IIgAAAAAhAAAAAIgABAEAAAAACEAAAAAgIAACAEAACU=</HashCode>
+      <FileName>meeting.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="queueHelper">
+    <Position X="26.75" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAAIACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>queueHelper.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="socket_messages">
+    <Position X="26.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAACA=</HashCode>
+      <FileName>socket_messages.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="time_day_room">
+    <Position X="23.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgACAAAAAQIAAAIAAAAAAAAAA=</HashCode>
+      <FileName>time_day_room.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::position_t" Collapsed="true">
+    <Position X="28.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAECAAAAAAAAgAAAAAAAABAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::index_sequence&lt;...Ints&gt;" Collapsed="true">
+    <Position X="11.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::merge_and_renumber&lt;index_sequence&lt;I1...&gt;, index_sequence&lt;I2...&gt;&gt;" Collapsed="true">
+    <Position X="9" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::make_index_sequence&lt;N&gt;" Collapsed="true">
+    <Position X="9" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::make_index_sequence&lt;0&gt;" Collapsed="true">
+    <Position X="11.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::make_index_sequence&lt;1&gt;" Collapsed="true">
+    <Position X="13.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::priority_tag&lt;N&gt;" Collapsed="true">
+    <Position X="0.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::priority_tag&lt;0&gt;" Collapsed="true">
+    <Position X="16.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::static_const&lt;T&gt;" Collapsed="true">
+    <Position X="21.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::make_void&lt;...Ts&gt;" Collapsed="true">
+    <Position X="19.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::iterator_types&lt;It, &gt;" Collapsed="true">
+    <Position X="13.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::iterator_types&lt;It, void_t&lt;typename It::difference_type, typename It::value_type, typename It::pointer, typename It::reference, typename It::iterator_category&gt;&gt;" Collapsed="true">
+    <Position X="26.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::iterator_traits&lt;T, &gt;" Collapsed="true">
+    <Position X="25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::iterator_traits&lt;T, enable_if_t&lt;!std::is_pointer&lt;T&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="13.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::nonesuch" Collapsed="true">
+    <Position X="30.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::detector&lt;Default, AlwaysVoid, Op&lt;...&gt;, ...Args&gt;" Collapsed="true">
+    <Position X="16.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_basic_json&lt;&gt;" Collapsed="true">
+    <Position X="25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_basic_json&lt;NLOHMANN_BASIC_JSON_TPL&gt;" Collapsed="true">
+    <Position X="23.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::has_from_json&lt;BasicJsonType, T, &gt;" Collapsed="true">
+    <Position X="25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::has_from_json&lt;BasicJsonType, T, enable_if_t&lt;not is_basic_json&lt;T&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="23.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::has_non_default_from_json&lt;BasicJsonType, T, &gt;" Collapsed="true">
+    <Position X="26.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::has_non_default_from_json&lt;BasicJsonType, T, enable_if_t&lt;not is_basic_json&lt;T&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="28.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::has_to_json&lt;BasicJsonType, T, &gt;" Collapsed="true">
+    <Position X="18" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::has_to_json&lt;BasicJsonType, T, enable_if_t&lt;not is_basic_json&lt;T&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="16.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_iterator_traits&lt;T, &gt;" Collapsed="true">
+    <Position X="19.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_iterator_traits&lt;iterator_traits&lt;T&gt;&gt;" Collapsed="true">
+    <Position X="18" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_complete_type&lt;T, &gt;" Collapsed="true">
+    <Position X="21.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_complete_type&lt;T, decltype(void(sizeof(T)))&gt;" Collapsed="true">
+    <Position X="23.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_object_type_impl&lt;BasicJsonType, CompatibleObjectType, &gt;" Collapsed="true">
+    <Position X="12.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_object_type_impl&lt;BasicJsonType, CompatibleObjectType, enable_if_t&lt;is_detected&lt;mapped_type_t,CompatibleObjectType&gt;::value and is_detected&lt;key_type_t,CompatibleObjectType&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="16.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_object_type&lt;BasicJsonType, CompatibleObjectType&gt;" Collapsed="true">
+    <Position X="12.75" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_constructible_object_type_impl&lt;BasicJsonType, ConstructibleObjectType, &gt;" Collapsed="true">
+    <Position X="12.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_constructible_object_type_impl&lt;BasicJsonType, ConstructibleObjectType, enable_if_t&lt;is_detected&lt;mapped_type_t,ConstructibleObjectType&gt;::value and is_detected&lt;key_type_t,ConstructibleObjectType&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="26.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_constructible_object_type&lt;BasicJsonType, ConstructibleObjectType&gt;" Collapsed="true">
+    <Position X="12.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_string_type_impl&lt;BasicJsonType, CompatibleStringType, &gt;" Collapsed="true">
+    <Position X="3.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_string_type_impl&lt;BasicJsonType, CompatibleStringType, enable_if_t&lt;is_detected_exact&lt;typename BasicJsonType::string_t::value_type, value_type_t, CompatibleStringType&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="18" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_string_type&lt;BasicJsonType, ConstructibleStringType&gt;" Collapsed="true">
+    <Position X="3.75" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_constructible_string_type_impl&lt;BasicJsonType, ConstructibleStringType, &gt;" Collapsed="true">
+    <Position X="12.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_constructible_string_type_impl&lt;BasicJsonType, ConstructibleStringType, enable_if_t&lt;is_detected_exact&lt;typename BasicJsonType::string_t::value_type, value_type_t, ConstructibleStringType&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="28.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_constructible_string_type&lt;BasicJsonType, ConstructibleStringType&gt;" Collapsed="true">
+    <Position X="12.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_array_type_impl&lt;BasicJsonType, CompatibleArrayType, &gt;" Collapsed="true">
+    <Position X="0.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_array_type_impl&lt;BasicJsonType, CompatibleArrayType, enable_if_t&lt;is_detected&lt;value_type_t,CompatibleArrayType&gt;::value and is_detected&lt;iterator_t,CompatibleArrayType&gt;::value and not is_iterator_traits&lt;iterator_traits&lt;CompatibleArrayType&gt;&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="26.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_array_type&lt;BasicJsonType, CompatibleArrayType&gt;" Collapsed="true">
+    <Position X="0.75" Y="13" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_constructible_array_type_impl&lt;BasicJsonType, ConstructibleArrayType, &gt;" Collapsed="true">
+    <Position X="9.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_constructible_array_type_impl&lt;BasicJsonType, ConstructibleArrayType, enable_if_t&lt;std::is_same&lt;ConstructibleArrayType, typename BasicJsonType::value_type&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_constructible_array_type&lt;BasicJsonType, ConstructibleArrayType&gt;" Collapsed="true">
+    <Position X="9.75" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_integer_type_impl&lt;RealIntegerType, CompatibleNumberIntegerType, &gt;" Collapsed="true">
+    <Position X="6.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_integer_type_impl&lt;RealIntegerType, CompatibleNumberIntegerType, enable_if_t&lt;std::is_integral&lt;RealIntegerType&gt;::value and std::is_integral&lt;CompatibleNumberIntegerType&gt;::value and not std::is_same&lt;bool,CompatibleNumberIntegerType&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="28.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_integer_type&lt;RealIntegerType, CompatibleNumberIntegerType&gt;" Collapsed="true">
+    <Position X="6.75" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_type_impl&lt;BasicJsonType, CompatibleType, &gt;" Collapsed="true">
+    <Position X="3.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_type_impl&lt;BasicJsonType, CompatibleType, enable_if_t&lt;is_complete_type&lt;CompatibleType&gt;::value&gt;&gt;" Collapsed="true">
+    <Position X="19.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_compatible_type&lt;BasicJsonType, CompatibleType&gt;" Collapsed="true">
+    <Position X="3.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::conjunction&lt;...&gt;" Collapsed="true">
+    <Position X="26.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::conjunction&lt;B1&gt;" Collapsed="true">
+    <Position X="25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::conjunction&lt;B1, Bn...&gt;" Collapsed="true">
+    <Position X="23.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_constructible_tuple&lt;T1, T2&gt;" Collapsed="true">
+    <Position X="16.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::external_constructor&lt;value_t::boolean&gt;" Collapsed="true">
+    <Position X="19.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::to_json_fn" Collapsed="true">
+    <Position X="30.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::input_adapter_protocol" Collapsed="true">
+    <Position X="4.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::wide_string_input_helper&lt;WideStringType, T&gt;" Collapsed="true">
+    <Position X="28.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::wide_string_input_helper&lt;WideStringType, 2&gt;" Collapsed="true">
+    <Position X="31" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_sax&lt;SAX, BasicJsonType&gt;" Collapsed="true">
+    <Position X="21.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::is_sax_static_asserts&lt;SAX, BasicJsonType&gt;" Collapsed="true">
+    <Position X="23.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::internal_iterator&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="21.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAAAAAAAAAAAIAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::output_adapter_protocol&lt;CharType&gt;" Collapsed="true">
+    <Position X="3.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAABAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::adl_serializer&lt;, &gt;" Collapsed="true">
+    <Position X="16.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::json_sax&lt;BasicJsonType&gt;" Collapsed="true">
+    <Position X="28.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAJAIAAAgBAAAAAAAAEQAAEAAAAAgAAEAAAAAQAAAI=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="std::hash&lt;nlohmann::json&gt;" Collapsed="true">
+    <Position X="19.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="std::less&lt;::nlohmann::detail::value_t&gt;" Collapsed="true">
+    <Position X="16.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::dtoa_impl::diyfp" Collapsed="true">
+    <Position X="18" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAADAAAQAAAAAAAAAAAAAAAAgAASACAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::dtoa_impl::boundaries" Collapsed="true">
+    <Position X="19.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAIAAAAAgAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="nlohmann::detail::dtoa_impl::cached_power" Collapsed="true">
+    <Position X="21.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASgAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="nlohmann::detail::value_t" Collapsed="true">
+    <Position X="19.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAJAAAAACBAAAAAAAgAQAAAAAAAAgAAAAAAAABAAAI=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="nlohmann::detail::input_format_t" Collapsed="true">
+    <Position X="18" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAACAAAAIAAAAAAAAAAICAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="nlohmann::detail::error_handler_t" Collapsed="true">
+    <Position X="16.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAgAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>json.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

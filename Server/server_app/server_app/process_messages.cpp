@@ -2,8 +2,12 @@
 #include "process_messages.h"
 #define BUFLEN 32768		//Max length of buffer 
 #define SERVER_PORT 45678   //The port on which to listen for incoming data
+#include <chrono>
 std::mutex sendmessage_mutex;
 
+void discarder(json& invitations, const string& requestID, const string& meetingDay, 
+	const string& meetingTime, const string& requesterID,
+	std::queue<socket_messages>& sending_messages_queue);
 
 void processMessages(
 	json& db,
@@ -69,9 +73,17 @@ void processMessages(
 						send_message_client(ip, sending_messages_queue, meetingInv);
 					}
 				}
+				string reqID = req_data.at("requestID");
+				string day = req_data.at("meetingDay");
+				string times = req_data.at("meetingTime");
+				std::thread discards(discarder, ref(pendingdb), ref(reqID), 
+					ref(day), ref(times), ref(requesterIP), ref(sending_messages_queue));
+				discards.detach();
 				return;
 			}
 		}
+		// rooms not available - build unavailable reponse for the client
+		// db will not be updated
 		json unavailable = messages::response_unavail(req_data.at("requestID"));
 		send_message_client(requesterIP, sending_messages_queue, unavailable);
 	}
@@ -325,4 +337,46 @@ sockaddr_in clientMaker(string requesterIP)
 	}
 	client.sin_port = htons(SERVER_PORT);
 	return client;
+}
+
+void discarder(json& pendingdb, 
+	const string& requestID, 
+	const string& meetingDay, 
+	const string& meetingTime, 
+	const string& requesterID,
+	std::queue<socket_messages>& sending_messages_queue) {
+	std::this_thread::sleep_for(std::chrono::seconds(30));
+	if (pendingdb.at(meetingDay).at(meetingTime).at("requestID") == requestID
+		&& pendingdb.at(meetingDay).at(meetingTime).at("requesterIP") == requesterID) {
+		vector<string> ips;
+		for (auto& invitees : pendingdb.at(meetingDay).at(meetingTime).at("invitedParticipantsIP")) {
+			ips.push_back(invitees.dump());
+			for (auto& acceptees : pendingdb.at(meetingDay).at(meetingTime).at("confirmedParticipantsIP")) {
+				if (!invitees.dump().compare(acceptees.dump())) {
+					ips.pop_back();
+				}
+			}
+		}
+		for (auto& ip : ips) {
+			send_message_client(ip, sending_messages_queue, pendingdb.at(meetingDay).at(meetingTime));
+		}
+		std::this_thread::sleep_for(std::chrono::seconds(30));
+		if (pendingdb.at(meetingDay).at(meetingTime).at("requestID") == requestID
+			&& pendingdb.at(meetingDay).at(meetingTime).at("requesterIP") == requesterID) {
+				json cancelled;
+				cancelled["requestID"] = requestID;
+				cancelled["message"] = "CANCEL";
+				cancelled["reason"] = "not enough participants";
+				send_message_client(requesterID, sending_messages_queue, cancelled);
+			for (auto& invitees : pendingdb.at(meetingDay).at(meetingTime).at("invitedParticipantsIP")) {
+				send_message_client(invitees, sending_messages_queue, cancelled);
+			}
+			for (auto& requests : pendingdb.at(meetingDay).at(meetingTime)) {
+				if (requests.at("requestID") == requestID && requests.at("requesterIP") == requesterID) {
+					requests = json({});
+					break;
+				}
+			}
+		}
+	}
 }

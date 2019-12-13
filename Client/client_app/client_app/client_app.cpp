@@ -240,7 +240,8 @@ int main(void)
 		ref(socket_mutex),
 		ref(sending_messages_queue),
 		ref(received_messages_queue),
-		ref(CLIENT_IP)
+		ref(CLIENT_IP),
+		autonomous
 	);
 
 	//==================== Free running UI thread call ===========================
