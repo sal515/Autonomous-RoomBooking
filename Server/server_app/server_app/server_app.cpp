@@ -23,9 +23,6 @@ int test_pause_exit();
 void threadTester(int number);
 
 
-
-
-
 // Note: If I want to send x characters my buff has to be x+1 for '\0' character at the end
 #define BUFLEN 32768		//Max length of buffer 
 #define SERVER_PORT 8888    //The port on which to listen for incoming data
