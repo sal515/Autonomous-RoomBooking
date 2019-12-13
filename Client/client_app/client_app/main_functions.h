@@ -27,7 +27,8 @@ void menu(
 	std::mutex& socketMutex, 
 	std::queue<json>& sendingQueue, 
 	std::queue<json>& receivingQueue,
-	const string& ownIP
+	const string& ownIP,
+	bool autonomous
 );
 
 vector<string> list_of_participants(int min);
