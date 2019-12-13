@@ -7,7 +7,7 @@ bool autonomous = true;
 
 void menu(
 	json& db,
-	json& invitation_vec,
+	vector<json>& invitation_vec,
 	std::mutex& socketMutex,
 	std::queue<json>& sendingQueue,
 	std::queue<json>& receivingQueue,
@@ -478,7 +478,7 @@ void pop_from_queue(std::queue<json>& queue)
 }
 
 
-void push_to_queue(std::queue<json>& queue, const json& data)
+/*void push_to_queue(std::queue<json>& queue, const json& data)
 {
 	bool saved = false;
 	while (!saved)
@@ -491,7 +491,7 @@ void push_to_queue(std::queue<json>& queue, const json& data)
 			break;
 		}
 	}
-}
+}*/
 
 json get_queue_top(std::queue<json>& queue)
 {
