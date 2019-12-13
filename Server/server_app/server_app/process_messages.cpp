@@ -46,7 +46,7 @@ void processMessages(
 				// db_helper::save_db(config.CONFIRMED_DB_PATH, db);
 				db_helper::save_db(config.PENDING_DB_PATH, db);
 				json meetingInv = meeting::meetingObj_to_json(
-					meeting("invite",
+					meeting(messageType.invite,
 					        " ",
 					        " ",
 					        meetingID,

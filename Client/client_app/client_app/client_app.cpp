@@ -59,7 +59,7 @@ bool get_client_local_ip(SOCKET s, string& client_local_ip);
 
 // Please do not call this function - Its already threaded
 void send_to_server(SOCKET s, sockaddr_in serverAddrStr);
-void processMsg(json& db, vector<json> &invitations_db, std::queue<json>& received_messages_queue,
+void processMsg(json& db, vector<json>& invitations_db, std::queue<json>& received_messages_queue,
                 std::queue<json>& sending_messages_queue);
 
 int main(void)
@@ -206,7 +206,7 @@ int main(void)
 	ownAddrStr.sin_port = htons(OWN_LISTENING_PORT);
 	ownAddrStr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 	//Bind Socket
-	if (bind(s, (struct sockaddr *)&ownAddrStr, sizeof(ownAddrStr)) == SOCKET_ERROR)
+	if (bind(s, (struct sockaddr*)&ownAddrStr, sizeof(ownAddrStr)) == SOCKET_ERROR)
 	{
 		cout << "Bind failed with error code : " << WSAGetLastError() << endl;
 		exit(EXIT_FAILURE);
@@ -214,9 +214,18 @@ int main(void)
 
 
 	//==================== Sending thread call ===========================
-	thread sendingThread(send_to_server, ref(s), ref(serverAddrStr));
-	thread processThread(processMsg, ref(db), ref(invitation_db), ref(received_messages_queue),
-	                     ref(sending_messages_queue));
+	thread sendingThread(
+		send_to_server,
+		ref(s),
+		ref(serverAddrStr));
+
+	
+	thread processThread(
+		processMsg,
+		ref(db),
+		ref(invitation_db),
+		ref(received_messages_queue),
+		ref(sending_messages_queue));
 	//==================== Sending thread call  ===========================
 
 	//==================== Free running UI thread call ===========================
@@ -291,7 +300,7 @@ int main(void)
 	}
 }
 
-void processMsg(json& db, vector<json> &invitations_db, std::queue<json>& received_messages_queue,
+void processMsg(json& db, vector<json>& invitations_db, std::queue<json>& received_messages_queue,
                 std::queue<json>& sending_messages_queue)
 {
 	while (true)
@@ -338,7 +347,7 @@ void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 				if (socket_mutex.try_lock())
 				{
 					// sending the serialized string
-					if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr *>(&serverAddrStr),
+					if (sendto(s, buf, (BUFLEN - 1), 0, reinterpret_cast<struct sockaddr*>(&serverAddrStr),
 					           sizeof(serverAddrStr)) == SOCKET_ERROR)
 					{
 						cout << "sendto() failed with error code : " << WSAGetLastError() << endl;
@@ -348,7 +357,7 @@ void send_to_server(SOCKET s, sockaddr_in serverAddrStr)
 				}
 				json sentMessageToPop = queueHelper::get_queue_top(sending_messages_queue);
 				queueHelper::pop_from_queue(sending_messages_queue);
-				
+
 				if (logFileMutex.try_lock())
 				{
 					logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sentMessageToPop);
