@@ -1,0 +1,2 @@
+#pragma code_page(65001)
+1 /* CREATEPROCESS_MANIFEST_RESOURCE_ID */ 24 /* RT_MANIFEST */ "C:/Users/aidab/Documents/GitHub/COEN445-Autonomous-Roombooking/cmake-build-debug/CMakeFiles/COEN445_Autonomous_Roombooking.dir/embed.manifest"

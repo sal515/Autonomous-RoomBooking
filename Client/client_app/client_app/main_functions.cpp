@@ -136,6 +136,7 @@ void menu(
 			case 2: //Cancel a Meeting
 			{
 				string meetingID;
+				meetingID = "0";
 				while (db_helper::getMeetingByID(meetingID, db).empty())
 				{
 					cout << "\nPlease enter a valid meeting ID: ";

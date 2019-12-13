@@ -83,7 +83,7 @@ int main(void)
 {
 	// ============= Initialization of database ==========================
 
-	if (resetDatabases)
+	if (!resetDatabases)
 	{
 		cout << "Reset databases: (y/n)" << endl;
 		char resetDB = 'y';

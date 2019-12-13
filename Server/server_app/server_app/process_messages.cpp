@@ -5,6 +5,7 @@
 #include <chrono>
 std::mutex sendmessage_mutex;
 
+std::mutex pendingDBmutex;
 // void discarder(json& pendingdb, const string& requestID, const string& meetingDay, 
 // 	const string& meetingTime, const string& requesterID,
 // 	std::queue<socket_messages>& sending_messages_queue);
@@ -76,7 +77,7 @@ void processMessages(
 				string reqID = req_data.at("requestID");
 				string day1 = req_data.at("meetingDay");
 				string time1 = req_data.at("meetingTime");
-				string roomNum1 = req_data.at("roomNumber");
+				string roomNum1 = room;
 				std::thread discards(discarder, ref(pendingdb), ref(reqID),
 				                     ref(day1), ref(time1), ref(roomNum1), ref(requesterIP),
 				                     ref(sending_messages_queue));
@@ -349,7 +350,7 @@ void discarder(json& pendingdb,
                const string& requesterID,
                std::queue<socket_messages>& sending_messages_queue)
 {
-	std::this_thread::sleep_for(std::chrono::seconds(30));
+	std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	if (!pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).empty())
 	{
@@ -376,7 +377,7 @@ void discarder(json& pendingdb,
 				send_message_client(ip, sending_messages_queue, pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom));
 			}
 			
-			std::this_thread::sleep_for(std::chrono::seconds(30));
+			std::this_thread::sleep_for(std::chrono::seconds(10));
 			
 			if (pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).at("requestID") == requestID
 				&& pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).at("requesterIP") == requesterID)
@@ -396,8 +397,18 @@ void discarder(json& pendingdb,
 				{
 					if (requests.at("requestID") == requestID && requests.at("requesterIP") == requesterID)
 					{
-						requests = json({});
+						pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom) = json({});
 						break;
+					}
+				}
+				bool saved = false;
+				while (!saved)
+				{
+					if (pendingDBmutex.try_lock())
+					{
+						db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+						saved = true;
+						pendingDBmutex.unlock();
 					}
 				}
 			}

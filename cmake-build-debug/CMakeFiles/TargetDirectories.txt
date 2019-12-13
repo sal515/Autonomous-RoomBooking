@@ -1,0 +1,3 @@
+C:/Users/aidab/Documents/GitHub/COEN445-Autonomous-Roombooking/cmake-build-debug/CMakeFiles/COEN445_Autonomous_Roombooking.dir
+C:/Users/aidab/Documents/GitHub/COEN445-Autonomous-Roombooking/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/aidab/Documents/GitHub/COEN445-Autonomous-Roombooking/cmake-build-debug/CMakeFiles/rebuild_cache.dir

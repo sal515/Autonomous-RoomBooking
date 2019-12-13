@@ -66,7 +66,7 @@ int main(void)
 {
 	// ============= Initialization of database ==========================
 
-	if (resetDatabases)
+	if (!resetDatabases)
 	{
 		cout << "Reset databases: (y/n)" << endl;
 		char resetDB = 'y';
@@ -116,7 +116,7 @@ int main(void)
 
 
 	// --------------- Test codes below  -------------------------
-	if (debugTestData)
+	if (!debugTestData)
 	{
 		json jsonMsg;
 		jsonMsg["message"] = "REQUEST";

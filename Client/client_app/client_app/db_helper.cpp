@@ -280,10 +280,12 @@ json db_helper::getMeetingByID(const string& meetingID, const json& db)
 		// looping through time
 		for (const auto& time : day)
 		{
-			if (!meetingID.compare(time.at("meetingID")))
-			{
-				foundMeeting = (time);
-				return foundMeeting;
+			if (!time.empty()) {
+				if (!meetingID.compare(time.at("meetingID")))
+				{
+					foundMeeting = (time);
+					return foundMeeting;
+				}
 			}
 		}
 	}
@@ -343,10 +345,12 @@ void db_helper::remove_invitation(string meetingID, vector<json>& invitationDB)
 	for (json i : invitationDB)
 	{
 		counter += 1;
-		if (!meetingID.compare(i.at("meetingID")))
-		{
-			invitationDB.erase(invitationDB.begin() + (counter));
-			break;
+		if (!i.empty()) {
+			if (!meetingID.compare(i.at("meetingID")))
+			{
+				invitationDB.erase(invitationDB.begin() + (counter));
+				break;
+			}
 		}
 	}
 }
