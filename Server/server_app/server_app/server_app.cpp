@@ -214,6 +214,7 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
+
 	// ==================== Socket setup and binding =====================
 
 
@@ -277,10 +278,15 @@ int main(void)
 				socketMsgToPush.ip_for_message = CLIENT_IP;
 				queueHelper::push_to_queue(received_messages_queue, socketMsgToPush);
 
-				if (logFileMutex.try_lock())
+				bool saved = false;
+				while (!saved)
 				{
-					logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, socketMsgToPush);
-					logFileMutex.unlock();
+					if (logFileMutex.try_lock())
+					{
+						logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, socketMsgToPush);
+						saved = true;
+						logFileMutex.unlock();
+					}
 				}
 
 				if (debugResendToClientAfterReceive)
@@ -409,10 +415,15 @@ void send_to_client(SOCKET s, sockaddr_in clientAddrStr)
 				socket_messages sockMsgToLog = queueHelper::get_queue_top(sending_messages_queue);
 				queueHelper::pop_from_queue(sending_messages_queue);
 
-				if (logFileMutex.try_lock())
+				bool saved = false;
+				while (!saved)
 				{
-					logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sockMsgToLog);
-					logFileMutex.unlock();
+					if (logFileMutex.try_lock())
+					{
+						logger::add_sent_log(config.SENT_RECEIVED_LOG_PATH, sockMsgToLog);
+						saved = true;
+						logFileMutex.unlock();
+					}
 				}
 			}
 			catch (int e)
@@ -449,203 +460,166 @@ void maintenance_ui()
 
 	const vector<string> all_rooms = time_day_room::room_vec();
 	int counter = 0;
-
-	// cout << "Please choose a room from the following options to schedule maintenance:" << endl;
-	cout << "Please select one of the integer values to select the corresponding room for maintenance: " << endl;
-	for (const string& room : all_rooms)
-	{
-		cout << counter++ << " - " << room << endl;
-	}
-
+	string hour = "";
 	string roomName = "";
 	int roomNameInt = -1;
 	bool properSelection = false;
 
-	while (!properSelection)
+
+	string day = "";
+	map<string, string>::iterator day_it;
+	int hh;
+
+	bool saved = false;
+
+
+	while (true)
 	{
-		try
+		saved = false;
+
+		counter = 0;
+		hour = "";
+		roomName = "";
+		roomNameInt = -1;
+		properSelection = false;
+		day = "";
+		hh = -1;
+
+		// cout << "Please choose a room from the following options to schedule maintenance:" << endl;
+		cout << "Please select one of the integer values to select the corresponding room for maintenance: " << endl;
+		for (const string& room : all_rooms)
 		{
-			cout << "Enter your selection: " << endl;
-			cin >> roomName;
-			roomNameInt = std::stoi(roomName);
-			properSelection = true;
-			if ((roomNameInt < 0 || roomNameInt > (all_rooms.size() - 1)))
+			cout << counter++ << " - " << room << endl;
+		}
+
+
+		while (!properSelection)
+		{
+			try
+			{
+				cout << "Enter your selection: " << endl;
+				cin >> roomName;
+				roomNameInt = std::stoi(roomName);
+				properSelection = true;
+				if ((roomNameInt < 0 || roomNameInt > (all_rooms.size() - 1)))
+				{
+					properSelection = false;
+				}
+				// break;
+			}
+			catch (const std::invalid_argument& ia)
 			{
 				properSelection = false;
 			}
-			// break;
 		}
-		catch (const std::invalid_argument& ia)
-		{
-			properSelection = false;
-		}
-	}
 
-	string day;
-	map<string, string>::iterator day_it;
-	map<string, string> dayMap = time_day_room::day_map();
-	cout << "Please provide a working day of the week eg. friday:\n"
-		<< "Day: ";
-	cin >> day;
-	day_it = dayMap.find((day));
-	while (day_it == dayMap.end())
-	{
-		cout << "Please provide a working day of the week eg. friday :\n"
+
+		map<string, string> dayMap = time_day_room::day_map();
+		cout << "Please provide a working day of the week eg. friday:\n"
 			<< "Day: ";
 		cin >> day;
-		day_it = dayMap.find(day);
-	}
-
-
-	int hh;
-	cout << "\nTime of meeting between " << time_day_room::startTime << " and " << time_day_room::
-		endTime << ": " << endl;
-	cin >> hh;
-
-	while (hh > time_day_room::endTime || hh < time_day_room::startTime)
-	{
-		cout << "\nPlease input a valid time between " << time_day_room::startTime << " and " <<
-			time_day_room::endTime << ": " << endl;
-		cin >> hh;
-	}
-
-	string hour;
-	hour = std::to_string(hh);
-
-
-	// switch (roomNameInt)
-	// {
-	// case (0):
-	// 	{
-	cout << "You selected " << all_rooms.at(roomNameInt) << " for maintenance" << endl;
-	cout << "The day and time of maintenance is set to " << day << " at " << hh << endl;
-
-
-	/*
-	 *	Summary of the logic -  Maintenance of a room
-	 *
-	// check confirmed db if the room is busy at the time and date
-	// if(meeting exist in the room to be maintained)
-	//		check the other room
-	//		if (the other room is busy)
-	//			get the meeting to be cancelled
-	//			cancel the meeting by informing participants and requester
-	//			update the slot with a maintenance meeting obj in the db
-	//			save db
-	//
-	//		else if (the other room is not busy)
-	//			if (check someone is waiting for the other room in the pending db)
-	//				get the meeting obj of the other room
-	//				cancel ppl in the pending db
-	//				delete pending db meeting obj after cancellation
-	//				save pendingDB
-	//
-	//				-->>THEN MOVE THE PPL in the confirmed db to the new room
-	//				set the initial room to maintained by updating with maintenance obj
-	//				save the confrimedDB
-	//
-	//			else
-	//				do not do anything
-	//				-->>THEN MOVE THE PPL in the confirmed db to the new room
-	//				save the confirmedDB
-	//
-	//	else if(there is no meeting in the room to be mainted)
-	//		save a meeting object to the time slot with the requesterIP of 000.000.000.000
-	//		to identify that it is under maintenance
-	//		save the confirmedDB
-	//
-	*/
-
-
-	// create a meeting object to block the room for maintenance
-	meeting maintenanceMeettingObj(
-		"MAINTENANCE",
-		"",
-		"",
-		"",
-		vector<string>{},
-		vector<string>{},
-		all_rooms.at(roomNameInt),
-		"",
-		day,
-		hour,
-		"000.000.000.000",
-		""
-	);
-
-
-	// check if a meeting exist at the specifid time
-	if (meeting::isMeeting(confirmed_db, day, hour, all_rooms.at(roomNameInt)))
-	{
-		// the other room at the specifid time has a confirmed meeting
-		if (meeting::isMeeting(confirmed_db, day, hour, all_rooms.at(get_other_room(roomNameInt))))
+		day_it = dayMap.find((day));
+		while (day_it == dayMap.end())
 		{
-			// other room is busy
-
-
-			json meetingToBeCancelledJson = meeting::get_meeting(confirmed_db, day, hour, all_rooms.at(roomNameInt));
-			meeting meetingToBeCancelledObj = meeting::json_to_meetingObj(meetingToBeCancelledJson);
-
-			// create message to inform participants
-			json cancelled = messages::cancel(
-				meetingToBeCancelledObj.meetingID,
-				"Unavoidable maintenance is scheduled for the room and no other room was available at the specified time."
-			);
-
-			// create message to inform requester
-			json cancelledToRequester = messages::not_sched(
-				meetingToBeCancelledObj.requestID,
-				meetingToBeCancelledObj.meetingDay,
-				meetingToBeCancelledObj.meetingTime,
-				meetingToBeCancelledObj.minimumParticipants,
-				meetingToBeCancelledObj.confirmedParticipantsIP,
-				meetingToBeCancelledObj.topic
-			);
-
-			// send message to all participants
-			for (const string& participantIP : meetingToBeCancelledObj.invitedParticipantsIP)
-			{
-				socket_messages cancellationMsgToSendToClient;
-				cancellationMsgToSendToClient.ip_for_message = participantIP;
-				cancellationMsgToSendToClient.message = cancelled;
-				queueHelper::push_to_queue(sending_messages_queue, cancellationMsgToSendToClient);
-			}
-
-			// send message to requester
-			socket_messages cancellationMsgToSendToServer;
-			cancellationMsgToSendToServer.ip_for_message = meetingToBeCancelledObj.requesterIP;
-			cancellationMsgToSendToServer.message = cancelled;
-			queueHelper::push_to_queue(sending_messages_queue, cancellationMsgToSendToServer);
-
-			// store a maintenance object in the time slot
-
-			// create a meeting object to block the room for maintenance (created above)
-
-			// adding a maintenance obj at the time slot in the db
-			meeting::update_meeting(confirmed_db, day, hour, all_rooms.at(roomNameInt),
-			                        meeting::meetingObj_to_json(maintenanceMeettingObj));
-			while (!confirmedDBMutex.try_lock())
-			{
-				db_helper::save_db(config.CONFIRMED_DB_PATH, confirmed_db);
-				confirmedDBMutex.unlock();
-			}
+			cout << "Please provide a working day of the week eg. friday :\n"
+				<< "Day: ";
+			cin >> day;
+			day_it = dayMap.find(day);
 		}
-		else
-		{
-			// other room is not busy
 
-			// check if someone in the pending db is waiting for the time slot of the other room
-			if (meeting::isMeeting(pending_db, day, hour, all_rooms.at(get_other_room(roomNameInt))))
+
+		cout << "\nTime of meeting between " << time_day_room::startTime << " and " << time_day_room::
+			endTime << ": " << endl;
+		cin >> hh;
+
+		while (hh > time_day_room::endTime || hh < time_day_room::startTime)
+		{
+			cout << "\nPlease input a valid time between " << time_day_room::startTime << " and " <<
+				time_day_room::endTime << ": " << endl;
+			cin >> hh;
+		}
+
+		hour = std::to_string(hh);
+
+
+		// switch (roomNameInt)
+		// {
+		// case (0):
+		// 	{
+		cout << "You selected " << all_rooms.at(roomNameInt) << " for maintenance" << endl;
+		cout << "The day and time of maintenance is set to " << day << " at " << hh << endl;
+
+
+		/*
+		 *	Summary of the logic -  Maintenance of a room
+		 *
+		// check confirmed db if the room is busy at the time and date
+		// if(meeting exist in the room to be maintained)
+		//		check the other room
+		//		if (the other room is busy)
+		//			get the meeting to be cancelled
+		//			cancel the meeting by informing participants and requester
+		//			update the slot with a maintenance meeting obj in the db
+		//			save db
+		//
+		//		else if (the other room is not busy)
+		//			if (check someone is waiting for the other room in the pending db)
+		//				get the meeting obj of the other room
+		//				cancel ppl in the pending db
+		//				delete pending db meeting obj after cancellation
+		//				save pendingDB
+		//
+		//				-->>THEN MOVE THE PPL in the confirmed db to the new room
+		//				set the initial room to maintained by updating with maintenance obj
+		//				save the confrimedDB
+		//
+		//			else
+		//				do not do anything
+		//				-->>THEN MOVE THE PPL in the confirmed db to the new room
+		//				save the confirmedDB
+		//
+		//	else if(there is no meeting in the room to be mainted)
+		//		save a meeting object to the time slot with the requesterIP of 000.000.000.000
+		//		to identify that it is under maintenance
+		//		save the confirmedDB
+		//
+		*/
+
+
+		// create a meeting object to block the room for maintenance
+		meeting maintenanceMeettingObj(
+			"MAINTENANCE",
+			"",
+			"",
+			"",
+			vector<string>{},
+			vector<string>{},
+			all_rooms.at(roomNameInt),
+			"",
+			day,
+			hour,
+			"000.000.000.000",
+			""
+		);
+
+
+		// check if a meeting exist at the specifid time
+		if (meeting::isMeeting(confirmed_db, day, hour, all_rooms.at(roomNameInt)))
+		{
+			// the other room at the specifid time has a confirmed meeting
+			if (meeting::isMeeting(confirmed_db, day, hour, all_rooms.at(get_other_room(roomNameInt))))
 			{
-				// cancel the ppl waiting for the other room in the pending db
-				json meetingToBeCancelledJson = meeting::get_meeting(pending_db, day, hour,
-				                                                     all_rooms.at(get_other_room(roomNameInt)));
+				// other room is busy
+
+
+				json meetingToBeCancelledJson = meeting::
+					get_meeting(confirmed_db, day, hour, all_rooms.at(roomNameInt));
 				meeting meetingToBeCancelledObj = meeting::json_to_meetingObj(meetingToBeCancelledJson);
 
 				// create message to inform participants
 				json cancelled = messages::cancel(
 					meetingToBeCancelledObj.meetingID,
-					"Unavoidable maintenance was scheduled from a different room but the previously booked room is moved to this room."
+					"Unavoidable maintenance is scheduled for the room and no other room was available at the specified time."
 				);
 
 				// create message to inform requester
@@ -673,72 +647,154 @@ void maintenance_ui()
 				cancellationMsgToSendToServer.message = cancelled;
 				queueHelper::push_to_queue(sending_messages_queue, cancellationMsgToSendToServer);
 
-				// delete pending db meeting object
-				meeting::update_meeting(pending_db, day, hour, all_rooms.at(get_other_room(roomNameInt)),
-				                        json({}));
+				// store a maintenance object in the time slot
 
-				// save the pending db to file
+				// create a meeting object to block the room for maintenance (created above)
 
-				while (!pendingDBMutex.try_lock())
-				{
-					db_helper::save_db(config.PENDING_DB_PATH, pending_db);
-					pendingDBMutex.unlock();
-				}
-
-
-				// move the ppl from the room to be maintained to the other room in the confirmed db
-				json meetingToBeMovedToNewRoom = meeting::get_meeting(confirmed_db, day, hour,
-				                                                      all_rooms.at(roomNameInt));
-
-				meeting::update_meeting(confirmed_db, day, hour, all_rooms.at(get_other_room(roomNameInt)),
-				                        meetingToBeMovedToNewRoom);
-
-				// set the initial room in question to be under maintenance with maintenance meeting obj
-				meeting::update_meeting(confirmed_db, day, hour, all_rooms.at((roomNameInt)),
+				// adding a maintenance obj at the time slot in the db
+				meeting::update_meeting(confirmed_db, day, hour, all_rooms.at(roomNameInt),
 				                        meeting::meetingObj_to_json(maintenanceMeettingObj));
-
-				// save the confirmed db to file
-				while (!confirmedDBMutex.try_lock())
+				saved = false;
+				while (!saved)
 				{
-					db_helper::save_db(config.CONFIRMED_DB_PATH, confirmed_db);
-					confirmedDBMutex.unlock();
+					if (confirmedDBMutex.try_lock())
+					{
+						db_helper::save_db(config.CONFIRMED_DB_PATH, confirmed_db);
+						saved = true;
+						confirmedDBMutex.unlock();
+					}
 				}
 			}
-				// no one is waiting for the room in the pending db
 			else
 			{
-				// move the ppl from the room to be maintained to the other room
-				json meetingToBeMovedToNewRoom = meeting::get_meeting(confirmed_db, day, hour,
-				                                                      all_rooms.at(roomNameInt));
+				// other room is not busy
 
-				meeting::update_meeting(confirmed_db, day, hour, all_rooms.at(get_other_room(roomNameInt)),
-				                        meetingToBeMovedToNewRoom);
-
-				// set the initial room in question to be under maintenance with maintenance meeting obj
-				meeting::update_meeting(confirmed_db, day, hour, all_rooms.at((roomNameInt)),
-				                        meeting::meetingObj_to_json(maintenanceMeettingObj));
-
-				// save the confirmed db to file
-				while (!confirmedDBMutex.try_lock())
+				// check if someone in the pending db is waiting for the time slot of the other room
+				if (meeting::isMeeting(pending_db, day, hour, all_rooms.at(get_other_room(roomNameInt))))
 				{
-					db_helper::save_db(config.CONFIRMED_DB_PATH, confirmed_db);
-					confirmedDBMutex.unlock();
+					// cancel the ppl waiting for the other room in the pending db
+					json meetingToBeCancelledJson = meeting::get_meeting(pending_db, day, hour,
+					                                                     all_rooms.at(get_other_room(roomNameInt)));
+					meeting meetingToBeCancelledObj = meeting::json_to_meetingObj(meetingToBeCancelledJson);
+
+					// create message to inform participants
+					json cancelled = messages::cancel(
+						meetingToBeCancelledObj.meetingID,
+						"Unavoidable maintenance was scheduled from a different room but the previously booked room is moved to this room."
+					);
+
+					// create message to inform requester
+					json cancelledToRequester = messages::not_sched(
+						meetingToBeCancelledObj.requestID,
+						meetingToBeCancelledObj.meetingDay,
+						meetingToBeCancelledObj.meetingTime,
+						meetingToBeCancelledObj.minimumParticipants,
+						meetingToBeCancelledObj.confirmedParticipantsIP,
+						meetingToBeCancelledObj.topic
+					);
+
+					// send message to all participants
+					for (const string& participantIP : meetingToBeCancelledObj.invitedParticipantsIP)
+					{
+						socket_messages cancellationMsgToSendToClient;
+						cancellationMsgToSendToClient.ip_for_message = participantIP;
+						cancellationMsgToSendToClient.message = cancelled;
+						queueHelper::push_to_queue(sending_messages_queue, cancellationMsgToSendToClient);
+					}
+
+					// send message to requester
+					socket_messages cancellationMsgToSendToServer;
+					cancellationMsgToSendToServer.ip_for_message = meetingToBeCancelledObj.requesterIP;
+					cancellationMsgToSendToServer.message = cancelled;
+					queueHelper::push_to_queue(sending_messages_queue, cancellationMsgToSendToServer);
+
+					// delete pending db meeting object
+					meeting::update_meeting(pending_db, day, hour, all_rooms.at(get_other_room(roomNameInt)),
+					                        json({}));
+
+					// save the pending db to file
+
+					saved = false;
+					while (!saved)
+					{
+						if (pendingDBMutex.try_lock())
+						{
+							db_helper::save_db(config.PENDING_DB_PATH, pending_db);
+							saved = true;
+							pendingDBMutex.unlock();
+						}
+					}
+
+					// move the ppl from the room to be maintained to the other room in the confirmed db
+					json meetingToBeMovedToNewRoom = meeting::get_meeting(confirmed_db, day, hour,
+					                                                      all_rooms.at(roomNameInt));
+
+					meeting::update_meeting(confirmed_db, day, hour, all_rooms.at(get_other_room(roomNameInt)),
+					                        meetingToBeMovedToNewRoom);
+
+					// set the initial room in question to be under maintenance with maintenance meeting obj
+					meeting::update_meeting(confirmed_db, day, hour, all_rooms.at((roomNameInt)),
+					                        meeting::meetingObj_to_json(maintenanceMeettingObj));
+
+					// save the confirmed db to file
+					saved = false;
+					while (!saved)
+					{
+						if (confirmedDBMutex.try_lock())
+						{
+							db_helper::save_db(config.CONFIRMED_DB_PATH, confirmed_db);
+							saved = true;
+							confirmedDBMutex.unlock();
+						}
+					}
+				}
+					// no one is waiting for the room in the pending db
+				else
+				{
+					// move the ppl from the room to be maintained to the other room
+					json meetingToBeMovedToNewRoom = meeting::get_meeting(confirmed_db, day, hour,
+					                                                      all_rooms.at(roomNameInt));
+
+					meeting::update_meeting(confirmed_db, day, hour, all_rooms.at(get_other_room(roomNameInt)),
+					                        meetingToBeMovedToNewRoom);
+
+					// set the initial room in question to be under maintenance with maintenance meeting obj
+					meeting::update_meeting(confirmed_db, day, hour, all_rooms.at((roomNameInt)),
+					                        meeting::meetingObj_to_json(maintenanceMeettingObj));
+
+					// save the confirmed db to file
+					saved = false;
+					while (!saved)
+					{
+						if (!confirmedDBMutex.try_lock())
+						{
+							db_helper::save_db(config.CONFIRMED_DB_PATH, confirmed_db);
+							saved = true;
+							confirmedDBMutex.unlock();
+						}
+					}
 				}
 			}
 		}
-	}
-		// no meeting exist at the specified time
-	else
-	{
-		// create a meeting object to block the room for maintenance (created above)
-
-		// adding a maintenance obj at the time slot in the db
-		meeting::update_meeting(confirmed_db, day, hour, all_rooms.at(roomNameInt),
-		                        meeting::meetingObj_to_json(maintenanceMeettingObj));
-		while (!confirmedDBMutex.try_lock())
+			// no meeting exist at the specified time
+		else
 		{
-			db_helper::save_db(config.CONFIRMED_DB_PATH, confirmed_db);
-			confirmedDBMutex.unlock();
+			// create a meeting object to block the room for maintenance (created above)
+
+			// adding a maintenance obj at the time slot in the db
+			meeting::update_meeting(confirmed_db, day, hour, all_rooms.at(roomNameInt),
+			                        meeting::meetingObj_to_json(maintenanceMeettingObj));
+			saved = false;
+			while (!saved)
+			{
+				if (confirmedDBMutex.try_lock())
+				{
+					cout << "saved to db" << endl;
+					db_helper::save_db(config.CONFIRMED_DB_PATH, confirmed_db);
+					saved = true;
+					confirmedDBMutex.unlock();
+				}
+			}
 		}
 	}
 }

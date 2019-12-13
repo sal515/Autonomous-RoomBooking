@@ -69,17 +69,11 @@ void processMessages(
 						send_message_client(ip, sending_messages_queue, meetingInv);
 					}
 				}
-				break;
-			}
-			else
-			{
-				// rooms not available - build unavailable reponse for the client
-				// db will not be updated
-				json unavailable = messages::response_unavail(req_data.at("requestID"));
-				// sockaddr_in client = clientMaker(requesterIP);
-				send_message_client(requesterIP, sending_messages_queue, unavailable);
+				return;
 			}
 		}
+		json unavailable = messages::response_unavail(req_data.at("requestID"));
+		send_message_client(requesterIP, sending_messages_queue, unavailable);
 	}
 	else if (!(messageType.accept.compare(req_data.at("message"))) || !(messageType.add.compare(req_data.at("message")))
 	)
@@ -148,11 +142,17 @@ void processMessages(
 			lookForMeeting.at("confirmedParticipantsIP") = acceptedParticipants;
 			meeting::update_meeting(db, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"),
 			                        lookForMeeting);
-			while (!sendmessage_mutex.try_lock())
+
+			bool saved = false;
+			while (!saved)
 			{
-				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-				db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
-				sendmessage_mutex.unlock();
+				if (sendmessage_mutex.try_lock())
+				{
+					db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+					db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+					saved = true;
+					sendmessage_mutex.unlock();
+				}
 			}
 		}
 	}
@@ -224,11 +224,16 @@ void processMessages(
 			lookForMeeting.at("confirmedParticipantsIP") = acceptedParticipants;
 			meeting::update_meeting(db, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"),
 			                        lookForMeeting);
-			while (!sendmessage_mutex.try_lock())
+			bool saved = false;
+			while (!saved)
 			{
-				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-				db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
-				sendmessage_mutex.unlock();
+				if (sendmessage_mutex.try_lock())
+				{
+					db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+					db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+					saved = true;
+					sendmessage_mutex.unlock();
+				}
 			}
 		}
 	}
@@ -277,10 +282,16 @@ void processMessages(
 				meetObj.meetingTime,
 				meetObj.roomNumber,
 				json({}));
-			while (!sendmessage_mutex.try_lock())
+
+			bool saved = false;
+			while (!saved)
 			{
-				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-				sendmessage_mutex.unlock();
+				if (sendmessage_mutex.try_lock())
+				{
+					db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+					saved = true;
+					sendmessage_mutex.unlock();
+				}
 			}
 		}
 	}
