@@ -72,7 +72,7 @@ void processMessages(
 				return;
 			}
 		}
-		
+
 		// rooms not available - build unavailable reponse for the client
 		// db will not be updated
 		json unavailable = messages::response_unavail(req_data.at("requestID"));
@@ -146,11 +146,17 @@ void processMessages(
 			lookForMeeting.at("confirmedParticipantsIP") = acceptedParticipants;
 			meeting::update_meeting(db, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"),
 			                        lookForMeeting);
-			while (!sendmessage_mutex.try_lock())
+
+			bool saved = false;
+			while (!saved)
 			{
-				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-				db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
-				sendmessage_mutex.unlock();
+				if (sendmessage_mutex.try_lock())
+				{
+					db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+					db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+					saved = true;
+					sendmessage_mutex.unlock();
+				}
 			}
 		}
 	}
@@ -222,11 +228,16 @@ void processMessages(
 			lookForMeeting.at("confirmedParticipantsIP") = acceptedParticipants;
 			meeting::update_meeting(db, req_data.at("day"), req_data.at("time"), req_data.at("roomNumber"),
 			                        lookForMeeting);
-			while (!sendmessage_mutex.try_lock())
+			bool saved = false;
+			while (!saved)
 			{
-				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-				db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
-				sendmessage_mutex.unlock();
+				if (sendmessage_mutex.try_lock())
+				{
+					db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+					db_helper::save_db(config.PENDING_DB_PATH, pendingdb);
+					saved = true;
+					sendmessage_mutex.unlock();
+				}
 			}
 		}
 	}
@@ -275,10 +286,16 @@ void processMessages(
 				meetObj.meetingTime,
 				meetObj.roomNumber,
 				json({}));
-			while (!sendmessage_mutex.try_lock())
+
+			bool saved = false;
+			while (!saved)
 			{
-				db_helper::save_db(config.CONFIRMED_DB_PATH, db);
-				sendmessage_mutex.unlock();
+				if (sendmessage_mutex.try_lock())
+				{
+					db_helper::save_db(config.CONFIRMED_DB_PATH, db);
+					saved = true;
+					sendmessage_mutex.unlock();
+				}
 			}
 		}
 	}
