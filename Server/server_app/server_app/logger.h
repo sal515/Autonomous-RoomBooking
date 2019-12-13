@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "pch.h"
 
+static std::mutex logFileMutex;
 
 struct logger
 {
@@ -10,6 +11,6 @@ struct logger
 	static void add_received_log(std::string logPath, const socket_messages& msg);
 	static void add_sent_log(std::string logPath, const socket_messages& msg);
 
-	static string get_time();
+	static std::string get_time();
 
 };

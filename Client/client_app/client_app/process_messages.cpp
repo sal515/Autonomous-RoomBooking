@@ -1,9 +1,12 @@
 #include "pch.h"
 #include "process_messages.h"
+#include "main_functions.h"
+
 
 // void (json& db, const json& req_data) {
 
-void processMessages(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue, std::queue<json>& sending_messages_queue)
+void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& received_messages_queue,
+                     std::queue<json>& sending_messages_queue)
 {
 	// scheduled that meeting is happening
 	// not_scheduled
@@ -11,20 +14,36 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 	// confirmed x
 	// invitation
 	json req_data = received_messages_queue.front();
+
 	bool exit = false;
 	//meeting req_meeting = meeting::json_to_meetingObj(req_data);
 
 	//invite
-	if (!(messageType.invite.compare(req_data.at("message"))))
+	if (!abs(messageType.invite.compare(req_data.at("message"))))
 	{
-		meeting myMeeting = meeting(req_data.at("message"), "", "", req_data.at("meetingID"), {}, {}, "",
-		                            req_data.at("topic"),
-		                            req_data.at("meetingDay"), req_data.at("meetingTime"), req_data.at("requesterIP"),
-		                            false, false);
+		meeting myMeeting = meeting(
+			req_data.at("message"),
+			"",
+			"",
+			req_data.at("meetingID"),
+			{},
+			{},
+			"",
+			req_data.at("topic"),
+			req_data.at("meetingDay"),
+			req_data.at("meetingTime"),
+			req_data.at("requesterIP"),
+			false,
+			false);
 		db_helper::add_invitation(myMeeting, invitations_db);
+		db_helper::save_db(config.INVITATIONS_PATH, invitations_db);
+
+		int pause = 0;
+		cin >> pause;
+		
 	}
 		//confirm
-	else if (!(messageType.confirm.compare(req_data.at("message"))))
+	else if (!abs(messageType.confirm.compare(req_data.at("message"))))
 	{
 		meeting myMeeting = meeting();
 
@@ -42,7 +61,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		}
 	}
 		//cancel
-	else if (!(messageType.cancelResponse.compare(req_data.at("message"))))
+	else if (!abs(messageType.cancelResponse.compare(req_data.at("message"))))
 	{
 		meeting myMeeting = meeting();
 		if (db_helper::find_invitation(req_data.at("meetingID"), myMeeting, invitations_db))
@@ -54,38 +73,43 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		}
 	}
 		//response unavailable
-	else if (!(messageType.response.compare(req_data.at("message"))))
+	else if (!abs(messageType.response.compare(req_data.at("message"))))
 	{
 		string requestId = req_data.at("requestID");
-		for (auto day : db)
+
+		for (const auto& day : db)
 		{
 			for (auto time : day)
 			{
-				if (!requestId.compare(time.at("requestID")))
+				if (!(time.empty()) && !abs(requestId.compare(time.at("requestID"))))
 				{
 					meeting::update_meeting(db, time.at("meetingDay"), time.at("meetingTime"), json({}));
+
 					db_helper::save_db(config.DB_PATH, db);
 					//TODO  log Request denied
-					//cout << endl << "----------" << "Request " << requestId << " denied. Room is unavailable." << endl;
+					cout << endl << "----------" << "Request " << requestId <<
+						" denied. Room is unavailable. Meeting removed from MS or agenda." << endl;
+
 					exit = true;
 					break;
 				}
 			}
 			if (exit)
 			{
+				exit = false;
 				break;
 			}
 		}
 	}
 		//Meeting Not Scheduled
-	else if (!(messageType.notScheduled.compare(req_data.at("message"))))
+	else if (!abs(messageType.notScheduled.compare(req_data.at("message"))))
 	{
 		string requestId = req_data.at("requestID");
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!requestId.compare(time.at("requestID")))
+				if (!(time.empty()) && !abs(requestId.compare(time.at("requestID"))))
 				{
 					meeting db_meeting = meeting::json_to_meetingObj(time);
 
@@ -103,19 +127,20 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 			}
 			if (exit)
 			{
+				exit = false;
 				break;
 			}
 		}
 	}
 		//Meeting scheduled successful
-	else if (!messageType.scheduled.compare(req_data.at("message")))
+	else if (!abs(messageType.scheduled.compare(req_data.at("message"))))
 	{
 		string requestId = req_data.at("requestID");
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!requestId.compare(time.at("requestID")))
+				if (!(time.empty()) && !abs(requestId.compare(time.at("requestID"))))
 				{
 					meeting thisMeeting = meeting::json_to_meetingObj(time);
 					string meetingId = req_data.at("meetingID");
@@ -138,14 +163,14 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 		}
 	}
 		//Added Participant to Meeting
-	else if (!messageType.added.compare(req_data.at("message")))
+	else if (!abs(messageType.added.compare(req_data.at("message"))))
 	{
 		string meetingId = req_data.at("meetingID");
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!meetingId.compare(time.at("meetingID")))
+				if (!(time.empty()) && !abs(meetingId.compare(time.at("meetingID"))))
 				{
 					meeting thisMeeting = meeting::json_to_meetingObj(time);
 
@@ -162,19 +187,20 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 			}
 			if (exit)
 			{
+				exit = false;
 				break;
 			}
 		}
 	}
 		//Withdraw from Meeting (Requester side)
-	else if (!messageType.withdrawNotify.compare(req_data.at("message")))
+	else if (!abs(messageType.withdrawNotify.compare(req_data.at("message"))))
 	{
 		string meetingId = req_data.at("meetingID");
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!meetingId.compare(time.at("meetingID")))
+				if (!(time.empty()) && !abs(meetingId.compare(time.at("meetingID"))))
 				{
 					meeting thisMeeting = meeting::json_to_meetingObj(time);
 
@@ -183,7 +209,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 					for (const string element : thisMeeting.confirmedParticipantsIP)
 					{
 						counter += 1;
-						if (!element.compare(req_data.at("IP")))
+						if (!abs(element.compare(req_data.at("IP"))))
 						{
 							thisMeeting.confirmedParticipantsIP.erase(
 								thisMeeting.confirmedParticipantsIP.begin() + counter);
@@ -205,19 +231,20 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 			}
 			if (exit)
 			{
+				exit = false;
 				break;
 			}
 		}
 	}
 		//Room_Change
-	else if (!messageType.roomChange.compare(req_data.at("message")))
+	else if (!abs(messageType.roomChange.compare(req_data.at("message"))))
 	{
 		string meetingId = req_data.at("meetingID");
 		for (auto day : db)
 		{
 			for (auto time : day)
 			{
-				if (!meetingId.compare(time.at("meetingID")))
+				if (!(time.empty()) && !abs(meetingId.compare(time.at("meetingID"))))
 				{
 					meeting thisMeeting = meeting::json_to_meetingObj(time);
 
@@ -236,6 +263,7 @@ void processMessages(json& db, vector<json> invitations_db, std::queue<json>& re
 			}
 			if (exit)
 			{
+				exit = false;
 				break;
 			}
 		}

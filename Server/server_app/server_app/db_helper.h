@@ -25,6 +25,7 @@ struct db_helper
 	 */
 	static void initialize_db(const string& pending_db, const string& confirmed_db);
 	static json db_to_json(const string& dbPath);
+	static json db_to_jsonArr(const string& dbPath);
 	static bool save_db(const string& dbPath, const json& db);
 
 	static json getMeetingByID(const json &db, const string meetingID);

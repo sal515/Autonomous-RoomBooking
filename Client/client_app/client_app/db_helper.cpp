@@ -6,7 +6,9 @@ bool db_helper::createDirectory(string relativeDirName)
 {
 	try
 	{
-		if (fs::create_directory(relativeDirName))
+		const fs::path p(relativeDirName);
+
+		if (fs::create_directory(p))
 		{
 			cout << "Local storage directory was created" << endl;
 			return true;
@@ -26,6 +28,7 @@ bool db_helper::createDirectory(string relativeDirName)
 	catch (fs::filesystem_error e)
 	{
 		cout << "Exception: createDirectory method throws -> " << e.what() << endl;
+		exit(0);
 		return false;
 	}
 }
@@ -34,7 +37,9 @@ bool db_helper::isDirectoryExist(string relativeDirName)
 {
 	try
 	{
-		if (fs::exists(relativeDirName))
+		const fs::path p(relativeDirName);
+
+		if (fs::exists(p))
 		{
 			return true;
 		}
@@ -58,9 +63,12 @@ bool db_helper::removeDirectory(string relativeDirName)
 {
 	try
 	{
+		const fs::path p(relativeDirName);
+
 		if (db_helper::isDirectoryExist(relativeDirName))
 		{
-			fs::remove(relativeDirName);
+			// fs::remove(p);
+			fs::remove_all(p);
 			cout << "The directory \"" << relativeDirName << "\" was removed" << endl;
 			return true;
 		};
@@ -69,6 +77,8 @@ bool db_helper::removeDirectory(string relativeDirName)
 	catch (fs::filesystem_error e)
 	{
 		cout << "Exception: removeDirectory method throws -> " << e.what() << endl;
+
+		exit(0);
 		return false;
 	}
 }
@@ -173,9 +183,42 @@ json db_helper::db_to_json(const string& dbPath)
 	}
 }
 
+json db_helper::db_to_jsonArr(const string& dbPath)
+{
+	try
+	{
+		const fs::path p(dbPath);
+		if (fs::exists(p))
+		{
+			std::ifstream readFile(dbPath);
+			json db = json::array();
+			readFile >> db;
+			// readFile.close();
+			return db;
+
+			// example below below (tested)
+			// std::ifstream readFile("local_storage/client_json_db/storage.json");
+			// json db;
+			// readFile >> db;
+			// readFile.close();
+		}
+		else
+		{
+			// if the db.json file was not created send empty json object back
+			return json({});
+		}
+	}
+	catch (fstream::failure& e)
+	{
+		cout << "Exception: read_db_jsonArr method throws -> " << e.what() << endl;
+		return json({});
+	}
+}
+
 bool db_helper::save_db(const string& dbPath, const json& db)
 {
-	if (!dbPath.compare(config.INVITATIONS_PATH))
+	if (!dbPath.compare(config.INVITATIONS_PATH) || 
+		!dbPath.compare(config.SENT_RECEIVED_LOG_PATH))
 	{
 		json arr = json::array();
 		arr = db;
@@ -199,6 +242,7 @@ bool db_helper::save_db(const string& dbPath, const json& db)
 		catch (std::ofstream::failure& e)
 		{
 			cout << "Exception: save invitation database method throws -> " << e.what() << endl;
+
 			return false;
 		}
 	}

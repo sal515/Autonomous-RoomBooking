@@ -17,6 +17,7 @@
 
 // Other libraries
 #include <ctime>
+#include <ctype.h>
 #include <chrono>
 #include <sstream>
 #include <iomanip>
@@ -36,6 +37,8 @@
 
 #include <windows.h>
 
+#include "socket_messages.h"
+#include "queueHelper.h"
 #include "logger.h"
 #include "db_helper.h"
 #include "app_config.h"
@@ -52,11 +55,7 @@
 #define PCH_H
 #ifndef _MSG
 #define _MSG
-struct socket_messages
-{
-	std::string ip_for_message;
-	nlohmann::json message;
-};
+
 #endif //_MSG
 // TODO: add headers that you want to pre-compile here
 

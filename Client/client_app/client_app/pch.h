@@ -15,6 +15,7 @@
 #include <ws2tcpip.h> // Used to convert IPv4 or IPv6 addressed to standard binary and vice versa
 
 // Other libraries
+#include <ctype.h>
 #include <ctime>
 #include <sstream>
 #include <iomanip>
@@ -40,6 +41,8 @@
 #include "meeting.h"
 #include "process_messages.h"
 
+#include "main_functions.h"
+#include "queueHelper.h"
 #include "logger.h"
 #include "json.hpp"
 #include "spdlog/spdlog.h"

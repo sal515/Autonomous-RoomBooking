@@ -157,6 +157,7 @@
     <ClInclude Include="logger.h" />
     <ClInclude Include="main_functions.h" />
     <ClInclude Include="process_messages.h" />
+    <ClInclude Include="queueHelper.h" />
     <ClInclude Include="time_day_room.h" />
     <ClInclude Include="db_helper.h" />
     <ClInclude Include="meeting.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="main_functions.cpp" />
     <ClCompile Include="process_messages.cpp" />
     <ClCompile Include="project_examples.cpp" />
+    <ClCompile Include="queueHelper.cpp" />
     <ClCompile Include="time_day_room.cpp" />
     <ClCompile Include="db_helper.cpp" />
     <ClCompile Include="syntax_examples.cpp" />
