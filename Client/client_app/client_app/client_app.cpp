@@ -301,13 +301,13 @@ int main(void)
 }
 
 void processMsg(json& db, vector<json>& invitations_db, std::queue<json>& received_messages_queue,
-                std::queue<json>& sending_messages_queue)
+                std::queue<json>& sending_messages_queue, bool autonomous)
 {
 	while (true)
 	{
 		if (!received_messages_queue.empty())
 		{
-			processMessages(db, invitations_db, received_messages_queue, sending_messages_queue);
+			processMessages(db, invitations_db, received_messages_queue, sending_messages_queue, autonomous);
 
 			queueHelper::pop_from_queue(received_messages_queue);
 			// received_messages_queue.pop();
