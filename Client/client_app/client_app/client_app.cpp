@@ -79,7 +79,6 @@ int main(void)
 		}
 	}
 
-
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
 	db_helper::initialize_db(config.DB_PATH);
 	db_helper::initialize_invitations_db(config.INVITATIONS_PATH);
