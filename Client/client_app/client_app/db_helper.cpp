@@ -28,6 +28,7 @@ bool db_helper::createDirectory(string relativeDirName)
 	catch (fs::filesystem_error e)
 	{
 		cout << "Exception: createDirectory method throws -> " << e.what() << endl;
+		exit(0);
 		return false;
 	}
 }
@@ -76,6 +77,8 @@ bool db_helper::removeDirectory(string relativeDirName)
 	catch (fs::filesystem_error e)
 	{
 		cout << "Exception: removeDirectory method throws -> " << e.what() << endl;
+
+		exit(0);
 		return false;
 	}
 }
@@ -239,6 +242,7 @@ bool db_helper::save_db(const string& dbPath, const json& db)
 		catch (std::ofstream::failure& e)
 		{
 			cout << "Exception: save invitation database method throws -> " << e.what() << endl;
+
 			return false;
 		}
 	}

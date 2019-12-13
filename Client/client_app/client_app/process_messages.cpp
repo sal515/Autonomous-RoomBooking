@@ -37,6 +37,10 @@ void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& r
 			false);
 		db_helper::add_invitation(myMeeting, invitations_db);
 		db_helper::save_db(config.INVITATIONS_PATH, invitations_db);
+
+		int pause = 0;
+		cin >> pause;
+		
 	}
 		//confirm
 	else if (!abs(messageType.confirm.compare(req_data.at("message"))))
