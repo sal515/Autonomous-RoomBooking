@@ -5,9 +5,9 @@
 #include <chrono>
 std::mutex sendmessage_mutex;
 
-void discarder(json& pendingdb, const string& requestID, const string& meetingDay, 
-	const string& meetingTime, const string& requesterID,
-	std::queue<socket_messages>& sending_messages_queue);
+// void discarder(json& pendingdb, const string& requestID, const string& meetingDay, 
+// 	const string& meetingTime, const string& requesterID,
+// 	std::queue<socket_messages>& sending_messages_queue);
 
 void processMessages(
 	json& db,
@@ -67,7 +67,7 @@ void processMessages(
 				// string toSend = meetingInv.dump();
 				for (string ip : req_data.at("invitedParticipantsIP"))
 				{
-					if(abs(ip.compare(requesterIP)))
+					if (abs(ip.compare(requesterIP)))
 					{
 						// sockaddr_in client = clientMaker(ip);
 						send_message_client(ip, sending_messages_queue, meetingInv);
@@ -76,8 +76,10 @@ void processMessages(
 				string reqID = req_data.at("requestID");
 				string day1 = req_data.at("meetingDay");
 				string time1 = req_data.at("meetingTime");
-				std::thread discards(discarder, ref(pendingdb), ref(reqID), 
-					ref(day1), ref(time1), ref(requesterIP), ref(sending_messages_queue));
+				string roomNum1 = req_data.at("roomNumber");
+				std::thread discards(discarder, ref(pendingdb), ref(reqID),
+				                     ref(day1), ref(time1), ref(roomNum1), ref(requesterIP),
+				                     ref(sending_messages_queue));
 				discards.join();
 				return;
 			}
@@ -310,7 +312,7 @@ void processMessages(
 }
 
 void send_message_client(
-	const string &ip,
+	const string& ip,
 	std::queue<socket_messages>& sending_messages_queue,
 	const json& msg)
 {
@@ -339,41 +341,61 @@ sockaddr_in clientMaker(string requesterIP)
 	return client;
 }
 
-void discarder(json& pendingdb, 
-	const string& requestID, 
-	const string& meetingDay, 
-	const string& meetingTime, 
-	const string& requesterID,
-	std::queue<socket_messages>& sending_messages_queue) {
+void discarder(json& pendingdb,
+               const string& requestID,
+               const string& meetingDay,
+               const string& meetingTime,
+               const string& meetingRoom,
+               const string& requesterID,
+               std::queue<socket_messages>& sending_messages_queue)
+{
 	std::this_thread::sleep_for(std::chrono::seconds(30));
-	if (!pendingdb.at(meetingDay).at(meetingTime).empty()) {
-		if (pendingdb.at(meetingDay).at(meetingTime).at("requestID") == requestID
-			&& pendingdb.at(meetingDay).at(meetingTime).at("requesterIP") == requesterID) {
+
+	if (!pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).empty())
+	{
+		if (pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).at("requestID") == requestID
+			&& pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).at("requesterIP") == requesterID)
+		{
 			vector<string> ips;
-			for (auto& invitees : pendingdb.at(meetingDay).at(meetingTime).at("invitedParticipantsIP")) {
+			
+			for (auto& invitees : pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).at("invitedParticipantsIP"))
+			{
 				ips.push_back(invitees.dump());
-				for (auto& acceptees : pendingdb.at(meetingDay).at(meetingTime).at("confirmedParticipantsIP")) {
-					if (!invitees.dump().compare(acceptees.dump())) {
+				for (auto& acceptees : pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).at(
+					     "confirmedParticipantsIP"))
+				{
+					if (!invitees.dump().compare(acceptees.dump()))
+					{
 						ips.pop_back();
 					}
 				}
 			}
-			for (auto& ip : ips) {
-				send_message_client(ip, sending_messages_queue, pendingdb.at(meetingDay).at(meetingTime));
+
+			for (auto& ip : ips)
+			{
+				send_message_client(ip, sending_messages_queue, pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom));
 			}
+			
 			std::this_thread::sleep_for(std::chrono::seconds(30));
-			if (pendingdb.at(meetingDay).at(meetingTime).at("requestID") == requestID
-				&& pendingdb.at(meetingDay).at(meetingTime).at("requesterIP") == requesterID) {
+			
+			if (pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).at("requestID") == requestID
+				&& pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).at("requesterIP") == requesterID)
+			{
 				json cancelled;
 				cancelled["requestID"] = requestID;
 				cancelled["message"] = "CANCEL";
 				cancelled["reason"] = "not enough participants";
+
 				send_message_client(requesterID, sending_messages_queue, cancelled);
-				for (auto& invitees : pendingdb.at(meetingDay).at(meetingTime).at("invitedParticipantsIP")) {
+				
+				for (auto& invitees : pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom).at("invitedParticipantsIP"))
+				{
 					send_message_client(invitees, sending_messages_queue, cancelled);
 				}
-				for (auto& requests : pendingdb.at(meetingDay).at(meetingTime)) {
-					if (requests.at("requestID") == requestID && requests.at("requesterIP") == requesterID) {
+				for (auto& requests : pendingdb.at(meetingDay).at(meetingTime).at(meetingRoom))
+				{
+					if (requests.at("requestID") == requestID && requests.at("requesterIP") == requesterID)
+					{
 						requests = json({});
 						break;
 					}
