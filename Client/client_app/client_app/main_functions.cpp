@@ -47,13 +47,13 @@ void menu(
 					int min_participants;
 					string topic;
 
-					cout << "Please provide the day of the week:\n"
+					cout << "Please provide a working day of the week eg. friday:\n"
 						<< "Day: ";
 					cin >> day;
 					day_it = dayMap.find((day));
 					while (day_it == dayMap.end())
 					{
-						cout << "Please provide the day of the week eg. friday :\n"
+						cout << "Please provide a working day of the week eg. friday :\n"
 							<< "Day: ";
 						cin >> day;
 						day_it = dayMap.find(day);
