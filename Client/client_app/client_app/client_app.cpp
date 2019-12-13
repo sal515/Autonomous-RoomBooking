@@ -60,7 +60,7 @@ bool get_client_local_ip(SOCKET s, string& client_local_ip);
 // Please do not call this function - Its already threaded
 void send_to_server(SOCKET s, sockaddr_in serverAddrStr);
 void processMsg(json& db, vector<json>& invitations_db, std::queue<json>& received_messages_queue,
-                std::queue<json>& sending_messages_queue);
+                std::queue<json>& sending_messages_queue, bool autonomous);
 
 int main(void)
 {
@@ -78,7 +78,9 @@ int main(void)
 			db_helper::removeDirectory(config.DIR_LOCAL_STORAGE);
 		}
 	}
-
+	cout << "\n0- Manual\n1-Autonomous\n\n";
+	int autonomous;
+	cin >> autonomous;
 
 	db_helper::createDirectory(config.DIR_LOCAL_STORAGE);
 	db_helper::initialize_db(config.DB_PATH);
@@ -225,7 +227,8 @@ int main(void)
 		ref(db),
 		ref(invitation_db),
 		ref(received_messages_queue),
-		ref(sending_messages_queue));
+		ref(sending_messages_queue),
+		autonomous);
 	//==================== Sending thread call  ===========================
 
 	//==================== Free running UI thread call ===========================
@@ -233,6 +236,7 @@ int main(void)
 	thread thread_UI(
 		menu,
 		ref(db),
+		ref(invitation_db),
 		ref(socket_mutex),
 		ref(sending_messages_queue),
 		ref(received_messages_queue),

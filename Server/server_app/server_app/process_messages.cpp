@@ -63,21 +63,23 @@ void processMessages(
 				// string toSend = meetingInv.dump();
 				for (string ip : req_data.at("invitedParticipantsIP"))
 				{
-					if (abs(ip.compare(requesterIP)))
+					if(abs(ip.compare(requesterIP)))
 					{
 						// sockaddr_in client = clientMaker(ip);
 						send_message_client(ip, sending_messages_queue, meetingInv);
 					}
 				}
-				return;
+				break;
+			}
+			else
+			{
+				// rooms not available - build unavailable reponse for the client
+				// db will not be updated
+				json unavailable = messages::response_unavail(req_data.at("requestID"));
+				// sockaddr_in client = clientMaker(requesterIP);
+				send_message_client(requesterIP, sending_messages_queue, unavailable);
 			}
 		}
-		
-		// rooms not available - build unavailable reponse for the client
-		// db will not be updated
-		json unavailable = messages::response_unavail(req_data.at("requestID"));
-		// sockaddr_in client = clientMaker(requesterIP);
-		send_message_client(requesterIP, sending_messages_queue, unavailable);
 	}
 	else if (!(messageType.accept.compare(req_data.at("message"))) || !(messageType.add.compare(req_data.at("message")))
 	)
@@ -285,7 +287,7 @@ void processMessages(
 }
 
 void send_message_client(
-	const string& ip,
+	const string &ip,
 	std::queue<socket_messages>& sending_messages_queue,
 	const json& msg)
 {

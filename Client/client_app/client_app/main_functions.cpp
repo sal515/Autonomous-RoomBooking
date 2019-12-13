@@ -146,7 +146,7 @@ void menu(
 				if (myMeeting.at("server_confirmation") && !ownIP.compare(myMeeting.at("requesterIP"))) {
 
 					json cancel = messages::cancelMeet(meetingID);
-					push_to_queue(sendingQueue, cancel);
+					queueHelper::push_to_queue(sendingQueue, cancel);
 				}
 
 				break;
