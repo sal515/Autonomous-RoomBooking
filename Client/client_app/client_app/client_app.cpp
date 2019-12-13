@@ -59,7 +59,7 @@ bool get_client_local_ip(SOCKET s, string& client_local_ip);
 
 // Please do not call this function - Its already threaded
 void send_to_server(SOCKET s, sockaddr_in serverAddrStr);
-void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue,
+void processMsg(json& db, vector<json> &invitations_db, std::queue<json>& received_messages_queue,
                 std::queue<json>& sending_messages_queue);
 
 int main(void)
@@ -291,7 +291,7 @@ int main(void)
 	}
 }
 
-void processMsg(json& db, vector<json> invitations_db, std::queue<json>& received_messages_queue,
+void processMsg(json& db, vector<json> &invitations_db, std::queue<json>& received_messages_queue,
                 std::queue<json>& sending_messages_queue)
 {
 	while (true)
