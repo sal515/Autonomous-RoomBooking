@@ -7,6 +7,7 @@ bool autonomous = true;
 
 void menu(
 	json& db,
+	vector<json>& invitations_db,
 	std::mutex& socketMutex,
 	std::queue<json>& sendingQueue,
 	std::queue<json>& receivingQueue,
@@ -171,27 +172,9 @@ void menu(
 						{
 						case 1: // view invitations
 						{
-							vector<json> invites;
-							for (const auto& dayz : db)
-							{
-								for (const auto& timez : dayz)
-								{
-									if (!(timez).empty())
-									{
-										if (!messageType.invite.compare((timez).at("message")))
-										{
-											invites.push_back((timez));
-										}
-									}
-								}
-							}
-							for (int i = 0; i < invites.size(); i++)
-							{
-								meeting thisMeet = meeting::json_to_meetingObj(invites.at(i));
-								meeting::print_meeting(thisMeet);
-							}
+							db_helper::print_invitations(invitations_db);
 							break;
-							//to test
+						
 						}
 						case 2:
 						{
@@ -356,7 +339,7 @@ vector<string> list_of_participants(int min)
 {
 	vector<string> participants;
 	string participants_menu =
-		"\na. add new participant\n v. view list of participants\n s. submit list of participants\n Please enter your selection: ";
+		"\n a. add new participant\n v. view list of participants\n s. submit list of participants\n Please enter your selection: ";
 	string ip;
 	bool loop = true;
 	char choice = 'm';

@@ -23,6 +23,7 @@ string ask_for_ip();
 
 void menu(
 	json& db, 
+	vector<json>& invitations_db,
 	std::mutex& socketMutex, 
 	std::queue<json>& sendingQueue, 
 	std::queue<json>& receivingQueue,
