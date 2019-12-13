@@ -7,6 +7,7 @@ bool autonomous = true;
 
 void menu(
 	json& db,
+	json& invitation_vec,
 	std::mutex& socketMutex,
 	std::queue<json>& sendingQueue,
 	std::queue<json>& receivingQueue,
@@ -155,7 +156,7 @@ void menu(
 					if (!autonomous)
 					{
 						cout << "manual mode" << endl;
-						
+
 						bool subMenu = true;
 						while (subMenu)
 						{
@@ -170,25 +171,31 @@ void menu(
 							{
 							case 1: // view invitations
 								{
-									vector<json> invites;
-									for (const auto& dayz : db)
+									// for (const auto& dayz : db)
+									// {
+									// 	for (const auto& timez : dayz)
+									// 	{
+									// 		if (!(timez).empty())
+									// 		{
+									// 			if (!messageType.invite.compare((timez).at("message")))
+									// 			{
+									// 				invites.push_back((timez));
+									// 			}
+									// 		}
+									// 	}
+									// }
+									//
+									//
+
+									for (json invitation : invitation_vec)
 									{
-										for (const auto& timez : dayz)
+										for (int i = 0; i < invitation.size(); i++)
 										{
-											if (!(timez).empty())
-											{
-												if (!messageType.invite.compare((timez).at("message")))
-												{
-													invites.push_back((timez));
-												}
-											}
+											meeting thisMeet = meeting::json_to_meetingObj(invitation.at(i));
+											meeting::print_meeting(thisMeet);
 										}
 									}
-									for (int i = 0; i < invites.size(); i++)
-									{
-										meeting thisMeet = meeting::json_to_meetingObj(invites.at(i));
-										meeting::print_meeting(thisMeet);
-									}
+
 									break;
 									//to test
 								}
