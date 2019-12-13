@@ -7,11 +7,12 @@ bool autonomous = true;
 
 void menu(
 	json& db,
-	vector<json>& invitation_vec,
+	vector<json>& invitations_db,
 	std::mutex& socketMutex,
 	std::queue<json>& sendingQueue,
 	std::queue<json>& receivingQueue,
-	const string& ownIP)
+	const string& ownIP,
+	bool autonomous)
 {
 	string choiceStr;
 	int choice;
@@ -25,8 +26,9 @@ void menu(
 			cout << "Please select from the following options:\n"
 				<< "1. Book a Room\n"
 				<< "2. Cancel a Meeting\n"
-				<< "3. Check inbox for invitations\n"
+				//<< "3. Check inbox for invitations\n"
 				<< "4. Request to Participate\n"
+				<< "5. Withdraw from a meeting"
 				<< "9. Exit the Program\n"
 				<< "10. Debug: Book a room\n";
 			cin >> choiceStr;
@@ -44,283 +46,287 @@ void menu(
 			switch (choice)
 			{
 			case 1:
-				{
-					string day;
-					// int mm, dd, yyyy, 
-					int hh;
-					int min_participants;
-					string topic;
+			{
+				string day;
+				int hh;
+				int min_participants;
+				string topic;
 
-					cout << "Please provide a working day of the week eg. friday:\n"
+				cout << "Please provide a working day of the week eg. friday:\n"
+					<< "Day: ";
+				cin >> day;
+				day_it = dayMap.find((day));
+				while (day_it == dayMap.end())
+				{
+					cout << "Please provide a working day of the week eg. friday :\n"
 						<< "Day: ";
 					cin >> day;
-					day_it = dayMap.find((day));
-					while (day_it == dayMap.end())
-					{
-						cout << "Please provide a working day of the week eg. friday :\n"
-							<< "Day: ";
-						cin >> day;
-						day_it = dayMap.find(day);
-					}
+					day_it = dayMap.find(day);
+				}
 
 
-					cout << "\nTime of meeting between " << time_day_room::startTime << " and " << time_day_room::
-						endTime << ": " << endl;
+				cout << "\nTime of meeting between " << time_day_room::startTime << " and " << time_day_room::
+					endTime << ": " << endl;
+				cin >> hh;
+
+
+				while (hh > time_day_room::endTime || hh < time_day_room::startTime)
+				{
+					cout << "\nPlease input a valid time between " << time_day_room::startTime << " and " <<
+						time_day_room::endTime << ": " << endl;
 					cin >> hh;
-
-					while (hh > time_day_room::endTime || hh < time_day_room::startTime)
-					{
-						cout << "\nPlease input a valid time between " << time_day_room::startTime << " and " <<
-							time_day_room::endTime << ": " << endl;
-						cin >> hh;
-					}
-
-					if (!db.at(day).at(std::to_string(hh)).empty())
-					{
-						cout <<
-							"A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting."
-							<< endl;
-
-						break;
-					};
-
-
-					cout << "\nTopic of meeting: ";
-					cin >> topic;
-					cout << "\nMinimum number of Participants: ";
-					cin >> min_participants;
-					vector<string> participants = list_of_participants(min_participants);
-
-					//Copy into json to send to server + implement request id with incremental?
-					//variables are day, time, topic, min_participants and participants(list)
-					goodInput = true;
-					// string dayStr = std::to_string(day);
-					string requestID = std::to_string(REQUEST_COUNTER++);
-					string timeH = std::to_string(hh);
-					string minParts = std::to_string(min_participants);
-					// string topic_str = std::to_string(topic);
-
-
-					// TODO: Check if it available to request
-
-					json request = messages::request(
-						requestID,
-						day,
-						timeH,
-						minParts,
-						participants,
-						topic
-					);
-
-					meeting requestMetObj = meeting(
-						messageType.request,
-						minParts,
-						requestID,
-						"",
-						participants,
-						vector<string>{},
-						"",
-						topic,
-						day,
-						timeH,
-						ownIP,
-						false,
-						false
-					);
-
-					meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
-					db_helper::save_db(config.DB_PATH, db);
-
-					queueHelper::push_to_queue(sendingQueue, request);
-
-					break;
 				}
-			case 2:
+
+				if (!db.at(day).at(std::to_string(hh)).empty())
 				{
-					string meetingID;
-					while (db_helper::getMeetingByID(meetingID, db).empty())
-					{
-						cout << "\nPlease enter a meeting ID: ";
-						cin >> meetingID;
-					}
-					//check if meeting in agenda.
-					//check if meeting creator is same IP.
-					//if it is, send cancellation.
-					goodInput = true;
-					messages message;
-					json cancel = message.cancelMeet(meetingID);
+					cout <<
+						"A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting."
+						<< endl;
+
 					break;
+				};
+
+				cout << "\nTopic of meeting: ";
+				cin >> topic;
+				cout << "\nMinimum number of Participants: ";
+				cin >> min_participants;
+				vector<string> participants = list_of_participants(min_participants);
+
+				goodInput = true;
+				// string dayStr = std::to_string(day);
+				string requestID = std::to_string(REQUEST_COUNTER++);
+				string timeH = std::to_string(hh);
+				string minParts = std::to_string(min_participants);
+				// string topic_str = std::to_string(topic);
+
+
+
+				json request = messages::request(
+					requestID,
+					day,
+					timeH,
+					minParts,
+					participants,
+					topic
+				);
+
+				meeting requestMetObj = meeting(
+					messageType.request,
+					minParts,
+					requestID,
+					"",
+					participants,
+					vector<string>{},
+					"",
+					topic,
+					day,
+					timeH,
+					ownIP,
+					false,
+					false
+				);
+
+				meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
+				db_helper::save_db(config.DB_PATH, db);
+
+				queueHelper::push_to_queue(sendingQueue, request);
+
+				break;
+			}
+			case 2: //Cancel a Meeting
+			{
+				string meetingID;
+				while (db_helper::getMeetingByID(meetingID, db).empty())
+				{
+					cout << "\nPlease enter a valid meeting ID: ";
+					cin >> meetingID;
 				}
+
+				json myMeeting = db_helper::getMeetingByID(meetingID, db);
+
+				if (myMeeting.at("server_confirmation") && !ownIP.compare(myMeeting.at("requesterIP"))) {
+
+					json cancel = messages::cancelMeet(meetingID);
+					queueHelper::push_to_queue(sendingQueue, cancel);
+				}
+
+				break;
+			}
 			case 3:
+			{
+				if (!autonomous)
 				{
-					if (!autonomous)
-					{
-						cout << "manual mode" << endl;
 
-						bool subMenu = true;
-						while (subMenu)
+					cout << "manual mode" << endl;
+
+					bool subMenu = true;
+					while (subMenu)
+					{
+						cout << "\n1. View your invitations (Accepted and Rejected)\n"
+							<< "2. Accept invitation\n"
+							<< "3. Decline invitation\n"
+							<< "4. Request to join meeting\n"
+							<< "5. Withdraw from meeting\n"
+							<< "9. Go back to previous menu\n";
+						cin >> choice;
+						switch (choice)
 						{
-							cout << "\n1. View your invitations (Accepted and Rejected)\n"
-								<< "2. Accept invitation\n"
-								<< "3. Decline invitation\n"
-								<< "4. Request to join meeting\n"
-								<< "5. Withdraw from meeting\n"
-								<< "9. Go back to previous menu\n";
-							cin >> choice;
-							switch (choice)
-							{
-							case 1: // view invitations
-								{
-									// for (const auto& dayz : db)
-									// {
-									// 	for (const auto& timez : dayz)
-									// 	{
-									// 		if (!(timez).empty())
-									// 		{
-									// 			if (!messageType.invite.compare((timez).at("message")))
-									// 			{
-									// 				invites.push_back((timez));
-									// 			}
-									// 		}
-									// 	}
-									// }
-									//
-									//
-
-									for (json invitation : invitation_vec)
-									{
-										for (int i = 0; i < invitation.size(); i++)
-										{
-											meeting thisMeet = meeting::json_to_meetingObj(invitation.at(i));
-											meeting::print_meeting(thisMeet);
-										}
-									}
-
-									break;
-									//to test
-								}
-							case 2: // accept invitation
-							case 4:
-								{
-									string meet_ID;
-									while (db_helper::getMeetingByID(meet_ID, db).empty())
-									{
-										cout << "\nPlease enter a meeting ID: ";
-										cin >> meet_ID;
-									}
-									json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
-									meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
-									thisMeeting.meetingStatus = true;
-									//send msg to RBMS 
-
-									// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
-									// check if meeting in agenda
-									// put acceptance if in local agenda.
-									//store in json
-									goodInput = true;
-									break;
-								}
-							case 3: // decline invitation
-							case 5: // withdraw
-								{
-									string meet_ID;
-									while (db_helper::getMeetingByID(meet_ID, db).empty())
-									{
-										cout << "\nPlease enter a meeting ID: ";
-										cin >> meet_ID;
-									}
-									json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
-									meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
-									thisMeeting.meetingStatus = false;
-									//send msg to RBMS 
-
-									// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
-									// check if meeting in agenda
-									// put withdraw if in local agenda.
-									//store in json
-									goodInput = true;
-									break;
-								}
-							case 9:
-								{
-									cout << endl;
-									subMenu = false;
-									break;
-								}
-							}
+						case 1: // view invitations
+						{
+							db_helper::print_invitations(invitations_db);
+							break;
+						
 						}
-						break;
+						case 2:
+						{
+							string meet_ID;
+							while (db_helper::getMeetingByID(meet_ID, db).empty())
+							{
+								cout << "\nPlease enter a valid meeting ID: ";
+								cin >> meet_ID;
+							}
+
+							json accept = messages::accept_inv(meet_ID);
+							queueHelper::push_to_queue(sendingQueue, accept);
+
+							break;
+
+						}
+						case 3:
+						{
+							string meet_ID;
+							while (db_helper::getMeetingByID(meet_ID, db).empty())
+							{
+								cout << "\nPlease enter a valid meeting ID: ";
+								cin >> meet_ID;
+							}
+
+							json reject = messages::reject_inv(meet_ID);
+							queueHelper::push_to_queue(sendingQueue, reject);
+
+							break;
+
+						}
+						case 4:
+						{
+							string meet_ID;
+							while (db_helper::getMeetingByID(meet_ID, db).empty())
+							{
+								cout << "\nPlease enter a valid meeting ID: ";
+								cin >> meet_ID;
+							}
+							json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
+							meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
+							//thisMeeting.meetingStatus = true;
+							//send msg to RBMS 
+
+							// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
+							// check if meeting in agenda
+							// put acceptance if in local agenda.
+							//store in json
+							goodInput = true;
+							break;
+						}
+						case 5: // withdraw
+						{
+							string meet_ID;
+							while (db_helper::getMeetingByID(meet_ID, db).empty())
+							{
+								cout << "\nPlease enter a meeting ID: ";
+								cin >> meet_ID;
+							}
+							json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
+							meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
+							thisMeeting.meetingStatus = false;
+							//send msg to RBMS 
+
+							// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
+							// check if meeting in agenda
+							// put withdraw if in local agenda.
+							//store in json
+							goodInput = true;
+							break;
+						}
+						case 9:
+						{
+							cout << endl;
+							subMenu = false;
+							break;
+						}
+						}
 					}
-					cout << "Autonomous mode: this selection doesn't do anything" << endl;
 					break;
 				}
+				cout << "Autonomous mode: this selection doesn't do anything" << endl;
+				break;
+			}
 			case 9:
-				{
-					// exit_program = true;
+			{
+				// exit_program = true;
 
-					cout << "exiting program";
-					return;
-				}
+				cout << "exiting program";
+				return;
+			}
 			case 10:
+			{
+				// This is purely a test case
+
+				string requestID = std::to_string(REQUEST_COUNTER++);
+				string day = "friday";
+				string timeH = "10";
+				string minParts = "1";
+				vector<string> participants = {
+					"192.168.0.183",
+					"192.168.0.106",
+					"172.31.8.16",
+					"192.168.1.133"
+				};
+				string topic = "Test topic";
+
+
+				json request = messages::request(
+					requestID,
+					day,
+					timeH,
+					minParts,
+					participants,
+					topic
+				);
+
+				meeting requestMetObj = meeting(
+					messageType.request,
+					minParts,
+					requestID,
+					"",
+					participants,
+					vector<string>{},
+					"",
+					topic,
+					day,
+					timeH,
+					ownIP,
+					false,
+					false
+				);
+
+
+				if (!db.at(requestMetObj.meetingDay).at(requestMetObj.meetingTime).empty())
 				{
-					// This is purely a test case
-
-					string requestID = std::to_string(REQUEST_COUNTER++);
-					string day = "friday";
-					string timeH = "10";
-					string minParts = "1";
-					vector<string> participants = {
-						"192.168.0.183",
-						"192.168.0.106",
-						"172.31.8.16",
-						"192.168.1.133"
-					};
-					string topic = "Test topic";
-
-
-					json request = messages::request(
-						requestID,
-						day,
-						timeH,
-						minParts,
-						participants,
-						topic
-					);
-
-					meeting requestMetObj = meeting(
-						messageType.request,
-						minParts,
-						requestID,
-						"",
-						participants,
-						vector<string>{},
-						"",
-						topic,
-						day,
-						timeH,
-						ownIP,
-						false,
-						false
-					);
-
-
-					if (!db.at(requestMetObj.meetingDay).at(requestMetObj.meetingTime).empty())
-					{
-						REQUEST_COUNTER--;
-						cout <<
-							"A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting."
-							<< endl;
-						break;
-					};
-
-					meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
-
-					db_helper::save_db(config.DB_PATH, db);
-
-					queueHelper::push_to_queue(sendingQueue, request);
-
+					REQUEST_COUNTER--;
+					cout <<
+						"A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting."
+						<< endl;
 					break;
-				}
+				};
+
+				meeting::update_meeting(db, day, timeH, meeting::meetingObj_to_json(requestMetObj));
+
+				db_helper::save_db(config.DB_PATH, db);
+
+				queueHelper::push_to_queue(sendingQueue, request);
+
+				break;
+			}
 			default:
 				cout << "Please enter a valid input\n";
 			}
@@ -334,7 +340,7 @@ vector<string> list_of_participants(int min)
 {
 	vector<string> participants;
 	string participants_menu =
-		"\na. add new participant\n v. view participants\n f. finish\n Please enter your selection: ";
+		"\n a. add new participant\n v. view list of participants\n s. submit list of participants\n Please enter your selection: ";
 	string ip;
 	bool loop = true;
 	char choice = 'm';
@@ -344,15 +350,30 @@ vector<string> list_of_participants(int min)
 		cin >> choice;
 		switch (choice)
 		{
-			// case 'm': //show menu
-			// 	cout << participants_menu;
-			// 	cin >> choice;
-			// 	break;
-		case 'a': //add participants
+
+		case 'a': //add new participant
+		{
+			cout << "IP: ";
+			cin >> ip;
+			if (participants.empty())
 			{
-				cout << "IP: ";
-				cin >> ip;
-				if (participants.empty())
+				if (check_ip(ip))
+				{
+					participants.push_back(ip);
+				}
+				else
+				{
+					cout << "IP address is not valid.\n"; //TODO: UDP should not check if address valid or not
+				}
+			}
+			else
+			{
+				vector<string>::iterator it = find(participants.begin(), participants.end(), ip);
+				if (it != participants.end())
+				{
+					cout << "Participant is already part of the list\n";
+				}
+				else
 				{
 					if (check_ip(ip))
 					{
@@ -363,59 +384,41 @@ vector<string> list_of_participants(int min)
 						cout << "IP address is not valid.\n";
 					}
 				}
-				else
-				{
-					vector<string>::iterator it = find(participants.begin(), participants.end(), ip);
-					if (it != participants.end())
-					{
-						cout << "Participant is already part of the list\n";
-					}
-					else
-					{
-						if (check_ip(ip))
-						{
-							participants.push_back(ip);
-						}
-						else
-						{
-							cout << "IP address is not valid.\n";
-						}
-					}
-				}
-				break;
 			}
+			break;
+		}
 		case 'v':
+		{
+			//output list of participants
+			for (auto participant : participants)
 			{
-				//output list of participants
-				for (auto participant : participants)
-				{
-					cout << participant << endl;
-				}
-				break;
+				cout << participant << endl;
 			}
-		case 'f':
-			{
-				//check if list is complete
-				if (min <= static_cast<int>(participants.size()))
-				{
-					loop = false;
-				}
-				else
-				{
-					cout << "The total number of participants is smaller than the minimum required.\nYou need to add "
-						<< min - participants.size() << " more participants.\n";
-				}
-				break;
-			}
-		case 'e':
+			break;
+		}
+		case 's':
+		{
+			//check if list is complete
+			if (min <= static_cast<int>(participants.size()))
 			{
 				loop = false;
-				break;
 			}
-		default:
+			else
 			{
-				cout << "Please input a valid choice.\n";
+				cout << "The total number of participants is smaller than the minimum required.\nYou need to add "
+					<< min - participants.size() << " more participants.\n";
 			}
+			break;
+		}
+		case 'e':
+		{
+			loop = false;
+			break;
+		}
+		default:
+		{
+			cout << "Please input a valid choice.\n";
+		}
 		}
 	}
 	return participants;

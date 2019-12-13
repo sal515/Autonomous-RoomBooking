@@ -6,13 +6,9 @@
 // void (json& db, const json& req_data) {
 
 void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& received_messages_queue,
-                     std::queue<json>& sending_messages_queue)
+                     std::queue<json>& sending_messages_queue, bool autonomous)
 {
-	// scheduled that meeting is happening
-	// not_scheduled
-	// response unavailable
-	// confirmed x
-	// invitation
+
 	json req_data = received_messages_queue.front();
 
 	bool exit = false;
@@ -35,12 +31,23 @@ void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& r
 			req_data.at("requesterIP"),
 			false,
 			false);
-		db_helper::add_invitation(myMeeting, invitations_db);
-		db_helper::save_db(config.INVITATIONS_PATH, invitations_db);
+			db_helper::add_invitation(myMeeting, invitations_db);
+			db_helper::save_db(config.INVITATIONS_PATH, invitations_db); 
+
+			if (autonomous) {
+				if (meeting::get_meeting(db, req_data.at("meetingDay"), req_data.at("meetingTime")).empty()) {
+
+					json accept = messages::accept_inv(req_data.at("meetingID"));
+					queueHelper::push_to_queue(sending_messages_queue, accept);
+				}
+				else {
+					json reject = messages::reject_inv(req_data.at("meetingID"));
+					queueHelper::push_to_queue(sending_messages_queue, reject);
+				}
+			}
 
 		int pause = 0;
 		cin >> pause;
-		
 	}
 		//confirm
 	else if (!abs(messageType.confirm.compare(req_data.at("message"))))
@@ -69,7 +76,7 @@ void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& r
 			db_helper::remove_invitation(req_data.at("meetingID"), invitations_db);
 			//cout << endl << "----------" << "Meeting " << req_data.at("meetingID") << " cancelled." << endl <<
 			//"Number of participants is lower than minimum required." << endl;
-			//TODO log Meeting Cancelled
+
 		}
 	}
 		//response unavailable
@@ -86,7 +93,7 @@ void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& r
 					meeting::update_meeting(db, time.at("meetingDay"), time.at("meetingTime"), json({}));
 
 					db_helper::save_db(config.DB_PATH, db);
-					//TODO  log Request denied
+
 					cout << endl << "----------" << "Request " << requestId <<
 						" denied. Room is unavailable. Meeting removed from MS or agenda." << endl;
 
@@ -118,7 +125,7 @@ void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& r
 						db_meeting.confirmedParticipantsIP.push_back(element);
 					}
 
-					//TODO log meeting NOT scheduled
+
 					meeting::update_meeting(db, time.at("meetingDay"), time.at("meetingTime"), json({}));
 					db_helper::save_db(config.DB_PATH, db);
 					exit = true;
@@ -152,8 +159,6 @@ void processMessages(json& db, vector<json>& invitations_db, std::queue<json>& r
 					{
 						thisMeeting.confirmedParticipantsIP.push_back(element);
 					}
-
-					//TODO log schedule successful
 
 					meeting::update_meeting(db, thisMeeting.meetingDay, thisMeeting.meetingTime,
 					                        meeting::meetingObj_to_json(thisMeeting));
