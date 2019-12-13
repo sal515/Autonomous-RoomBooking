@@ -168,5 +168,10 @@ bool meeting::update_meeting(json& db, const string& day, const string& time, co
 // is meetting already booked at the given time and day
 bool meeting::isMeeting(json& db, const string& day, const string& time, const string& room)
 {
+	// checks at the specified time and day in the room - if a meeting is being held
+	// if a meeting is being held:
+	//		return true
+	// else
+	//		return false
 	return !meeting::get_meeting(db, day, time, room).empty();
 }
