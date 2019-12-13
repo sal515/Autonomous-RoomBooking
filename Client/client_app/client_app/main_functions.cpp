@@ -2,6 +2,9 @@
 
 #include "main_functions.h"
 
+
+bool autonomous = true;
+
 void menu(
 	json& db,
 	std::mutex& socketMutex,
@@ -71,9 +74,11 @@ void menu(
 						cin >> hh;
 					}
 
-					if(!db.at(day).at(std::to_string(hh)).empty())
+					if (!db.at(day).at(std::to_string(hh)).empty())
 					{
-						cout << "A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting." << endl;
+						cout <<
+							"A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting."
+							<< endl;
 
 						break;
 					};
@@ -147,92 +152,99 @@ void menu(
 				}
 			case 3:
 				{
-					bool subMenu = true;
-					while (subMenu)
+					if (!autonomous)
 					{
-						cout << "\n1. View your invitations (Accepted and Rejected)\n"
-							<< "2. Accept invitation\n"
-							<< "3. Decline invitation\n"
-							<< "4. Request to join meeting\n"
-							<< "5. Withdraw from meeting\n"
-							<< "9. Go back to previous menu\n";
-						cin >> choice;
-						switch (choice)
+						cout << "manual mode" << endl;
+						
+						bool subMenu = true;
+						while (subMenu)
 						{
-						case 1: // view invitations
+							cout << "\n1. View your invitations (Accepted and Rejected)\n"
+								<< "2. Accept invitation\n"
+								<< "3. Decline invitation\n"
+								<< "4. Request to join meeting\n"
+								<< "5. Withdraw from meeting\n"
+								<< "9. Go back to previous menu\n";
+							cin >> choice;
+							switch (choice)
 							{
-								vector<json> invites;
-								for (const auto& dayz : db)
+							case 1: // view invitations
 								{
-									for (const auto& timez : dayz)
+									vector<json> invites;
+									for (const auto& dayz : db)
 									{
-										if (!(timez).empty())
+										for (const auto& timez : dayz)
 										{
-											if (!messageType.invite.compare((timez).at("message")))
+											if (!(timez).empty())
 											{
-												invites.push_back((timez));
+												if (!messageType.invite.compare((timez).at("message")))
+												{
+													invites.push_back((timez));
+												}
 											}
 										}
 									}
+									for (int i = 0; i < invites.size(); i++)
+									{
+										meeting thisMeet = meeting::json_to_meetingObj(invites.at(i));
+										meeting::print_meeting(thisMeet);
+									}
+									break;
+									//to test
 								}
-								for (int i = 0; i < invites.size(); i++)
+							case 2: // accept invitation
+							case 4:
 								{
-									meeting thisMeet = meeting::json_to_meetingObj(invites.at(i));
-									meeting::print_meeting(thisMeet);
-								}
-								break;
-								//to test
-							}
-						case 2: // accept invitation
-						case 4:
-							{
-								string meet_ID;
-								while (db_helper::getMeetingByID(meet_ID, db).empty())
-								{
-									cout << "\nPlease enter a meeting ID: ";
-									cin >> meet_ID;
-								}
-								json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
-								meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
-								thisMeeting.meetingStatus = true;
-								//send msg to RBMS 
+									string meet_ID;
+									while (db_helper::getMeetingByID(meet_ID, db).empty())
+									{
+										cout << "\nPlease enter a meeting ID: ";
+										cin >> meet_ID;
+									}
+									json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
+									meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
+									thisMeeting.meetingStatus = true;
+									//send msg to RBMS 
 
-								// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
-								// check if meeting in agenda
-								// put acceptance if in local agenda.
-								//store in json
-								goodInput = true;
-								break;
-							}
-						case 3: // decline invitation
-						case 5: // withdraw
-							{
-								string meet_ID;
-								while (db_helper::getMeetingByID(meet_ID, db).empty())
-								{
-									cout << "\nPlease enter a meeting ID: ";
-									cin >> meet_ID;
+									// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
+									// check if meeting in agenda
+									// put acceptance if in local agenda.
+									//store in json
+									goodInput = true;
+									break;
 								}
-								json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
-								meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
-								thisMeeting.meetingStatus = false;
-								//send msg to RBMS 
+							case 3: // decline invitation
+							case 5: // withdraw
+								{
+									string meet_ID;
+									while (db_helper::getMeetingByID(meet_ID, db).empty())
+									{
+										cout << "\nPlease enter a meeting ID: ";
+										cin >> meet_ID;
+									}
+									json meetJsonObj = db_helper::getMeetingByID(meet_ID, db);
+									meeting thisMeeting = meeting::json_to_meetingObj(meetJsonObj);
+									thisMeeting.meetingStatus = false;
+									//send msg to RBMS 
 
-								// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
-								// check if meeting in agenda
-								// put withdraw if in local agenda.
-								//store in json
-								goodInput = true;
-								break;
-							}
-						case 9:
-							{
-								cout << endl;
-								subMenu = false;
-								break;
+									// meeting::update_meeting(db, meetJsonObj.at("day"), meetJsonObj.at("time"), meeting::meetingObj_to_json(thisMeeting));
+									// check if meeting in agenda
+									// put withdraw if in local agenda.
+									//store in json
+									goodInput = true;
+									break;
+								}
+							case 9:
+								{
+									cout << endl;
+									subMenu = false;
+									break;
+								}
 							}
 						}
+						break;
 					}
+					cout << "Autonomous mode: this selection doesn't do anything" << endl;
 					break;
 				}
 			case 9:
@@ -288,7 +300,9 @@ void menu(
 					if (!db.at(requestMetObj.meetingDay).at(requestMetObj.meetingTime).empty())
 					{
 						REQUEST_COUNTER--;
-						cout << "A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting." << endl;
+						cout <<
+							"A meeting already exists, cannot schedule a new meeting without cancellation or withdrawal of the current meeting."
+							<< endl;
 						break;
 					};
 
