@@ -108,9 +108,14 @@ int main(void)
 	//
 	// logger::add_received_log(config.SENT_RECEIVED_LOG_PATH, jsonMsg);
 	//
-	// test_pause_exit();
 	//
+
+	// json jmsg;
+	// jmsg["testField"] = "hello";
+	// cout << jmsg.empty() << endl;
+	// test_pause_exit();
 	// return 0;
+
 
 	// TODO: Delete test =====================
 
