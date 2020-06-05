@@ -1,6 +1,1 @@
-# COEN445-Autonomous-Roombooking
-
-Instructions - Initial Setup:
-
-The project is setup for Visual studio 2017
-
+Built both Client and Server application that manages room booking for University professors. UDP transport layer protocol is used to communicate between the Client applications and the server.
